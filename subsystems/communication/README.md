@@ -1,7 +1,15 @@
+# Wherehouse: Communication Subsystem
+
+Author(s): Sam Kovnar
+
+## About this repository
 
 This repository contains the code used to test the Communications
 subsystem of the Wherehouse, Team 23's Spring 2023 ECE senior design
 project.
+
+The Communication subsystem is responsible for interactions between the STM32F0 
+microcontroller and ESP8266 Wi-Fi module.
 
 ## Hardware Dependencies
 
