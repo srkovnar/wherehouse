@@ -17,18 +17,41 @@ The code for ESP8266 devices has been tested on Ai-Thinker's ESP8266 ESP-01 modu
 
 ## Software Dependencies
 
+### General
+
+Operating System: Ubuntu 22.04 LTS
+- Code functionality on other operating systems can be neither confirmed nor denied
+
 Arduino IDE v2.0.0 or later
 - This version has been tested on Arduino v2.0.3
 - Certain libraries do not work on versions earlier than v2.0.0 for Linux
 
-ESP8266 Core for Arduino
+### ESP8266 Core for Arduino IDE
+
+ESP8266 Core for Arduino, *version 3.1.1*
 - ESP8266WiFi.h
 - ESP8266HTTPClient.h
 - ESP8266WiFiMulti.h
 
-WiFiClient.h
+Multiple libraries used in the code contained in this project utilize the ESP8266
+core for Arduino IDE. You must make sure that it is installed.
+
+1.  Open Arduino IDE
+2.  Navigate to File > Preferences
+3.  Find the textbox labeled "Additional Board Manager URLs"
+4.  Insert the following link into the box: http://arduino.esp8266.com/stable/package_esp8266com_index.json, then click "OK".
+  - You can have multiple URLs in the box. Just separate them with commas.
+5.  Navigate to "Boards Manager"
+6.  Search for "esp8266"
+7.  Install the board labeled "esp8266 by ESP8266 Community"
+
+### Additional Libraries
 
 ESPAsyncWebServer.h
+- https://github.com/me-no-dev/ESPAsyncWebServer
+
+ESPAsyncTCP.h
+- https://github.com/me-no-dev/ESPAsyncTCP
 
 ## Repository Contents
 
