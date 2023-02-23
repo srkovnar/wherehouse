@@ -15,7 +15,8 @@
 #include <ESP8266WiFiMulti.h>
 
 #define DOTDELAY 2000 //milliseconds
-#define SKIPWIFI 0 //0 = connect, 1 = don't connect
+#define SKIPWIFI 1 //0 = connect, 1 = don't connect automatically
+#define VERBOSE 1 //If 0, don't print anything unnecessary
 
 #define MAX_SSID_LENGTH 32
 #define MAX_PASSWORD_LENGTH 64
@@ -26,14 +27,14 @@
 ESP8266WiFiMulti WiFiMulti;
 
 //const char* ssid      = "Wherehouse";
-char ssid[MAX_SSID_LENGTH] = "Wherehouse";
+char ssid[MAX_SSID_LENGTH+1] = "Wherehouse"; //The +1 is for the null terminator
 //const char* password  = "12345678";
-char password[MAX_PASSWORD_LENGTH] = "12345678";
+char password[MAX_PASSWORD_LENGTH+1] = "12345678";
 
 const char* http_tag = "http://";
 //const char* ip_addr = "192.168.4.1";
 //const char* ip_addr = "192.168.0.101";
-char ip_addr[MAX_IP_LENGTH] = "192.168.0.101";
+char ip_addr[MAX_IP_LENGTH+1] = "192.168.0.101";
 //const char* data_ext = "/data";
 
 const char* data_ext = "/demo/esp-data.php";
@@ -45,6 +46,10 @@ String apiKeyValue = "tPmAT5Ab3j7F9";
 String shelfNumber = "One";
 String led = "WACK";
 String F = "70.25";
+
+char device_id[9] = "0000abcd";
+
+float stock = 0;
 
 
 //For connecting to database
@@ -66,9 +71,15 @@ const char modifier__get = '?';
 const char modifier__set = '=';
 const char modifier__exe = '!';
 
-const char* cmd__ip     = "WF+IP";
-const char* cmd__ssid   = "WF+SSID";
-const char* cmd__pass   = "WF+PW";
+// Read/Write
+const char* cmd__ip     = "WF+IP";    // Hub IP Address
+const char* cmd__ssid   = "WF+SSID";  // Wi-Fi SSID
+const char* cmd__pass   = "WF+PW";    // Wi-Fi Password
+const char* cmd__id     = "WF+ID";    // Device ID
+
+const char* cmd__conn   = "WF+CONN";  // Connect to network
+const char* cmd__disc   = "WF+DISC";  // Disconnect from network
+const char* cmd__send   = "WF+SEND";  // Send data
 
 
 //char cmd[64];
@@ -92,45 +103,6 @@ String httpGETRequest(const char* serverName) {
 
   // Send HTTP POST request
 //  int httpResponseCode = http.GET("");
-  int httpResponseCode = http.GET();
-
-  String payload = "--";
-
-  if (httpResponseCode > 0) {
-    Serial.print("HTTP Response code: ");
-    Serial.println(httpResponseCode);
-    payload = http.getString();
-  }
-  else {
-    Serial.print("Error code: ");
-    Serial.println(httpResponseCode);
-  }
-
-  http.end();
-
-  return payload;
-}
-
-String httpGETRequest_test(
-  const char* serverName
-){
-  WiFiClient client;
-  HTTPClient http;
-
-  String temp_server_name = String(serverName);
-
-  String httpRequestData = ("api_key=" + apiKeyValue + "&shelfnumber=" + shelfNumber + "&temperature=" + F + "&led=" + led);
-  Serial.print("httpRequestData: ");
-  Serial.println(httpRequestData);
-
-  //strcat(temp_server_name, serverName);
-  //strcat(temp_server_name, httpRequestData);
-
-  http.addHeader("Content-Type", "application/x-www-form-urlencoded");
-
-  http.begin(client, temp_server_name+httpRequestData); // Does this work???
-  // ^ Expects (client, String) arguments
-
   int httpResponseCode = http.GET();
 
   String payload = "--";
@@ -212,30 +184,6 @@ int compare_char_array(const char* str1, const char* str2) {
   return mismatch;
 }
 
-bool match_char_arrays(const char* str1, const char* str2) {
-  /*  Similar to compare_char_arrays, but with bool return.*/
-  int L1;
-  int L2;
-  int minlength;
-  int i;
-  bool mismatch;
-
-  L1 = strlen(str1);
-  L2 = strlen(str2);
-  minlength = min(L1, L2);
-
-  i = 0;
-  mismatch = false;
-  while (i < minlength) {
-    if (str1[i] != str2[i]) {
-      mismatch = true;
-    }
-    i++;
-  }
-
-  return mismatch;
-}
-
 int value_tool(int index, const char* cmd, char* value){
   /* this will be capable of setting and getting values, like the IP address*/
   int k;
@@ -283,6 +231,25 @@ int value_tool(int index, const char* cmd, char* value){
   return 0;
 }
 
+int connect() {
+  Serial.print("Connecting to ");
+  Serial.println(ssid);
+
+  WiFi.begin(ssid, password);
+  while (WiFi.status() != WL_CONNECTED) {
+    delay(2000);
+    Serial.print(".");
+  }
+  Serial.println("");
+  Serial.println("Connected to WiFi!");
+
+  // Print IP (Not sure what this does)
+  Serial.println("");
+  Serial.println(WiFi.localIP()); //This is the IP of the ESP8266
+
+  return 0;
+}
+
 int handler(const char* cmd) {
   //Serial.print("Received: ");
   //Serial.println(cmd);
@@ -295,6 +262,8 @@ int handler(const char* cmd) {
 
   int temp;
   int out;
+
+  out = 0;
 
   mismatch = compare_char_array(cmd_header, cmd);
   //Serial.print("Number of mismatches: ");
@@ -330,13 +299,20 @@ int handler(const char* cmd) {
     out = value_tool(5, cmd, ip_addr);
   }
 
+  temp = compare_char_array(cmd, cmd__conn);
+  if (temp == 0) {
+    //Serial.println("Connecting...");
+    out = connect();
+  }
 
-  return 0;
+
+  return out;
 }
 
 
 // === MAIN OPERATION STARTS HERE ===
 void setup() {
+  int temp;
   // put your setup code here, to run once:
   delay(1000);
   Serial.begin(115200);
@@ -347,6 +323,7 @@ void setup() {
     Serial.println("Skipping WiFi connection.");
   }
   else {
+    /*
     Serial.print("Connecting to ");
     Serial.println(ssid);
 
@@ -361,6 +338,8 @@ void setup() {
     // Print IP (Not sure what this does)
     Serial.println("");
     Serial.println(WiFi.localIP()); //This is the IP of the ESP8266
+    */
+    temp = connect();
 
     // Testing dynamic creating of address.
     strcat(buf, http_tag);
