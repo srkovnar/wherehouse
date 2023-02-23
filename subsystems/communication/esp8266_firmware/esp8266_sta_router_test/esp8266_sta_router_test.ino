@@ -16,6 +16,7 @@
 
 #define DOTDELAY 2000 //milliseconds
 #define SKIPWIFI 0 //0 = connect, 1 = don't connect
+#define VERBOSE 1
 
 ESP8266WiFiMulti WiFiMulti;
 
@@ -25,7 +26,8 @@ const char* password  = "12345678";
 //const char* server_name_data = "http://192.168.4.1/data";
 const char* http_tag = "http://";
 //const char* ip_addr = "192.168.4.1";
-const char* ip_addr = "192.168.0.101";
+//const char* ip_addr = "192.168.0.101";
+const char* ip_addr = "192.168.1.102";
 //const char* data_ext = "/data";
 
 const char* data_ext = "/demo/esp-data.php";
@@ -40,7 +42,9 @@ String shelfNumber = "One";
 String led = "WACK";
 String F = "70.25";
 
-String seek_id = "14";
+//String seek_id = "1";
+
+int device_id = 1;
 
 
 //For connecting to database
@@ -134,9 +138,9 @@ String httpGETRequest_id(const char* serverName, int id) {
   HTTPClient http;
 
   String temp_server_name = String(serverName);
-  id_str = String(id);
+  String id_str = String(id);
 
-  String httpRequestData = ("?api_key=" + apiKeyValue + "&id=" + id_str);
+  String httpRequestData = ("?api_key=" + apiKeyValue + "&device=" + id_str);
   Serial.print("httpRequestData: ");
   Serial.println(httpRequestData);
 
@@ -280,7 +284,7 @@ void loop() {
     if ((WiFiMulti.run() == WL_CONNECTED)) {
       //data = httpGETRequest(buf);
       //data = httpGETRequest_test(buf_post);
-      data = httpGETRequest_id(buf_test2, 14);
+      data = httpGETRequest_id(buf_test2, device_id);
       Serial.println("Data: " + data);
       previousMillis = currentMillis;
     }
