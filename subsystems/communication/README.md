@@ -11,6 +11,10 @@ project.
 The Communication subsystem is responsible for interactions between the STM32F0 
 microcontroller and ESP8266 Wi-Fi module.
 
+## TL;DR for TAs and Instructors
+
+The code you're looking for is in subsystems/communication/esp8266_firmware/esp8266_release/esp8266_release.ino. All of the other files in subsystems/communication/esp8266_firmware are used exclusively for testing.
+
 ## Hardware Dependencies
 
 The code for ESP8266 devices has been tested on Ai-Thinker's ESP8266 ESP-01 modules.
@@ -98,5 +102,9 @@ the Arduino IDE serial monitor
     managing data in the final project
     
 **esp8266_sta_router_test**: Test interactions between ESP8266 station and web server via router
+
+### ESP8266 Firmware
+**esp8266_release**: Firmware to be used on device
+- This is the code being used in the *midterm demo*!
 
 

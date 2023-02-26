@@ -15,9 +15,8 @@
 #include <ESP8266WiFiMulti.h>
 
 #define DOTDELAY 2000 //milliseconds
-#define SKIPWIFI 1 //0 = connect, 1 = don't connect automatically
-#define VERBOSE 1
-//#define VERBOSE 0 //If 0, don't print anything unnecessary
+//#define VERBOSE 1
+#define VERBOSE 0 //If 0, don't print anything unnecessary
 
 #define MAX_SSID_LENGTH 32
 #define MAX_PASSWORD_LENGTH 64
@@ -29,21 +28,13 @@
 
 #define ACK "ACK" //Return this on a success (if no data to return)
 #define NACK "NACK" //Return this on a failure
-
 #define HTTP_TAG "http://"
 
 ESP8266WiFiMulti WiFiMulti;
 
-//const char* ssid      = "Wherehouse";
 char ssid[MAX_SSID_LENGTH+1] = "Wherehouse"; //The +1 is for the null terminator
-//const char* password  = "12345678";
 char password[MAX_PASSWORD_LENGTH+1] = "12345678";
-
-const char* http_tag = "http://";
-//const char* ip_addr = "192.168.4.1";
-//const char* ip_addr = "192.168.0.101";
 char ip_addr[MAX_IP_LENGTH+1] = "192.168.1.102";
-//const char* data_ext = "/data";
 
 const char* data_ext = "/demo/esp-data.php";
 const char* post_data_ext = "/demo/post-esp-data.php";
@@ -51,14 +42,19 @@ const char* get_data_ext = "/demo/get-esp-data.php";
 
 //Maybe replace post-esp-data.php with esp-data.php
 
-String apiKeyValue = "tPmAT5Ab3j7F9";
-String shelfNumber = "One";
-String led = "WACK";
-String F = "70.25";
+//String apiKeyValue = "tPmAT5Ab3j7F9";
+String apiKeyValue = "tpmat5ab3j7f9";
+char api_key[32] = "tpmat5ab3j7f9";
+//String shelfNumber = "One";
+//String led = "WACK";
+//String F = "70.25";
+
+//char api_key[MAX_STRING_LENGTH] = "tPmAT5Ab3j7F9"; //Unused
 
 char device_id[9] = "1";
 
-float stock = 0;
+char stock[MAX_STRING_LENGTH] = "0";
+char name[MAX_STRING_LENGTH] = "Widgets";
 
 
 //For connecting to database
@@ -67,11 +63,11 @@ const char* username = "root";
 const char* dbpassword = "";
 
 
-char buf[64]; // For dynamic address creation
-char buf_post[64]; //For POST testing
+//char buf[64]; // For dynamic address creation
+//char buf_post[64]; //For POST testing
 
-char cmd[128]; //Storage for command
-int status;
+//char cmd[128]; //Storage for command
+int status; //Status returned from handling command
 
 
 
@@ -86,11 +82,17 @@ const char* cmd__ssid   = "WF+SSID";  // Wi-Fi SSID
 const char* cmd__pass   = "WF+PW";    // Wi-Fi Password
 const char* cmd__id     = "WF+ID";    // Device ID
 
+const char* cmd__stock  = "WF+STOCK"; // Amount of item in stock
+const char* cmd__name   = "WF+NAME";  // Name of item
+
 const char* cmd__connect      = "WF+CONN";  // Connect to network
 const char* cmd__disconnect   = "WF+DISC";  // Disconnect from network
 
 const char* cmd__send   = "WF+SEND";  // Send data
 const char* cmd__config = "WF+CFG";   // Get configuration (item name, weight, tare)
+
+// Miscellaneous
+const char* cmd__ping   = "WF+PING"; 
 
 //char cmd[64];
 
@@ -104,33 +106,6 @@ String data;
 unsigned long previousMillis = 0;
 const long interval = 5000;
 
-void httpPOSTRequest(const char* serverName) {
-  WiFiClient client;
-  HTTPClient http;
-
-  http.begin(client, serverName);
-
-  http.addHeader("Content-Type", "application/x-www-form-urlencoded");
-
-  String httpRequestData = "api_key=" + apiKeyValue + "&shelfnumber=" + shelfNumber + "&temperature=" + F + "&led=" + led;
-  Serial.print("httpRequestData: ");
-  Serial.println(httpRequestData);
-
-  int httpResponseCode = http.POST(httpRequestData);
-
-  if (httpResponseCode > 0){
-    Serial.print("HTTP Response Code: ");
-    Serial.println(httpResponseCode);
-  }
-  else {
-    Serial.print("Error code: ");
-    Serial.println(httpResponseCode);
-  }
-
-  http.end();
-
-  return;
-}
 
 int compare_char_array(const char* str1, const char* str2) {
   // Return number of mismatches between str1 and str2.
@@ -160,6 +135,7 @@ int compare_char_array(const char* str1, const char* str2) {
   return mismatch;
 }
 
+
 int value_tool(int index, const char* cmd, char* value){
   /* this will be capable of setting and getting values, like the IP address*/
   int k;
@@ -170,7 +146,8 @@ int value_tool(int index, const char* cmd, char* value){
   int cmp;
   
   if (strlen(cmd) <= index) {
-    Serial.println("\tIt's not long enough, mate.");
+    Serial.println("NACK");
+    if (VERBOSE) {Serial.println("\tIt's not long enough, mate.");}
     return 1;
   }
 
@@ -185,15 +162,11 @@ int value_tool(int index, const char* cmd, char* value){
     }
     k++;
   }
-  //Serial.print("Argument: ");
-  //Serial.println(arg);
   
   if (cmd[index] == modifier__get) {
-    //Serial.println("\tIt's a get command");
     Serial.println(value);
   }
   else if (cmd[index] == modifier__set) {
-    //Serial.println("\tIt's a set command");
     strcpy(value, arg);
     cmp = strcmp(value, arg);
     if (cmp == 0) {
@@ -220,6 +193,7 @@ int value_tool(int index, const char* cmd, char* value){
 
   return 0;
 }
+
 
 int connect() {
   int timer = 0;
@@ -260,21 +234,21 @@ int connect() {
   }
 }
 
+
 int disconnect() {
   if (WiFi.status() == WL_CONNECTED) {
     WiFi.disconnect();
   }
+  Serial.println(ACK);
   if (VERBOSE) {
-    Serial.print("Status: ");
+    Serial.print("\tStatus: ");
     Serial.println(WiFi.status());
-  }
-  else {
-    Serial.print(ACK);
   }
   return 0;
 }
 
-int get_config() {
+
+int get_config(const char* api_key/*unused*/) {
   WiFiClient client;
   HTTPClient http;
 
@@ -289,11 +263,9 @@ int get_config() {
   char temp_server_name[64] = "";
 
   if (WiFi.status() != WL_CONNECTED) {
+    Serial.println(NACK);
     if (VERBOSE) {
       Serial.println("\tERROR: Cannot get config, not connected to WiFi");
-    }
-    else {
-      Serial.println(NACK);
     }
     return 1; //No Wifi error
   }
@@ -302,6 +274,7 @@ int get_config() {
   strcat(temp_server_name, ip_addr);
   strcat(temp_server_name, get_data_ext);
 
+  //http_request_data = ("?api_key=" + apiKeyValue + "&device=" + device_id);
   http_request_data = ("?api_key=" + apiKeyValue + "&device=" + device_id);
   server_name = String(temp_server_name);
   full_address = server_name + http_request_data;
@@ -322,6 +295,7 @@ int get_config() {
 
   if (http_response_code > 0) {
     payload = http.getString();
+    payload.trim();
     if (VERBOSE) {
       Serial.print("HTTP response code: ");
       Serial.println(http_response_code);
@@ -338,29 +312,76 @@ int get_config() {
 
   http.end();
 
+  /*
   if (http_response_code == 200) {
     return 0;
   }
   else {
     return 1;
   }
+  */
+  return http_response_code;
 }
 
-/*
-int try_run(const char* cmd, const char* cmd_stub) {
-  int stub_length = strlen(cmd_stub);
-  int cmd_length = strlen(cmd);
 
-  if (cmd_length < stub_length) {return 1;}
+int post_stock() {
+  WiFiClient client;
+  HTTPClient http;
 
-  if (cmd[stub_length] == modifier__run) {
-    
+  String http_request_data;
+  String server_name;
+
+  int http_response_code;
+
+  char temp_server_name[64] = "";
+
+  if (WiFi.status() != WL_CONNECTED) {
+    Serial.println(NACK);
+    if (VERBOSE) {
+      Serial.println("\tERROR: Cannot get config, not connected to WiFi");
+    }
+    return 1; //No Wifi error
+  }
+
+  strcat(temp_server_name, HTTP_TAG);
+  strcat(temp_server_name, ip_addr);
+  strcat(temp_server_name, post_data_ext);
+  server_name = String(temp_server_name);
+  //server_name = HTTP_TAG + ip_addr + post_data_ext;
+
+  http.begin(client, server_name);
+
+  http.addHeader("Content-Type", "application/x-www-form-urlencoded");
+
+  http_request_data = "api_key=" + apiKeyValue + "&device=" + device_id + "&stock=" + stock + "&name=" + name;
+  
+  if (VERBOSE) {
+    Serial.print("http_request_data: ");
+    Serial.println(http_request_data);
+  }
+
+  http_response_code = http.POST(http_request_data);
+
+  if (http_response_code > 0){
+    //Serial.println(ACK);
+    if (VERBOSE) {
+      Serial.print("\tHTTP Response Code: ");
+    }
+    Serial.println(http_response_code);
   }
   else {
-    return 1;
+    Serial.println(NACK);
+    if (VERBOSE) {
+      Serial.print("\tError code: ");
+      Serial.println(http_response_code);
+    }
   }
+
+  http.end();
+
+  return http_response_code;
 }
-*/
+
 
 int handler(const char* cmd) {
   //Serial.print("Received: ");
@@ -411,6 +432,18 @@ int handler(const char* cmd) {
     return out;
   }
 
+  temp = compare_char_array(cmd, cmd__stock);
+  if (temp == 0) {
+    out = value_tool(8, cmd, stock);
+    return out;
+  }
+
+  temp = compare_char_array(cmd, cmd__name);
+  if (temp == 0) {
+    out = value_tool(7, cmd, name);
+    return out;
+  }
+
   // === '!' COMMANDS ===
   temp = compare_char_array(cmd, cmd__connect);
   if (temp == 0) {
@@ -419,6 +452,7 @@ int handler(const char* cmd) {
     if (strlen(cmd) > cmd_length) {
       if (cmd[cmd_length] == modifier__run) {
         out = connect();
+        return out;
       }
       else if (cmd[cmd_length] == modifier__get) {
         if (WiFi.status() == WL_CONNECTED) {
@@ -445,12 +479,8 @@ int handler(const char* cmd) {
       return out;
     }
     else {
-      if (VERBOSE) {
-        Serial.println("\tWF+DISC (disconnect) command only accepts '!' ending.");
-      }
-      else {
-        Serial.println(NACK);
-      }
+      Serial.println(NACK);
+      if (VERBOSE) {Serial.println("\tWF+DISC (disconnect) command only accepts '!' ending.");}
       return 1;
     }
   }
@@ -458,15 +488,43 @@ int handler(const char* cmd) {
   temp = compare_char_array(cmd, cmd__config);
   if (temp == 0) {
     if (cmd[6] == modifier__run) {
-      out = get_config();
+      //out = get_config();
+      out = get_config(apiKeyValue.c_str());
+      return out;
     }
     else {
+      Serial.println(NACK);
       if (VERBOSE) {
         Serial.println("\tWF+CFG (Get config) command only available with '!' ending.");
       }
-      else {
-        Serial.println(NACK);
+      return 1;
+    }
+  }
+
+  temp = compare_char_array(cmd, cmd__send);
+  if (temp == 0) {
+    if (cmd[7] == modifier__run) {
+      out = post_stock();
+      return out;
+    }
+    else {
+      Serial.println(NACK);
+      if (VERBOSE) {
+        Serial.println("\tWF+SEND (Send stock) command only available with '!' ending.");
       }
+      return 1;
+    }
+  }
+
+  temp = compare_char_array(cmd, cmd__ping);
+  if (temp == 0) {
+    if (cmd[7] == modifier__run) {
+      Serial.println(ACK);
+      return 0;
+    }
+    else {
+      Serial.println(NACK);
+      if (VERBOSE) {Serial.println("\tUnrecognized extension for WF+PING; expected '!'");}
       return 1;
     }
   }
@@ -489,62 +547,7 @@ void setup() {
   Serial.println();
   delay(1000);
 
-  if (SKIPWIFI) {
-    Serial.println("Skipping WiFi connection.");
-  }
-  else {
-    /*
-    Serial.print("Connecting to ");
-    Serial.println(ssid);
-
-    WiFi.begin(ssid, password);
-    while (WiFi.status() != WL_CONNECTED) {
-      delay(2000);
-      Serial.print(".");
-    }
-    Serial.println("");
-    Serial.println("Connected to WiFi!");
-
-    // Print IP (Not sure what this does)
-    Serial.println("");
-    Serial.println(WiFi.localIP()); //This is the IP of the ESP8266
-    */
-    temp = connect();
-
-    // Testing dynamic creating of address.
-    strcat(buf, HTTP_TAG);
-    strcat(buf, ip_addr);
-    strcat(buf, data_ext);
-    Serial.println(buf);
-
-    strcat(buf_post, HTTP_TAG);
-    strcat(buf_post, ip_addr);
-    strcat(buf_post, post_data_ext);
-    Serial.println(buf_post);
-
-    /*
-    while (i < STOP) {
-      Serial.print("Waiting... (");
-      Serial.print(i);
-      Serial.print("/");
-      Serial.print(STOP);
-      Serial.println(")");
-      i++;
-      delay(500);
-    }
-
-    WiFi.disconnect();
-    //WiFi.mode(WIFI_OFF); //This is similar to disconnect, but saves previous credentials (you can turn it back on)
-    Serial.println("Disconnected");
-    */
-
-    /*
-    if ((WiFiMulti.run() == WL_CONNECTED)) {
-      httpPOSTRequest(buf_post);
-    }
-    Serial.println("Post finished.\n");
-    */
-  }
+  if (VERBOSE) {Serial.println("Ready.");}
 }
 
 void loop() {
