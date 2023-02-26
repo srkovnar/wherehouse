@@ -13,7 +13,7 @@ microcontroller and ESP8266 Wi-Fi module.
 
 ## TL;DR for TAs and Instructors
 
-The code you're looking for is in subsystems/communication/esp8266_firmware/esp8266_release/esp8266_release.ino. All of the other files in subsystems/communication/esp8266_firmware are used exclusively for testing.
+The code you're looking for is at `subsystems/communication/esp8266_firmware/esp8266_release/esp8266_release.ino`. All of the other files in `subsystems/communication/esp8266_firmware` are used for testing. If you want to see my code, that's where you should look.
 
 ## Hardware Dependencies
 
