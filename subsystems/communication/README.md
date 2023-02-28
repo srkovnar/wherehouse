@@ -10,7 +10,8 @@ Author(s): Sam Kovnar
 4. [Software Dependencies](#software)
     1. [General](#sw_general)
     2. [ESP8266 Core for Arduino IDE](#esp8266core)
-    3. [Additional Libraries](#sw_libraries)
+    3. [Additional Firmware Libraries](#fw_libraries)
+    4. [KiCad Libraries](#kicad_libraries)
 5. [ESP8266 Firmware](#esp_firmware)
     1. [Testing Phase 1](#esp_fw_t1)
     2. [Testing Phase 2](#esp_fw_t2)
@@ -49,6 +50,8 @@ Arduino IDE v2.0.0 or later
 - This version has been tested on Arduino v2.0.3
 - Certain libraries do not work on versions earlier than v2.0.0 for Linux
 
+KiCad *(version 6.0)*
+
 ### ESP8266 Core for Arduino IDE <a name="esp8266core"></a>
 
 ESP8266 Core for Arduino *(version 3.1.1)*
@@ -68,15 +71,27 @@ Core for Arduino IDE. You must make sure that it is installed.
 6.  Search for "esp8266"
 7.  Install the board labeled "esp8266 by ESP8266 Community"
 
-### Additional Libraries <a name="sw_libraries"></a>
+### Additional Firmware Libraries <a name="fw_libraries"></a>
 
-ESPAsyncWebServer.h
-- https://github.com/me-no-dev/ESPAsyncWebServer
+ESPAsyncWebServer.h (https://github.com/me-no-dev/ESPAsyncWebServer)
 - This is used by the project
 
-ESPAsyncTCP.h
-- https://github.com/me-no-dev/ESPAsyncTCP
+ESPAsyncTCP.h (https://github.com/me-no-dev/ESPAsyncTCP)
 - Required for ESPAsyncWebServer.h to work
+
+### KiCad Libraries <a name="kicad_libraries"></a>
+
+kicad-ESP8266 (https://github.com/jdunmire/kicad-ESP8266)
+- Contains schematic and PCB footprints for most commonly used ESP8266 modules, including the ESP-01 which is being used in this project.
+- Installation instructions:
+    1. Download files from the Github link listed above
+    2. Open KiCad
+    3. In the toolbar, go to "Preferences", then click on "Manage Symbol Libraries". A window will appear.
+    4. In the window that just appeared, click on "Global Libraries" near the top.
+    5. Click on the Folder icon near the bottom.
+    6. In the file browser that appears, find the file `kicad-ESP8266/ESP8266.lib`. Click on it, then click "Open".
+    7. Name it "ESP8266", then click "OK".
+    8. Repeat steps 3 through 7, but go to "Manage Footprint Libraries" instead of "Manage Symbol Libraries".
 
 ## Firmware <a name="esp_firmware"></a>
 
