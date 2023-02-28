@@ -15,11 +15,16 @@ project.
 The Communication subsystem is responsible for interactions between the STM32F0 
 microcontroller and ESP8266 Wi-Fi module.
 
-## Hardware Dependencies
+### Table of Contents
+
+1. [Hardware Dependencies](#hardware)
+2. [Software Dependencies](#software)
+
+## Hardware Dependencies <a name="hardware"></a>
 
 The code for ESP8266 devices has been tested on Ai-Thinker's ESP8266 ESP-01 modules.
 
-## Software Dependencies
+## Software Dependencies <a name="software"></a>
 
 ### General
 
