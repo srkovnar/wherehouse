@@ -2,18 +2,18 @@
 
 Author(s): Sam Kovnar
 
-## About this repository
+## TL;DR for TAs and Instructors
 
-This repository contains the code used to test the Communications
+The code you're looking for is at `subsystems/communication/esp8266_firmware/esp8266_release/esp8266_release.ino`. All of the other files in `subsystems/communication/esp8266_firmware` are used for testing. If you want to see my code, that's where you should look.
+
+## About this folder
+
+This folder (`wherehouse/subsystems/communication`) contains the code used to test the Communications
 subsystem of the Wherehouse, Team 23's Spring 2023 ECE senior design
 project.
 
 The Communication subsystem is responsible for interactions between the STM32F0 
 microcontroller and ESP8266 Wi-Fi module.
-
-## TL;DR for TAs and Instructors
-
-The code you're looking for is at `subsystems/communication/esp8266_firmware/esp8266_release/esp8266_release.ino`. All of the other files in `subsystems/communication/esp8266_firmware` are used for testing. If you want to see my code, that's where you should look.
 
 ## Hardware Dependencies
 
@@ -32,13 +32,13 @@ Arduino IDE v2.0.0 or later
 
 ### ESP8266 Core for Arduino IDE
 
-ESP8266 Core for Arduino, *version 3.1.1*
+ESP8266 Core for Arduino *(version 3.1.1)*
 - ESP8266WiFi.h
 - ESP8266HTTPClient.h
 - ESP8266WiFiMulti.h
 
 Multiple libraries used in the code contained in this project utilize the ESP8266
-core for Arduino IDE. You must make sure that it is installed.
+Core for Arduino IDE. You must make sure that it is installed.
 
 1.  Open Arduino IDE
 2.  Navigate to File > Preferences
@@ -93,6 +93,7 @@ the /data URL.
 This code was last tested 2023-02-16.
 
 ### ESP8266 Testing Stage 2: Functionality
+
 **esp8266_serial_test**: Code for testing Serial UART communication to and from the ESP8266
 - Includes a handler for interpreting UART commands
 - Serial commands can be sent from the host computer to the ESP8266 via
@@ -104,7 +105,14 @@ the Arduino IDE serial monitor
 **esp8266_sta_router_test**: Test interactions between ESP8266 station and web server via router
 
 ### ESP8266 Firmware
+
 **esp8266_release**: Firmware to be used on device
-- This is the code being used in the *midterm demo*!
+- *This is the code being used in the midterm demo*!
+
+## Schematics
+
+Schematics for the Communication subsystem are stored in the 
+`wherehouse/subsystems/communication/Schematics` directory.
+
 
 
