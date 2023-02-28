@@ -72,9 +72,11 @@ Core for Arduino IDE. You must make sure that it is installed.
 
 ESPAsyncWebServer.h
 - https://github.com/me-no-dev/ESPAsyncWebServer
+- This is used by the project
 
 ESPAsyncTCP.h
 - https://github.com/me-no-dev/ESPAsyncTCP
+- Required for ESPAsyncWebServer.h to work
 
 ## Firmware <a name="esp_firmware"></a>
 
@@ -135,5 +137,10 @@ Schematics for the Communication subsystem are stored in the
 
 ## Documentation <a name="documentation"></a>
 
-
+This folder contains:
+- Activity Diagram (`communication_activity_diagram.pdf`), which shows interactions between
+microcontroller, wi-fi module, and the web server.
+- Block Diagram (`communication_block_diagram.pdf`), which shows the signal connections between
+the microcontroller and the wi-fi module.
+- PCB Design Review Submission (`communication_pcb_design_review_submission_1.pdf`), which was submitted for the subsystem PCB design review. The schematic used was Version 2.
 
