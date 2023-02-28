@@ -15,8 +15,8 @@
 #include <ESP8266WiFiMulti.h>
 
 #define DOTDELAY 2000 //milliseconds
-//#define VERBOSE 1
-#define VERBOSE 0 //If 0, don't print anything unnecessary
+#define VERBOSE 1
+//#define VERBOSE 0 //If 0, don't print anything unnecessary
 
 #define MAX_SSID_LENGTH 32
 #define MAX_PASSWORD_LENGTH 64
