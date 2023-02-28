@@ -63,7 +63,7 @@ Core for Arduino IDE. You must make sure that it is installed.
 2.  Navigate to File > Preferences
 3.  Find the textbox labeled "Additional Board Manager URLs"
 4.  Insert the following link into the box: http://arduino.esp8266.com/stable/package_esp8266com_index.json, then click "OK".
-  - You can have multiple URLs in the box. Just separate them with commas.
+    - You can have multiple URLs in the box. Just separate them with commas.
 5.  Navigate to "Boards Manager"
 6.  Search for "esp8266"
 7.  Install the board labeled "esp8266 by ESP8266 Community"
