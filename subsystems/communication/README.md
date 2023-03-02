@@ -1,6 +1,10 @@
 # Wherehouse: Communication Subsystem
 
-Author(s): Sam Kovnar
+Author(s): Sam Kovnar (Github: srkovnar)
+
+With additional credit to: 
+- me-no-dev
+- jdunmire
 
 ## Table of Contents
 
@@ -21,23 +25,28 @@ Author(s): Sam Kovnar
 
 ## TL;DR for TAs and Instructors <a name="tldr"></a>
 
-The code you're looking for is at `subsystems/communication/esp8266_firmware/esp8266_release/esp8266_release.ino`. All of the other files in `subsystems/communication/esp8266_firmware` are used for testing. If you want to see my code, that's where you should look.
+The code used for the ESP8266 in the Midterm Demo is at 
+`subsystems/communication/esp8266_firmware/esp8266_release/esp8266_release.ino`.
+The files contained in `subsystems/communication/esp8266_test_code`
+were used for testing and are not being used in the design at this
+time. They are being kept solely as documentation.
 
 ## About this folder <a name="about"></a>
 
-This folder (`wherehouse/subsystems/communication`) contains the code used to test the Communications
-subsystem of the Wherehouse, Team 23's Spring 2023 ECE senior design
-project.
+This folder (`wherehouse/subsystems/communication`) contains the code
+used to test the Communications subsystem of the Wherehouse, Team 23's
+Spring 2023 ECE senior design project.
 
-The Communication subsystem is responsible for interactions between the STM32F0 
-microcontroller and ESP8266 Wi-Fi module.
+The Communication subsystem is responsible for interactions between the
+STM32F0 microcontroller and ESP8266 Wi-Fi module.
 
 ## Hardware Dependencies <a name="hardware"></a>
 
 The code for ESP8266 devices has been tested on Ai-Thinker's ESP8266 ESP-01 modules.
 
-For flashing and testing the ESP8266 ESP-01 modules, I recommend using a ESP-01 USB
-adapter. You can find these from multiple different vendors. I found mine on eBay.
+For flashing and testing the ESP8266 ESP-01 modules, I recommend using
+a ESP-01 USB adapter. You can find these from multiple different
+vendors. I found mine on eBay.
 
 ## Software Dependencies <a name="software"></a>
 
@@ -51,6 +60,8 @@ Arduino IDE *(version 2.0.0 or later)*
 - Certain libraries do not work on versions earlier than v2.0.0 for Linux
 
 KiCad *(version 6.0)*
+- Certain libraries used for this project are for older versions of
+KiCad, but they work fine on more recent versions as well.
 
 ### ESP8266 Core for Arduino IDE <a name="esp8266core"></a>
 
@@ -71,7 +82,7 @@ Core for Arduino IDE. You must make sure that it is installed.
 6.  Search for "esp8266"
 7.  Install the board labeled "esp8266 by ESP8266 Community"
 
-### Arduino IDE Libraries <a name="fw_libraries"></a>
+### Additional Arduino IDE Libraries <a name="fw_libraries"></a>
 
 ESPAsyncWebServer.h (https://github.com/me-no-dev/ESPAsyncWebServer)
 - Used by ESP8266 firmware and test code
