@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<section name="Workbench">
+	<list key="org.eclipse.ui.internal.wizards.datatransfer.SmartImportRootWizardPage.knownSources">
+		<item value="/home/sam/Documents/senior_design/wherehouse/subsystems/communication/stm32_firmware/lab01"/>
+		<item value="/home/sam/Documents/senior_design/wherehouse_comms/stm32_workspace/test1"/>
+		<item value="/home/sam/Documents/senior_design/wherehouse/subsystems/communication/stm32_firmware/stm32_communication"/>
+		<item value="/home/sam/Documents/ece36200_workspace/lab10"/>
+	</list>
+	<section name="CleanDialogSettings">
+		<item value="563" key="DIALOG_WIDTH"/>
+		<item value="true" key="BUILD_ALL"/>
+		<item value="true" key="TOGGLE_SELECTED"/>
+		<item value="479" key="DIALOG_HEIGHT"/>
+		<item value="716" key="DIALOG_X_ORIGIN"/>
+		<item value="234" key="DIALOG_Y_ORIGIN"/>
+		<item value="false" key="BUILD_NOW"/>
+	</section>
+</section>
