@@ -23,8 +23,8 @@
 // Using EEPROM for storing wifi data so that I don't have to reconfigure it every single time.
 
 #define DOTDELAY 2000 //milliseconds
-#define VERBOSE 1
-//#define VERBOSE 0 //If 0, don't print anything unnecessary
+//#define VERBOSE 1
+#define VERBOSE 0 //If 0, don't print anything unnecessary
 
 #define START_AS_AP 1
 // If this is 0, we skip straight to station mode,
@@ -104,19 +104,19 @@ const char modifier__set = '=';
 const char modifier__run = '!';
 
 // Read/Write
-const char* cmd__ip     = "WF+IP";    // Hub IP Address
+const char* cmd__ip     = "WF+IPAD";    // Hub IP Address
 const char* cmd__ssid   = "WF+SSID";  // Wi-Fi SSID
-const char* cmd__pass   = "WF+PW";    // Wi-Fi Password
-const char* cmd__id     = "WF+ID";    // Device ID
+const char* cmd__pass   = "WF+PWRD";    // Wi-Fi Password
+const char* cmd__id     = "WF+DVID";    // Device ID
 
-const char* cmd__stock  = "WF+STOCK"; // Amount of item in stock
+const char* cmd__stock  = "WF+STCK"; // Amount of item in stock
 const char* cmd__name   = "WF+NAME";  // Name of item
 
 const char* cmd__connect      = "WF+CONN";  // Connect to network
-const char* cmd__disconnect   = "WF+DISC";  // Disconnect from network
+const char* cmd__disconnect   = "WF+DCON";  // Disconnect from network
 
 const char* cmd__send   = "WF+SEND";  // Send data
-const char* cmd__config = "WF+CFG";   // Get configuration (item name, weight, tare)
+const char* cmd__config = "WF+CNFG";   // Get configuration (item name, weight, tare)
 
 const char* cmd__access  = "WF+AP"; // Go back to Access Point mode
 
@@ -403,13 +403,17 @@ int value_tool(const char* cmd, const char* base_cmd, char* value){
   }
   
   if (cmd[index] == modifier__get) {
+    Serial.print(ACK);
+    Serial.print(":");
     Serial.println(value);
   }
   else if (cmd[index] == modifier__set) {
     strcpy(value, arg);
     cmp = strcmp(value, arg);
     if (cmp == 0) {
-      Serial.println(ACK);
+      Serial.print(ACK);
+      Serial.print(":");
+      Serial.println(value);
     }
     else {
       Serial.println(NACK);
@@ -450,9 +454,6 @@ int connect() {
     if (VERBOSE) {
       Serial.println("\tConnection timed out.");
     }
-    else {
-      Serial.println(NACK);
-    }
     return 1;
   }
   else {
@@ -463,9 +464,6 @@ int connect() {
       Serial.println("");
       Serial.println(WiFi.localIP()); //This is the IP of the ESP8266
     }
-    else {
-      Serial.println(ACK);
-    }
     return 0;
   }
 }
@@ -475,7 +473,7 @@ int disconnect() {
   if (WiFi.status() == WL_CONNECTED) {
     WiFi.disconnect();
   }
-  Serial.println(ACK);
+  //Serial.println(ACK);
   if (VERBOSE) {
     Serial.print("\tStatus: ");
     Serial.println(WiFi.status());
@@ -537,6 +535,8 @@ int get_config(const char* api_key/*unused*/) {
       Serial.print("HTTP response code: ");
       Serial.println(http_response_code);
     }
+    Serial.print(ACK);
+    Serial.print(":");
     Serial.println(payload);
   }
   else {
@@ -593,9 +593,10 @@ int post_stock() {
   http_response_code = http.POST(http_request_data);
 
   if (http_response_code > 0){
-    //Serial.println(ACK);
+    Serial.print(ACK);
+    Serial.print(":");
     if (VERBOSE) {
-      Serial.print("\tHTTP Response Code: ");
+      Serial.print("\n\tHTTP Response Code: ");
     }
     Serial.println(http_response_code);
   }
@@ -675,15 +676,23 @@ int handler(const char* cmd) {
     if (strlen(cmd) > cmd_length) {
       if (cmd[cmd_length] == modifier__run) {
         out = connect();
+        if (out == 0) {
+          Serial.println(ACK);
+        }
+        else {
+          Serial.println(NACK);
+        }
         return out;
       }
       else if (cmd[cmd_length] == modifier__get) {
         if (WiFi.status() == WL_CONNECTED) {
-          Serial.println("Connected");
+          //Serial.println("Connected");
+          Serial.println(ACK);
           return 0;
         }
         else {
-          Serial.println("Disconnected");
+          //Serial.println("Disconnected");
+          Serial.println(NACK);
           return 0;
         }
       }
@@ -697,7 +706,14 @@ int handler(const char* cmd) {
   if (compare_char_array(cmd, cmd__disconnect) == 0) {
     cmd_length = strlen(cmd__disconnect);
     if (cmd[cmd_length] == modifier__run) {
-      return disconnect();
+      out = disconnect();
+      if (WiFi.status() != WL_CONNECTED) {
+        Serial.println(ACK);
+      }
+      else {
+        Serial.println(NACK);
+      }
+      return out;
     }
     else {
       print_error(cmd__disconnect, WRONG_MODIFIER, RUN_ONLY);
@@ -744,7 +760,12 @@ int handler(const char* cmd) {
   if (compare_char_array(cmd, cmd__ping) == 0) {
     cmd_length = strlen(cmd__ping);
     if (cmd[cmd_length] == modifier__run) {
-      Serial.println(ACK);
+      if (WiFi.status() == WL_CONNECTED) {
+        Serial.println(ACK);
+      }
+      else {
+        Serial.println(NACK);
+      }
       return 0;
     }
     else {
@@ -777,21 +798,19 @@ void fetch_wifi_memory(char* d_ssid, char* d_pw, char* d_ip) {
     char m_ip[MAX_IP_LENGTH+1] = "";
   } wifi_data;
 
-#ifdef VERBOSE
-  Serial.println("Fetching wifi connection information from memory.");
-#endif
+  if (VERBOSE) {Serial.println("Fetching wifi connection information from memory.");}
 
   // Fetch memory information.
   EEPROM.get(address, wifi_data);
 
-#ifdef VERBOSE
-  Serial.print("\tSSID: ");
-  Serial.println(wifi_data.m_ssid);
-  Serial.print("\tPassword: ");
-  Serial.println(wifi_data.m_pw);
-  Serial.print("\tIP Address: ");
-  Serial.println(wifi_data.m_ip);
-#endif
+  if (VERBOSE) {
+    Serial.print("\tSSID: ");
+    Serial.println(wifi_data.m_ssid);
+    Serial.print("\tPassword: ");
+    Serial.println(wifi_data.m_pw);
+    Serial.print("\tIP Address: ");
+    Serial.println(wifi_data.m_ip);
+  }
 
   strcpy(d_ssid, wifi_data.m_ssid);
   strcpy(d_pw, wifi_data.m_pw);
@@ -866,6 +885,8 @@ void setup() {
   bool ap_result;
   int ram_address = 0;
 
+  bool start_as_ap = 0;
+
   // Initialize variables
   switch_to_station = false;
   switch_to_access = false;
@@ -889,9 +910,21 @@ void setup() {
 
   // Update values from memory
   fetch_wifi_memory(ssid, password, ip_addr);
+  delay(500);
+  int try_to_connect = connect();
+
+  if (try_to_connect == 1) { // If failed to connect
+    start_as_ap = true;
+    try_to_connect = disconnect();
+  }
+  else {
+    start_as_ap = false;
+  }
+
+
 
   // === START AP ===
-  if (START_AS_AP) {
+  if (start_as_ap) {
     if (VERBOSE) {Serial.print("Setting AP (Access Point)...");}
     ap_result = WiFi.softAP(local_ssid, local_password);
     if (ap_result != true) {
@@ -909,52 +942,51 @@ void setup() {
         Serial.print("\tHost IP Address: ");
         Serial.println(myIP);
       }
-
-      // Initialize web server
-
-      if (VERBOSE) {Serial.print("Starting server...");}
-
-      //setup_server(server); //This caused a crash
-      //AsyncWebServer server = setup_server(); // This doesn't crash, but... nothing happens on access.
-
-      // Homepage
-      server.on("/", HTTP_GET, [](AsyncWebServerRequest *request){
-        request->send_P(200, "text/html", index_html, html_replacer);
-      });
-
-      // Redirects
-      server.on("/ssid", HTTP_GET, [](AsyncWebServerRequest *request){
-        if (request->hasArg("fssid2")) {
-          strcpy(ssid, request->arg("fssid2").c_str());
-        }
-        request->redirect("/");
-      });
-
-      server.on("/password", HTTP_GET, [](AsyncWebServerRequest *request){
-        if (request->hasArg("fpass2")) {
-          strcpy(password, request->arg("fpass2").c_str());
-        }
-        request->redirect("/");
-      });
-
-      server.on("/ip", HTTP_GET, [](AsyncWebServerRequest *request){
-        if (request->hasArg("fipad2")) {
-          strcpy(ip_addr, request->arg("fipad2").c_str());
-        }
-        request->redirect("/");
-      });
-
-      // Redirect and activate STATION mode
-      server.on("/continue", HTTP_GET, [](AsyncWebServerRequest *request){
-        switch_to_station = true;// Tells the device to exit setup mode.
-        request->redirect("/");
-      });
-
-      server.begin();
-      
-      if (VERBOSE) {Serial.println("done!");Serial.println("Setup complete.\n");}
     }
   }
+
+  // Initialize web server
+  if (VERBOSE) {Serial.print("Starting server...");}
+
+  //setup_server(server); //This caused a crash
+  //AsyncWebServer server = setup_server(); // This doesn't crash, but... nothing happens on access.
+
+  // Homepage
+  server.on("/", HTTP_GET, [](AsyncWebServerRequest *request){
+    request->send_P(200, "text/html", index_html, html_replacer);
+  });
+
+  // Redirects
+  server.on("/ssid", HTTP_GET, [](AsyncWebServerRequest *request){
+    if (request->hasArg("fssid2")) {
+      strcpy(ssid, request->arg("fssid2").c_str());
+    }
+    request->redirect("/");
+  });
+
+  server.on("/password", HTTP_GET, [](AsyncWebServerRequest *request){
+    if (request->hasArg("fpass2")) {
+      strcpy(password, request->arg("fpass2").c_str());
+    }
+    request->redirect("/");
+  });
+
+  server.on("/ip", HTTP_GET, [](AsyncWebServerRequest *request){
+    if (request->hasArg("fipad2")) {
+      strcpy(ip_addr, request->arg("fipad2").c_str());
+    }
+    request->redirect("/");
+  });
+
+  // Redirect and activate STATION mode
+  server.on("/continue", HTTP_GET, [](AsyncWebServerRequest *request){
+    switch_to_station = true;// Tells the device to exit setup mode.
+    request->redirect("/");
+  });
+
+  server.begin();
+      
+  if (VERBOSE) {Serial.println("done!");Serial.println("Setup complete.\n");}
 }
 
 void loop() {
