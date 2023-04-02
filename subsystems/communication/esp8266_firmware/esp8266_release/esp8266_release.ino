@@ -23,8 +23,8 @@
 // Using EEPROM for storing wifi data so that I don't have to reconfigure it every single time.
 
 #define DOTDELAY 2000 //milliseconds
-#define VERBOSE 1
-//#define VERBOSE 0 //If 0, don't print anything unnecessary
+//#define VERBOSE 1
+#define VERBOSE 0 //If 0, don't print anything unnecessary
 
 #define START_AS_AP 1
 // If this is 0, we skip straight to station mode,
@@ -104,21 +104,21 @@ const char modifier__set = '=';
 const char modifier__run = '!';
 
 // Read/Write
-const char* cmd__ip     = "WF+IP";    // Hub IP Address
+const char* cmd__ip     = "WF+IPAD";    // Hub IP Address
 const char* cmd__ssid   = "WF+SSID";  // Wi-Fi SSID
-const char* cmd__pass   = "WF+PW";    // Wi-Fi Password
-const char* cmd__id     = "WF+ID";    // Device ID
+const char* cmd__pass   = "WF+PWRD";    // Wi-Fi Password
+const char* cmd__id     = "WF+DVID";    // Device ID
 
-const char* cmd__stock  = "WF+STOCK"; // Amount of item in stock
+const char* cmd__stock  = "WF+STCK"; // Amount of item in stock
 const char* cmd__name   = "WF+NAME";  // Name of item
 
 const char* cmd__connect      = "WF+CONN";  // Connect to network
-const char* cmd__disconnect   = "WF+DISC";  // Disconnect from network
+const char* cmd__disconnect   = "WF+DCON";  // Disconnect from network
 
 const char* cmd__send   = "WF+SEND";  // Send data
-const char* cmd__config = "WF+CFG";   // Get configuration (item name, weight, tare)
+const char* cmd__config = "WF+CNFG";   // Get configuration (item name, weight, tare)
 
-const char* cmd__access  = "WF+AP"; // Go back to Access Point mode
+const char* cmd__access  = "WF+APMD"; // Go back to Access Point mode
 
 // Miscellaneous
 const char* cmd__ping   = "WF+PING"; 
@@ -679,11 +679,13 @@ int handler(const char* cmd) {
       }
       else if (cmd[cmd_length] == modifier__get) {
         if (WiFi.status() == WL_CONNECTED) {
-          Serial.println("Connected");
+          //Serial.println("Connected");
+          Serial.println(ACK);
           return 0;
         }
         else {
-          Serial.println("Disconnected");
+          //Serial.println("Disconnected");
+          Serial.println(NACK);
           return 0;
         }
       }
@@ -744,7 +746,14 @@ int handler(const char* cmd) {
   if (compare_char_array(cmd, cmd__ping) == 0) {
     cmd_length = strlen(cmd__ping);
     if (cmd[cmd_length] == modifier__run) {
-      Serial.println(ACK);
+      // Send NACK unless connected properly; might change this functionality later
+      if (WiFi.status() == WL_CONNECTED) {
+        Serial.println(ACK);
+      }
+      else {
+        Serial.println(NACK);
+      }
+      //Serial.println(ACK);
       return 0;
     }
     else {
