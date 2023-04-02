@@ -1,6 +1,7 @@
-13:14:39 **** Incremental Build of configuration Debug for project stm32_comms_1 ****
-make -j4 all 
-make: Nothing to be done for 'all'.
+11:19:45 **** Clean-only build of configuration Debug for project stm32_comms_1 ****
+make -j4 clean 
+rm -rf *
+ 
 
-13:14:40 Build Finished (took 620ms)
+11:19:45 Build Finished (took 699ms)
 

@@ -12,7 +12,7 @@
 #include <stdio.h> // for printf()
 
 
-#define COMM_DELAY 10 // Number of seconds to wait between commands
+#define COMM_DELAY 20 // Number of seconds to wait between commands
 
 #define LIL_INTERVAL 10
 #define BIG_INTERVAL 60
@@ -31,6 +31,7 @@ const int ESP_GPIO2 = (1 << 3);
 
 const char* run__ping       = "WF+PING!\n";
 const char* run__connect    = "WF+CONN!\n";
+const char* get__connect    = "WF+CONN?\n";
 const char* run__config     = "WF+CNFG!\n";
 const char* set__stock      = "WF+STCK=";
 const char* run__send       = "WF+SEND!\n";
@@ -41,6 +42,8 @@ const int LIL_READY     = (1 << 0); // UNUSED
 const int BIG_READY     = (1 << 1); // UNUSED
 const int TRIGGERED     = (1 << 2);
 const int WIFI_STATUS   = (1 << 3);
+const int RESET_START   = (1 << 4);
+const int RESET_END     = (1 << 5);
 // ^ This is for saving space on my "status" variable
 
 
@@ -53,6 +56,8 @@ char g_unit_weight[32]; // Convert this to int when needed
 char g_tare_weight[32]; // Convert this to int when needed
 
 int global_stock = 10;
+
+int comm_counter;
 
 // Write your subroutines below.
 
@@ -641,8 +646,10 @@ void parse_configuration(const char* raw_text) {
 
     char* strplist[] = {g_item_code, g_item_name, g_unit_weight, g_tare_weight};
     // ^ Avoids if-statements
+    char ignore_list[] = {':'}; // Not implemented
 
-    for (int i = 0; i <= strlen(raw_text); i++) {
+    //for (int i = 0; i <= strlen(raw_text); i++) {
+    for (int i = 1; i <= strlen(raw_text); i++) { //Ignore the first character, it's a colon.
         if (raw_text[i] == delimiter) {
             strcpy(strplist[k], p_buffer);
             n = 0;
@@ -685,6 +692,8 @@ int wifi_sequence(void) {
     temp[31] = '\0';
 
     int stock = 0;
+
+    //GPIOC->ODR |= (1<<9);
 
     cmd_response = char_response(run__connect, f_buffer);
     if (cmd_response != 1) {
@@ -729,14 +738,26 @@ int wifi_sequence(void) {
 //=====================================================================
 int check_sequence(void) {
     int cmd_response;
+    int resp2;
     int errors = 0;
 
     char f_buffer[32];
     f_buffer[31] = '\0';
 
-    cmd_response = char_response(run__ping, f_buffer);
-    if (cmd_response != 1) {
-        errors++;
+    //cmd_response = char_response(run__ping, f_buffer);
+    //if (cmd_response != 1) {
+    //    errors++;
+    //}
+
+    // PING has incorrect functionality right now, so I'm using a workaround.
+
+    cmd_response = char_response(get__connect, f_buffer);
+    if (cmd_response != 1) { // NACK = not connected
+        cmd_response = char_response(run__connect, f_buffer);
+        if (cmd_response != 1) { // NACK again = failed to connect
+            errors++;
+        }
+        cmd_response = char_response(run__disconnect, f_buffer);
     }
 
     if (errors != 0) {
@@ -776,10 +797,16 @@ int main()
     config_pin(GPIOC, 9, 1); // Dev board LED 4 (blue)
 
     // Now we can set values to be outputted by the GPIO pins.
-    GPIOC->ODR |= ESP_GPIO0;
-    GPIOC->ODR |= ESP_RST;
+    GPIOC->ODR &= ~ESP_RST;
     GPIOC->ODR |= ESP_CH_EN;
+    GPIOC->ODR |= ESP_GPIO0;
+    GPIOC->ODR |= ESP_GPIO2; // Testing using this as CH_EN
+    GPIOC->ODR |= ESP_RST;
+    //GPIOC->ODR &= ~ESP_RST; // Reset the chip
+    //GPIOC->ODR |= ESP_RST;
     //GPIOC->ODR |= ESP_GPIO2;
+
+    comm_status |= RESET_START; // Signal that reset has been started
 
     setup_tim6();
 
@@ -795,6 +822,17 @@ int main()
     comm_status = 0;
     global_buffer[99] = '\0';
 
+    /*
+    if (comm_status & TRIGGERED) {
+        comm_status |= RESET_END;
+        GPIOC->ODR  |= ESP_RST;
+        comm_status &= ~TRIGGERED;
+    }
+    */
+
+    GPIOC->ODR |= ESP_RST;
+
+
     // === MAIN LOOP TEST ===
     int cstate = 0; //Currently unused
     int result;
@@ -805,8 +843,12 @@ int main()
 
         if (comm_status & TRIGGERED) {
             GPIOC->ODR |= (1<<8);
-
-            if (comm_status & WIFI_STATUS) {
+/*
+            if (!(comm_status & RESET_END)) {
+                GPIOC->ODR  |= ESP_RST;
+                comm_status |= RESET_END;
+            }
+            else */if (comm_status & WIFI_STATUS) {
                 result = wifi_sequence();
                 if (result != 0) {
                     comm_status &= ~WIFI_STATUS;

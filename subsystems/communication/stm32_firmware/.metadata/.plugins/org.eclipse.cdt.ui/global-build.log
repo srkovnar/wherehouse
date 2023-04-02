@@ -1,31 +1,57 @@
-13:14:37 **** Incremental Build of configuration Debug for project stm32_comms_1 ****
+13:26:24 **** Incremental Build of configuration Debug for project stm32_comms_2 ****
 make -j4 all 
 Building file: ../src/main.c
 Invoking: MCU GCC Compiler
-/home/sam/Documents/ece36200_workspace/lab10/Debug
-arm-none-eabi-gcc -mcpu=cortex-m0 -mthumb -mfloat-abi=soft -DSTM32 -DSTM32F0 -DSTM32F091RCTx -DDEBUG -DSTM32F091 -DUSE_STDPERIPH_DRIVER -I"/home/sam/Documents/ece36200_workspace/lab10/StdPeriph_Driver/inc" -I"/home/sam/Documents/ece36200_workspace/lab10/inc" -I"/home/sam/Documents/ece36200_workspace/lab10/CMSIS/device" -I"/home/sam/Documents/ece36200_workspace/lab10/CMSIS/core" -O0 -g3 -Wall -fmessage-length=0 -ffunction-sections -c -MMD -MP -MF"src/main.d" -MT"src/main.o" -o "src/main.o" "../src/main.c"
+/home/sam/Documents/senior_design/wherehouse/subsystems/communication/stm32_firmware/stm32_comms_2/Debug
+arm-none-eabi-gcc -mcpu=cortex-m0 -mthumb -mfloat-abi=soft -DSTM32 -DSTM32F0 -DSTM32F091RCTx -DDEBUG -DSTM32F091 -DUSE_STDPERIPH_DRIVER -I"/home/sam/Documents/senior_design/wherehouse/subsystems/communication/stm32_firmware/stm32_comms_2/StdPeriph_Driver/inc" -I"/home/sam/Documents/senior_design/wherehouse/subsystems/communication/stm32_firmware/stm32_comms_2/inc" -I"/home/sam/Documents/senior_design/wherehouse/subsystems/communication/stm32_firmware/stm32_comms_2/CMSIS/device" -I"/home/sam/Documents/senior_design/wherehouse/subsystems/communication/stm32_firmware/stm32_comms_2/CMSIS/core" -O0 -g3 -Wall -fmessage-length=0 -ffunction-sections -c -MMD -MP -MF"src/main.d" -MT"src/main.o" -o "src/main.o" "../src/main.c"
+../src/main.c: In function 'TIM6_DAC_IRQHandler':
+../src/main.c:176:9: warning: unused variable 'buffer_index' [-Wunused-variable]
+     int buffer_index;
+         ^~~~~~~~~~~~
+../src/main.c:174:9: warning: unused variable 'respval' [-Wunused-variable]
+     int respval;
+         ^~~~~~~
 ../src/main.c: In function 'interrupt_getchar':
-../src/main.c:164:17: warning: unused variable 'u' [-Wunused-variable]
+../src/main.c:277:17: warning: unused variable 'u' [-Wunused-variable]
   USART_TypeDef *u = USART5;
                  ^
+../src/main.c: In function 'parse_configuration':
+../src/main.c:649:10: warning: unused variable 'ignore_list' [-Wunused-variable]
+     char ignore_list[] = {':'}; // Not implemented
+          ^~~~~~~~~~~
+../src/main.c: In function 'wifi_sequence':
+../src/main.c:711:23: warning: format '%ld' expects argument of type 'long int', but argument 4 has type 'int' [-Wformat=]
+     sprintf(cmd, "%s%ld\n", set__stock, global_stock); //Convert int stock to string
+                     ~~^
+                     %d
+../src/main.c:694:9: warning: unused variable 'stock' [-Wunused-variable]
+     int stock = 0;
+         ^~~~~
+../src/main.c:691:10: warning: variable 'temp' set but not used [-Wunused-but-set-variable]
+     char temp[32];
+          ^~~~
+../src/main.c: In function 'check_sequence':
+../src/main.c:741:9: warning: unused variable 'resp2' [-Wunused-variable]
+     int resp2;
+         ^~~~~
 ../src/main.c: In function 'main':
-../src/main.c:263:9: warning: unused variable 'connected' [-Wunused-variable]
-     int connected; //0 for unconnected, 1 for connected, 2 for access mode
-         ^~~~~~~~~
+../src/main.c:836:9: warning: unused variable 'cstate' [-Wunused-variable]
+     int cstate = 0; //Currently unused
+         ^~~~~~
 Finished building: ../src/main.c
  
-Building target: stm32_comms_1.elf
+Building target: stm32_comms_2.elf
 Invoking: MCU GCC Linker
-arm-none-eabi-gcc -mcpu=cortex-m0 -mthumb -mfloat-abi=soft -T"/home/sam/Documents/ece36200_workspace/lab10/LinkerScript.ld" -Wl,-Map=output.map -Wl,--gc-sections -o "stm32_comms_1.elf" @"objects.list"   -lm
-Finished building target: stm32_comms_1.elf
+arm-none-eabi-gcc -mcpu=cortex-m0 -mthumb -mfloat-abi=soft -T"/home/sam/Documents/senior_design/wherehouse/subsystems/communication/stm32_firmware/stm32_comms_2/LinkerScript.ld" -Wl,-Map=output.map -Wl,--gc-sections -o "stm32_comms_2.elf" @"objects.list"   -lm
+Finished building target: stm32_comms_2.elf
  
 make --no-print-directory post-build
 Generating binary and Printing size information:
-arm-none-eabi-objcopy -O binary "stm32_comms_1.elf" "stm32_comms_1.bin"
-arm-none-eabi-size "stm32_comms_1.elf"
+arm-none-eabi-objcopy -O binary "stm32_comms_2.elf" "stm32_comms_2.bin"
+arm-none-eabi-size "stm32_comms_2.elf"
    text	   data	    bss	    dec	    hex	filename
-  13028	   2128	   1428	  16584	   40c8	stm32_comms_1.elf
+  45160	   2524	   1552	  49236	   c054	stm32_comms_2.elf
  
-13:14:39 **** Incremental Build of configuration Debug for project stm32_comms_1 ****
+13:26:26 **** Incremental Build of configuration Debug for project stm32_comms_2 ****
 make -j4 all 
 make: Nothing to be done for 'all'.
