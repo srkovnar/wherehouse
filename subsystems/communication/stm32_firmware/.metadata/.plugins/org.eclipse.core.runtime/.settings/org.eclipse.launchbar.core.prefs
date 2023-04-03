@@ -1,10 +1,13 @@
 LaunchTargetManager/org.eclipse.launchbar.core.launchTargetType.local,Local/arch=x86_64
 LaunchTargetManager/org.eclipse.launchbar.core.launchTargetType.local,Local/os=linux
-configDescList=org.eclipse.launchbar.core.descriptorType.default\:stm32_communication Debug,org.eclipse.launchbar.core.descriptorType.default\:lab01.elf,org.eclipse.launchbar.core.descriptorType.default\:lab01 Debug,org.eclipse.launchbar.core.descriptorType.default\:lab10_debug,org.eclipse.launchbar.core.descriptorType.default\:stm32_comms_1 Run
+configDescList=org.eclipse.launchbar.core.descriptorType.default\:stm32_communication Debug,org.eclipse.launchbar.core.descriptorType.default\:lab01.elf,org.eclipse.launchbar.core.descriptorType.default\:lab01 Debug,org.eclipse.launchbar.core.descriptorType.default\:lab10_debug,org.eclipse.launchbar.core.descriptorType.default\:stm32_comms_1 Run,org.eclipse.launchbar.core.descriptorType.default\:lab05,org.eclipse.launchbar.core.descriptorType.default\:stm32_comms_2 Run
 eclipse.preferences.version=1
 org.eclipse.launchbar.core.descriptorType.default\:New_configuration/activeLaunchMode=run
 org.eclipse.launchbar.core.descriptorType.default\:lab01\ Debug/activeLaunchMode=debug
 org.eclipse.launchbar.core.descriptorType.default\:lab01\ Debug/activeLaunchTarget=org.eclipse.launchbar.core.launchTargetType.local\:Local
 org.eclipse.launchbar.core.descriptorType.default\:lab01.elf/activeLaunchMode=debug
+org.eclipse.launchbar.core.descriptorType.default\:lab05/activeLaunchMode=run
+org.eclipse.launchbar.core.descriptorType.default\:lab05/activeLaunchTarget=org.eclipse.launchbar.core.launchTargetType.local\:Local
 org.eclipse.launchbar.core.descriptorType.default\:lab10_debug/activeLaunchMode=run
 org.eclipse.launchbar.core.descriptorType.default\:stm32_comms_1\ Run/activeLaunchMode=run
+org.eclipse.launchbar.core.descriptorType.default\:stm32_comms_2\ Run/activeLaunchMode=run

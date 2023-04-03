@@ -125,7 +125,7 @@ const char* cmd__disconnect   = "WF+DCON";  // Disconnect from network
 const char* cmd__send   = "WF+SEND";  // Send data
 const char* cmd__config = "WF+CNFG";   // Get configuration (item name, weight, tare)
 
-const char* cmd__access  = "WF+AP"; // Go back to Access Point mode
+const char* cmd__access  = "WF+APMD"; // Go back to Access Point mode
 
 // Miscellaneous
 const char* cmd__ping   = "WF+PING"; 
