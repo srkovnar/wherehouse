@@ -26,10 +26,6 @@
 //#define VERBOSE 1
 #define VERBOSE 0 //If 0, don't print anything unnecessary
 
-#define START_AS_AP 1
-// If this is 0, we skip straight to station mode,
-// and wi-fi must be configured manually over serial communication.
-
 #define MAX_SSID_LENGTH 32
 #define MAX_PASSWORD_LENGTH 64
 #define MAX_IP_LENGTH 16
@@ -97,11 +93,22 @@ bool switch_to_access; // We're in access mode, and we should be in station mode
 
 int status; //Status returned from handling command
 
+// Not all of these are implemented yet... vvv
+// Flags (stored in g_status)
+const int F__SETUP   = (1 << 0); // If 1, done with setup (unimplemented)
+const int F__READY   = (1 << 1); // 0 = still in access point mode. 1 = normal operation (station mode).
+const int F__ERROR   = (1 << 2); // Unrecoverable error
+const int F__SW2STAT = (1 << 3); // Switch to station mode
+const int F__SW2AP   = (1 << 4); // Switch to access point mode
+
+int g_status;
+
 
 // === COMMAND MATCH STRINGS ===
 const char modifier__get = '?';
 const char modifier__set = '=';
 const char modifier__run = '!';
+const char separator = ':';
 
 // Read/Write
 const char* cmd__ip     = "WF+IPAD";    // Hub IP Address
@@ -406,6 +413,7 @@ int value_tool(const char* cmd, const char* base_cmd, char* value){
     Serial.print(ACK);
     Serial.print(":");
     Serial.println(value);
+    return 0;
   }
   else if (cmd[index] == modifier__set) {
     strcpy(value, arg);
@@ -414,20 +422,21 @@ int value_tool(const char* cmd, const char* base_cmd, char* value){
       Serial.print(ACK);
       Serial.print(":");
       Serial.println(value);
+      return 0;
     }
     else {
-      Serial.println(NACK);
+      Serial.print(NACK);
+      Serial.print(":");
+      Serial.println(value);
+      return 1;
     }
   }
   else if (cmd[index] == modifier__run) {
-    print_error(base_cmd, WRONG_MODIFIER, RUN_ONLY);
+    print_error(base_cmd, WRONG_MODIFIER, GET_OR_SET);
     return 2;
   }
   else {
-    Serial.println(NACK);
-    if (VERBOSE) {
-      Serial.println("\tModifier unrecognized. Should be ?, =, or !");
-    }
+    print_error(base_cmd, WRONG_MODIFIER, ANY_MODIFIER);
     return 3;
   }
 
@@ -474,10 +483,11 @@ int disconnect() {
     WiFi.disconnect();
   }
   //Serial.println(ACK);
-  if (VERBOSE) {
-    Serial.print("\tStatus: ");
-    Serial.println(WiFi.status());
-  }
+  // if (VERBOSE) {
+  //   Serial.print("\tStatus: ");
+  //   Serial.println(WiFi.status());
+  // }
+  while (WiFi.status() == WL_CONNECTED); // Wait until done.
   return 0;
 }
 
@@ -537,14 +547,12 @@ int get_config(const char* api_key/*unused*/) {
     }
     Serial.print(ACK);
     Serial.print(":");
-    Serial.println(payload);
+    Serial.println(payload);// Should add the http response code to this in the future, TODO
   }
   else {
-    Serial.println(NACK);
-    if (VERBOSE) {
-      Serial.print("Error code: ");
-      Serial.println(http_response_code);
-    }
+    Serial.print(NACK);
+    Serial.print(separator);
+    Serial.println(http_response_code);
   }
 
   http.end();
@@ -592,21 +600,14 @@ int post_stock() {
 
   http_response_code = http.POST(http_request_data);
 
-  if (http_response_code > 0){
+  if (http_response_code > 0) {
     Serial.print(ACK);
-    Serial.print(":");
-    if (VERBOSE) {
-      Serial.print("\n\tHTTP Response Code: ");
-    }
-    Serial.println(http_response_code);
   }
   else {
-    Serial.println(NACK);
-    if (VERBOSE) {
-      Serial.print("\tError code: ");
-      Serial.println(http_response_code);
-    }
+    Serial.print(NACK);
   }
+  Serial.print(separator);
+  Serial.println(http_response_code);
 
   http.end();
 
@@ -633,8 +634,7 @@ int handler(const char* cmd) {
   mismatch = compare_char_array(cmd_header, cmd);
 
   if (mismatch) {
-    Serial.print("Invalid command; must start with ");
-    Serial.println(cmd_header);
+    Serial.println(NACK);
     return 1;
   }
 
@@ -708,11 +708,13 @@ int handler(const char* cmd) {
     if (cmd[cmd_length] == modifier__run) {
       out = disconnect();
       if (WiFi.status() != WL_CONNECTED) {
-        Serial.println(ACK);
+        Serial.print(ACK);
       }
       else {
-        Serial.println(NACK);
+        Serial.print(NACK);
       }
+        Serial.print(separator);
+        Serial.println(WiFi.status());
       return out;
     }
     else {
@@ -749,6 +751,7 @@ int handler(const char* cmd) {
     if (cmd[cmd_length] == modifier__run) {
       enter_access_mode();
       Serial.println(ACK);
+      g_status &= ~F__READY; // Lower READY flag
       return 0;
     }
     else {
@@ -760,11 +763,21 @@ int handler(const char* cmd) {
   if (compare_char_array(cmd, cmd__ping) == 0) {
     cmd_length = strlen(cmd__ping);
     if (cmd[cmd_length] == modifier__run) {
-      if (WiFi.status() == WL_CONNECTED) {
-        Serial.println(ACK);
+      // if (WiFi.status() == WL_CONNECTED) {
+      //   Serial.println(ACK);
+      // }
+      // else {
+      //   Serial.println(NACK);
+      // }
+      if (g_status & F__READY) {
+        Serial.print(ACK);
+        Serial.print(separator);
+        Serial.println(g_status);
       }
       else {
-        Serial.println(NACK);
+        Serial.print(NACK);
+        Serial.print(separator);
+        Serial.println(g_status);
       }
       return 0;
     }
@@ -887,6 +900,8 @@ void setup() {
 
   bool start_as_ap = 0;
 
+  g_status = 0;
+
   // Initialize variables
   switch_to_station = false;
   switch_to_access = false;
@@ -916,9 +931,11 @@ void setup() {
   if (try_to_connect == 1) { // If failed to connect
     start_as_ap = true;
     try_to_connect = disconnect();
+    g_status &= ~F__READY;
   }
   else {
     start_as_ap = false;
+    g_status |= F__READY;
   }
 
 
@@ -927,23 +944,30 @@ void setup() {
   if (start_as_ap) {
     if (VERBOSE) {Serial.print("Setting AP (Access Point)...");}
     ap_result = WiFi.softAP(local_ssid, local_password);
-    if (ap_result != true) {
-      if (VERBOSE) {Serial.println("Error! Something went wrong...");}
+    // if (ap_result != true) {
+    //   if (VERBOSE) {Serial.println("Error! Something went wrong...");}
+    // }
+    // else {
+    if (ap_result == true) {
+      myIP = WiFi.softAPIP();
+      // if (VERBOSE){
+      //   Serial.println("done!");
+      //   Serial.print("\tWiFi network name: ");
+      //   Serial.println(local_ssid);
+      //   Serial.print("\tWiFi network password: ");
+      //   Serial.println(local_password);
+      //   Serial.print("\tHost IP Address: ");
+      //   Serial.println(myIP);
+      // }
     }
     else {
-      myIP = WiFi.softAPIP();
-
-      if (VERBOSE){
-        Serial.println("done!");
-        Serial.print("\tWiFi network name: ");
-        Serial.println(local_ssid);
-        Serial.print("\tWiFi network password: ");
-        Serial.println(local_password);
-        Serial.print("\tHost IP Address: ");
-        Serial.println(myIP);
-      }
+      g_status |= F__ERROR;
     }
   }
+
+  // NOTE: Start the server even if we're in station mode,
+  // because this is the only time we can start it. If we ever go back
+  // into AP mode, then it needs to be already started.
 
   // Initialize web server
   if (VERBOSE) {Serial.print("Starting server...");}
@@ -980,7 +1004,8 @@ void setup() {
 
   // Redirect and activate STATION mode
   server.on("/continue", HTTP_GET, [](AsyncWebServerRequest *request){
-    switch_to_station = true;// Tells the device to exit setup mode.
+    // switch_to_station = true;// Tells the device to exit setup mode.
+    g_status |= F__SW2STAT; // Enable SW2STAT bit
     request->redirect("/");
   });
 
@@ -996,14 +1021,18 @@ void loop() {
   current_time = millis();
 
   if (current_time - previous_time >= interval) {
-    if (switch_to_station) {
+    if (g_status & F__SW2STAT) {
+    //if (switch_to_station) {
       // Make sure connection info is stored in memory
       update_wifi_memory(ssid, password, ip_addr);
 
       // Turn off the server and connect to a network
       enter_station_mode(ssid, password);
 
-      switch_to_station = false;
+      // switch_to_station = false;
+      g_status &= ~F__SW2STAT;
+      
+      g_status |= F__READY;
     }
     /*
     else if (switch_to_access) {
@@ -1016,7 +1045,7 @@ void loop() {
       // If there is serial data that has been received...
       String temp_command = Serial.readString();
       temp_command.trim(); // remove \r and \n
-      status = handler(temp_command.c_str());
+      int result = handler(temp_command.c_str()); // Result is currently unused.
     }
 
     previous_time = current_time;
