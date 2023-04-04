@@ -67,6 +67,25 @@
 							</tool>
 						</toolChain>
 					</folderInfo>
+					<fileInfo id="fr.ac6.managedbuild.config.gnu.cross.exe.debug.7232139.1369992829" name="main.c" rcbsApplicability="disable" resourcePath="src/main.c" toolsToInvoke="fr.ac6.managedbuild.tool.gnu.cross.c.compiler.810460514.1163693126">
+						<tool id="fr.ac6.managedbuild.tool.gnu.cross.c.compiler.810460514.1163693126" name="MCU GCC Compiler" superClass="fr.ac6.managedbuild.tool.gnu.cross.c.compiler.810460514">
+							<option id="gnu.c.compiler.option.include.paths.881650813" name="Include paths (-I)" superClass="gnu.c.compiler.option.include.paths" valueType="includePath">
+								<listOptionValue builtIn="false" value="&quot;${ProjDirPath}/HAL_Driver/Inc/Legacy&quot;"/>
+								<listOptionValue builtIn="false" value="&quot;${ProjDirPath}/inc&quot;"/>
+								<listOptionValue builtIn="false" value="&quot;${ProjDirPath}/CMSIS/device&quot;"/>
+								<listOptionValue builtIn="false" value="&quot;${ProjDirPath}/CMSIS/core&quot;"/>
+								<listOptionValue builtIn="false" value="&quot;${ProjDirPath}/HAL_Driver/Inc&quot;"/>
+							</option>
+							<inputType id="fr.ac6.managedbuild.tool.gnu.cross.c.compiler.input.c.702369720" superClass="fr.ac6.managedbuild.tool.gnu.cross.c.compiler.input.c"/>
+							<inputType id="fr.ac6.managedbuild.tool.gnu.cross.c.compiler.input.s.407061227" superClass="fr.ac6.managedbuild.tool.gnu.cross.c.compiler.input.s"/>
+						</tool>
+						<tool customBuildStep="true" id="org.eclipse.cdt.managedbuilder.ui.rcbs.1788193352" name="Resource Custom Build Step">
+							<inputType id="org.eclipse.cdt.managedbuilder.ui.rcbs.inputtype.217058945" name="Resource Custom Build Step Input Type">
+								<additionalInput kind="additionalinputdependency" paths=""/>
+							</inputType>
+							<outputType id="org.eclipse.cdt.managedbuilder.ui.rcbs.outputtype.841574771" name="Resource Custom Build Step Output Type"/>
+						</tool>
+					</fileInfo>
 					<sourceEntries>
 						<entry excluding="Src/stm32f0xx_hal_timebase_tim_template.c|Src/stm32f0xx_hal_timebase_rtc_wakeup_template.c|Src/stm32f0xx_hal_timebase_rtc_alarm_template.c" flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="HAL_Driver"/>
 						<entry flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="src"/>
@@ -164,4 +183,13 @@
 		</scannerConfigBuildInfo>
 	</storageModule>
 	<storageModule moduleId="org.eclipse.cdt.core.LanguageSettingsProviders"/>
+	<storageModule moduleId="refreshScope" versionNumber="2">
+		<configuration configurationName="Debug">
+			<resource resourceType="PROJECT" workspacePath="/Display Subsystem"/>
+		</configuration>
+		<configuration configurationName="Release">
+			<resource resourceType="PROJECT" workspacePath="/Display Subsystem"/>
+		</configuration>
+	</storageModule>
+	<storageModule moduleId="org.eclipse.cdt.make.core.buildtargets"/>
 </cproject>

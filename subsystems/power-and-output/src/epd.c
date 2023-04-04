@@ -153,6 +153,10 @@ void EPD_powerOff()
 {
 	// Write This Later
 	// For Saving Power
+	EPD_setReg(0x02);
+
+	while ((GPIOA->IDR & 0x1<<P_BUSY)>>P_BUSY != 1);
+
 }
 
 /*
