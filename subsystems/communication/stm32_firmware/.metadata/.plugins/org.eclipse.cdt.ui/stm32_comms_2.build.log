@@ -1,0 +1,6 @@
+13:26:26 **** Incremental Build of configuration Debug for project stm32_comms_2 ****
+make -j4 all 
+make: Nothing to be done for 'all'.
+
+13:26:27 Build Finished (took 585ms)
+

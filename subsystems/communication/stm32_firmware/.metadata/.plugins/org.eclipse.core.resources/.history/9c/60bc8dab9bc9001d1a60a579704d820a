@@ -1,0 +1,386 @@
+
+//===========================================================================
+// ECE 362 lab experiment 10 -- Asynchronous Serial Communication
+//===========================================================================
+
+#include "stm32f0xx.h"
+#include "ff.h"
+#include "diskio.h"
+#include "fifo.h"
+#include "tty.h"
+#include <string.h> // for memset()
+#include <stdio.h> // for printf()
+
+void advance_fattime(void);
+void command_shell(void);
+
+int comm_status;
+
+char global_buffer[100];
+int global_buffer_index = 0;
+
+// Write your subroutines below.
+
+void config_pin(GPIO_TypeDef *g, uint8_t x, uint8_t mode)
+{
+	//INPUT = 00, OUTPUT = 01, ALTERNATE = 10, ANALOG = 11
+	g->MODER &= ~(3 << (x * 2));
+	g->MODER |= mode << (x * 2);
+}
+
+void config_afr(GPIO_TypeDef *g, uint8_t x, uint8_t afr)
+{
+	int addr = x * 4;
+	int reg = 0;
+	if (x > 8)
+	{
+		reg = 1;
+		addr = (x - 8) * 4;
+	}
+	g->AFR[reg] &= ~(0xF << addr);
+	g->AFR[reg] |= afr << addr;
+}
+
+void setup_usart5(void)
+{
+	RCC->AHBENR |= RCC_AHBENR_GPIOCEN;
+	RCC->AHBENR |= RCC_AHBENR_GPIODEN;
+
+	config_pin(GPIOC, 12, 2); //Set PC12 to AFR2
+	config_afr(GPIOC, 12, 2);
+
+	config_pin(GPIOD, 2, 2); //Set PD2 to AFR2
+	config_afr(GPIOD, 2, 2);
+
+	RCC->APB1ENR	|= RCC_APB1ENR_USART5EN;
+	USART5->CR1 	&= ~USART_CR1_UE;	//Disable before configuring
+	USART5->CR1 	&= ~((1<<12) | (1<<28) | USART_CR1_PCE | USART_CR1_OVER8);
+	USART5->CR2 	&= ~(USART_CR2_STOP_0 | USART_CR2_STOP_1);
+	USART5->BRR  	 = 0x1A1;
+	USART5->CR1		|= USART_CR1_TE | USART_CR1_RE;
+	USART5->CR1 	|= USART_CR1_UE;	//Enable after configuring
+
+	while((USART5->ISR & USART_ISR_REACK) == 0);
+	while((USART5->ISR & USART_ISR_TEACK) == 0);
+}
+
+void enable_tty_interrupt(void)
+{
+	USART5->CR1 |= USART_CR1_RXNEIE;
+	NVIC->ISER[0] |= 1 << 29; //don't know the cmsis symbol for that
+}
+
+void setup_spi1(void)
+{
+	//Pretty sure this subroutine works fine...
+	RCC->AHBENR |= RCC_AHBENR_GPIOAEN;
+	config_pin(GPIOA, 12, 1); //PA12 = output
+	config_pin(GPIOA, 5, 2); //PA5 = alternate function
+	config_pin(GPIOA, 6, 2); //PA6 = alternate function
+	config_pin(GPIOA, 7, 2); //PA7 = alternate function
+	config_afr(GPIOA, 5, 0);
+	config_afr(GPIOA, 6, 0);
+	config_afr(GPIOA, 7, 0);
+
+	RCC->APB2ENR |= RCC_APB2ENR_SPI1EN;
+
+	SPI1->CR1 &= ~SPI_CR1_SPE; //Disable SPI1 so we can configure it
+	SPI1->CR1 |= SPI_CR1_BR; //Set baud rate for as low as possible (111)
+	SPI1->CR1 &= ~(SPI_CR1_BIDIMODE | SPI_CR1_BIDIOE);
+	SPI1->CR1 |= SPI_CR1_MSTR;
+	SPI1->CR2 |= SPI_CR2_NSSP | SPI_CR2_DS_0 | SPI_CR2_DS_1 | SPI_CR2_DS_2;
+	SPI1->CR2 &= ~(SPI_CR2_DS_3); //Make sure it's 8-bit word
+	SPI1->CR2 |= SPI_CR2_FRXTH; //Set FIFO reception threshold to 8 bits
+	SPI1->CR1 |= SPI_CR1_SPE; //Enable SPI1 after configuration
+}
+
+void setup_tim14(void)
+{
+	RCC->APB1ENR |= RCC_APB1ENR_TIM14EN;
+	TIM6->CR1 &= ~TIM_CR1_CEN;
+	TIM6->PSC = 9599; //9600
+	TIM6->ARR = 9999; //10000, will take it to 0.5 Hz
+	TIM6->DIER |= TIM_DIER_UIE;
+	TIM6->CR1 |= TIM_CR1_CEN;
+	NVIC->ISER[0] = 1<<TIM14_IRQn;
+}
+
+void spi_high_speed() //Configure SPI for 24 MHz clockrate
+{
+	SPI1->CR1 &= ~SPI_CR1_SPE;
+	SPI1->CR1 &= ~SPI_CR1_BR; //Clear BR to set baud rate to maximum speed
+	SPI1->CR1 |= SPI_CR1_BR_0; //Set to 12 MHz instead of 24 MHz because of an error
+	SPI1->CR1 |= SPI_CR1_SPE;
+}
+
+int simple_putchar(int x) //Tested, working for single values
+{
+	while((USART5->ISR & USART_ISR_TXE) == 0);
+	USART5->TDR = x;
+	return x;
+}
+
+int simple_getchar(void)
+{
+	while((USART5->ISR & USART_ISR_RXNE) == 0);
+	return USART5->RDR;
+}
+
+
+//Step 2.5
+int better_putchar(int x)
+{
+	if (x == '\n')
+	{
+		while((USART5->ISR & USART_ISR_TXE) == 0);
+		USART5->TDR = '\r';
+	}
+	while((USART5->ISR & USART_ISR_TXE) == 0);
+	USART5->TDR = x;
+	return x;
+}
+
+//Step 2.5
+int better_getchar(void)
+{
+	while((USART5->ISR & USART_ISR_RXNE) == 0);
+	if (USART5->RDR == '\r')
+		return '\n';
+	return USART5->RDR;
+}
+
+//Step 2.7
+int interrupt_getchar(void)
+{
+	/*
+	//while(fifo_newline(&input_fifo) == 0);
+	if (fifo_newline(&input_fifo) == 0)
+		asm volatile ("wfi"); //Wait for interrupt
+	char ch = fifo_remove(&input_fifo);
+	return ch; // Return a character from the line buffer.
+	*/
+	USART_TypeDef *u = USART5;
+	// If we missed reading some characters, clear the overrun flag.
+	//if (u->ISR & USART_ISR_ORE)
+	//    u->ICR |= USART_ICR_ORECF;
+	// Wait for a newline to complete the buffer.
+	while(fifo_newline(&input_fifo) == 0) {
+	    asm volatile ("wfi");
+		//while (!(u->ISR & USART_ISR_RXNE))
+	    //    ;
+	    //insert_echo_char(u->RDR);
+	}
+	// Return a character from the line buffer.
+	char ch = fifo_remove(&input_fifo);
+
+	// 3/23
+	global_buffer[global_buffer_index] = ch;
+	global_buffer_index++;
+	// end 3/23
+
+	return ch;
+}
+
+
+//=====================================================================
+// Pre-defined "weak" method used in printf() and putchar(),
+// among other system functions.
+//=====================================================================
+int __io_putchar(int ch)
+{
+	//return simple_putchar(ch); //Step 2.4
+	return better_putchar(ch); //Step 2.5
+}
+
+
+//=====================================================================
+// Pre-defined "weak" method used in fgets() and getchar(),
+// among other system functions.
+//=====================================================================
+int __io_getchar(void)
+{
+	//return simple_getchar(); //Step 2.4
+	//return better_getchar(); //Step 2.5
+	//return line_buffer_getchar(); //Step 2.6
+	return interrupt_getchar(); //Step 2.7
+}
+
+
+//=====================================================================
+// Used in Part 2.7
+//
+// Interrupt handler for UART, triggered by interrupt_getchar() when
+// that function receives a newline
+// (I think, it's been a while since I wrote this code).
+//=====================================================================
+void USART3_4_5_6_7_8_IRQHandler(void)
+{
+	USART_TypeDef *u = USART5;
+	// If we missed reading some characters, clear the overrun flag.
+	if (u->ISR & USART_ISR_ORE)
+		u->ICR |= USART_ICR_ORECF;
+	int x = u->RDR;
+	if (fifo_full(&input_fifo))
+		return;
+	//insert_echo_char(u->RDR);
+	insert_echo_char(x);
+}
+
+void TIM14_IRQHandler(void)
+{
+	TIM14->SR &= ~TIM_SR_UIF; //Acknowledge
+	advance_fattime();
+}
+
+// Write your subroutines above.
+
+
+
+/*
+void comms_handler(void) {
+
+}
+*/
+
+
+
+
+
+const char testline[] = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789\r\n";
+
+int main()
+{
+    comm_status = 0;
+    global_buffer[99] = '\0'; // just in case
+    global_buffer_index = 0;
+
+
+    char comm_buffer[100];
+    comm_buffer[99] = '\0'; // just in case
+
+    int temp;
+
+    setup_usart5();
+    setup_spi1();
+
+    // Uncomment these when you're asked to...
+    setbuf(stdin,0);
+    setbuf(stdout,0);
+    setbuf(stderr,0);
+
+    // Test for 2.2 simple_putchar()
+
+    //for(;;)
+        //for(const char *t=testline; *t; t++)
+            //simple_putchar(*t);
+
+    // Test for 2.3 simple_getchar()
+
+    //for(;;)
+        //simple_putchar( simple_getchar() );
+
+    // Test for 2.4 and 2.5 __io_putchar() and __io_getchar()
+
+
+    //printf("Hello!\n");
+    //
+    //for(;;) {
+    //    putchar( getchar() );
+    //}
+
+    // Test 2.6
+    //
+    //for(;;) {
+    //    printf("Enter string: ");
+    //    char line[100];
+    //    fgets(line, 99, stdin);
+    //    line[99] = '\0'; // just in case
+    //    printf("You entered: %s", line);
+    //}
+
+    // Test for 2.7
+    //
+
+    enable_tty_interrupt();
+    /*
+    for(;;) {
+        // This is the loop that actually does things.
+        printf("Enter string: ");
+        char line[100];
+        fgets(line, 99, stdin);
+        line[99] = '\0'; // just in case
+        printf("You entered: %s", line);
+        printf("Buffer: %s", global_buffer); // 3/23
+    }
+    */
+
+
+    // Test for 2.8 Test the command shell and clock
+    //
+    //enable_tty_interrupt();
+    //setup_tim14();
+    //FATFS fs_storage;
+    //FATFS *fs = &fs_storage;
+   // f_mount(fs, "", 1);
+    //command_shell();
+
+    // === MAIN LOOP TEST ===
+
+
+    for(;;) {
+        // This is the loop that actually does things.
+        //printf("Enter string: ");
+        //char line[100];
+        //fgets(line, 99, stdin);
+        comm_status = 0; // Waiting
+        char cmd[100] = "WF+PING!\n";
+        printf(cmd);
+        while (comm_status == 0) {
+            fgets(comm_buffer, 99, stdin); // This should be an interrupt in the future...
+            comm_buffer[99] = '\0'; // Just in case
+
+            temp = strcmp(comm_buffer, "ACK\n");
+            if (temp == 0) {
+                printf("ACK received.\n");
+                comm_status = 1; // Acknowledged
+            }
+            temp = strcmp(comm_buffer, "NACK\n");
+            if (temp == 0) {
+                printf("NACK received.\n");
+                comm_status = 2; // Not acknowledged
+            }
+        }
+
+
+        //line[99] = '\0'; // just in case
+        //printf("You entered: %s", line);
+        //printf("Buffer: %s", global_buffer); // 3/23
+    }
+
+    // FIgure out how to do this with interrupts later.
+    /*
+    for (;;) {
+        if (comm_status == 0) {
+            printf("WF+PING!\n");
+            comm_status = 1;
+        }
+    }
+    */
+
+    /*
+    for (;;) {
+        if (comm_status == 0) {
+            // Not waiting; send something.
+            printf("WF+PING!\n");
+            comm_status = 1;
+        }
+        else if (comm_status == 1){
+            // Waiting on response
+
+        }
+
+    }
+    */
+
+    return 0;
+}

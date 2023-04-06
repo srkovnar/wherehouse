@@ -1,0 +1,7 @@
+content_assist_parameters_background=152,77,90
+content_assist_proposals_background=140,65,78
+eclipse.preferences.version=1
+hoverModifiers=combinationHover|true|0;problemHover|false|0;documentationHover|false|0;annotationHover|true|Shift;
+matchingBracketsColor=77,77,77
+useAnnotationsPrefPage=true
+useQuickDiffPrefPage=true
