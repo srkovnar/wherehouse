@@ -22,6 +22,10 @@
 #include <EEPROM.h> // Not sure if this board even HAS an eeprom... but it's worth a try.
 // Using EEPROM for storing wifi data so that I don't have to reconfigure it every single time.
 
+
+#define FW_VERSION "0.1.0" // Readable with WF+VRSN?
+
+
 #define DOTDELAY 2000 //milliseconds
 //#define VERBOSE 1
 #define VERBOSE 0 //If 0, don't print anything unnecessary
@@ -67,7 +71,7 @@ char ip_addr[MAX_IP_LENGTH+1] = "192.168.1.102";
 
 char ssid[MAX_SSID_LENGTH+1];
 char password[MAX_PASSWORD_LENGTH+1];
-char ip_addr[MAX_IP_LENGTH+1];
+char server_ip[MAX_IP_LENGTH+1];
 
 const char* server_folder = "/demo"; // The folder where all the php and html files are kept, inside htdocs
 const char* data_ext = "/esp-data.php"; // Unused
@@ -100,6 +104,7 @@ const int F__READY   = (1 << 1); // 0 = still in access point mode. 1 = normal o
 const int F__ERROR   = (1 << 2); // Unrecoverable error
 const int F__SW2STAT = (1 << 3); // Switch to station mode
 const int F__SW2AP   = (1 << 4); // Switch to access point mode
+const int F__SERVERUP= (1 << 5); // Raise once server is started
 
 int g_status;
 
@@ -122,13 +127,14 @@ const char* cmd__name   = "WF+NAME";  // Name of item
 const char* cmd__connect      = "WF+CONN";  // Connect to network
 const char* cmd__disconnect   = "WF+DCON";  // Disconnect from network
 
-const char* cmd__send   = "WF+SEND";  // Send data
-const char* cmd__config = "WF+CNFG";   // Get configuration (item name, weight, tare)
+const char* cmd__send   = "WF+SEND";  //! Send data
+const char* cmd__config = "WF+CNFG";   //! Get configuration (item name, weight, tare)
 
-const char* cmd__access  = "WF+APMD"; // Go back to Access Point mode
+const char* cmd__access  = "WF+APMD"; //! Go back to Access Point mode
 
 // Miscellaneous
-const char* cmd__ping   = "WF+PING"; 
+const char* cmd__ping   = "WF+PING"; //!
+const char* cmd__version= "WF+VRSN"; //?
 
 String data;
 
@@ -183,27 +189,19 @@ const char index_html[] PROGMEM = R"rawliteral(
       Current IP Address: <span id="ip">%IP%</span>
     </p>
     <div>
-      <form action="/ssid" method="get">
-        <label for="fssid2">Wi-Fi Network Name (SSID):</label><br>
-        <input type="text" id="fssid2" name="fssid2" required>
-        <input type="submit" value="Update">
+      <form action="/submitall" method="get">
+        <br>
+        <label for="fssid">SSID:</label><br>
+        <input type="text" id="fssid" name="fssid"><br>
+        <label for="fpass">Password:</label><br>
+        <input type="text" id="fpass" name="fpass"><br>
+        <label for="fipad">Server IP Address:</label><br>
+        <input type="text" id="fipad" name="fipad"><br>
+        <br><input type="submit" class="button" value="Update Settings"><br>
       </form>
     </div>
-    <div>
-      <form action="/password" method="get">
-        <label for="fpass2">Wi-Fi Password:</label><br>
-        <input type="text" id="fpass2" name="fpass2" required>
-        <input type="submit" value="Update">
-      </form>
-    </div>
-    <div>
-      <form action="/ip" method="get">
-        <label for="fipad2">Server IP Address:</label><br>
-        <input type="text" id="fipad2" name="fipad2" required>
-        <input type="submit" value="Update">
-      </form>
-    </div>
-    <a href="/continue"><button class="button">Activate</button>
+    <br><a href="/continue"><button class="button">Done</button><br>
+    <br><a href="/scan"><button class="button">Scan for networks</button><br>
   </body>
   </html>
 )rawliteral";
@@ -222,7 +220,7 @@ String html_replacer(const String& var) {
     return String(password);
   }
   else if (var == "IP") {
-    return String(ip_addr);
+    return String(server_ip);
   }
   else {
     return String();
@@ -515,7 +513,7 @@ int get_config(const char* api_key/*unused*/) {
   }
 
   strcat(temp_server_name, HTTP_TAG);
-  strcat(temp_server_name, ip_addr);
+  strcat(temp_server_name, server_ip);
   strcat(temp_server_name, server_folder);
   strcat(temp_server_name, get_data_ext);
   server_name = String(temp_server_name);
@@ -581,7 +579,7 @@ int post_stock() {
   }
 
   strcat(temp_server_name, HTTP_TAG);
-  strcat(temp_server_name, ip_addr);
+  strcat(temp_server_name, server_ip);
   strcat(temp_server_name, server_folder);
   strcat(temp_server_name, post_data_ext);
   server_name = String(temp_server_name);
@@ -638,6 +636,16 @@ int handler(const char* cmd) {
     return 1;
   }
 
+  // The comparisons below should be done with arrays of pointers
+  // and nested for loops. Start with the full list of commands,
+  // then go character-by-character eliminating possibilities.
+
+  // Just to get to the WF+CONN command, you need to first go through 7
+  // if statements, each of which also contain a whole function which loops through
+  // the whole command string. So, instead of looping through the command string
+  // over and over again, you should just do it once and narrow down possibilities
+  // as you go.
+
   // === VALUE COMMANDS ===
   if (compare_char_array(cmd, cmd__ssid) == 0) {
     out = value_tool(cmd, cmd__ssid, ssid);
@@ -650,7 +658,7 @@ int handler(const char* cmd) {
   }
 
   if (compare_char_array(cmd, cmd__ip) == 0) {
-    out = value_tool(cmd, cmd__ip, ip_addr);
+    out = value_tool(cmd, cmd__ip, server_ip);
     return out;
   }
 
@@ -783,6 +791,20 @@ int handler(const char* cmd) {
     }
     else {
       print_error(cmd__ping, WRONG_MODIFIER, RUN_ONLY);
+      return 1;
+    }
+  }
+
+  if (compare_char_array(cmd, cmd__version) == 0) {
+    cmd_length = 7;
+    if (cmd[cmd_length] == modifier__get) {
+      Serial.print(ACK);
+      Serial.print(separator);
+      Serial.println(FW_VERSION);
+      return 0;
+    }
+    else {
+      print_error(cmd__version, WRONG_MODIFIER, GET_ONLY);
       return 1;
     }
   }
@@ -924,7 +946,7 @@ void setup() {
   delay(1000);
 
   // Update values from memory
-  fetch_wifi_memory(ssid, password, ip_addr);
+  fetch_wifi_memory(ssid, password, server_ip);
   delay(500);
   int try_to_connect = connect();
 
@@ -997,10 +1019,56 @@ void setup() {
 
   server.on("/ip", HTTP_GET, [](AsyncWebServerRequest *request){
     if (request->hasArg("fipad2")) {
-      strcpy(ip_addr, request->arg("fipad2").c_str());
+      strcpy(server_ip, request->arg("fipad2").c_str());
     }
     request->redirect("/");
   });
+
+  
+  server.on("/submitall", HTTP_GET, [](AsyncWebServerRequest *request){
+    if (request->arg("fssid").length() > 0) {
+      strcpy(ssid, request->arg("fssid").c_str());
+    }
+    if (request->arg("fpass").length() > 0) {
+      strcpy(password, request->arg("fpass").c_str());
+    }
+    if (request->arg("fipad").length() > 0) {
+      strcpy(server_ip, request->arg("fipad").c_str());
+    }
+    request->redirect("/");
+  });
+
+
+  // Get list of available networks (UNFINISHED)
+  //First request will return 0 results unless you start scan from somewhere else (loop/setup)
+  //Do not request more often than 3-5 seconds
+  server.on("/scan", HTTP_GET, [](AsyncWebServerRequest *request){
+    String json = "[";
+    int n = WiFi.scanComplete();
+    if(n == -2){
+      WiFi.scanNetworks(true);
+    } else if(n){
+      for (int i = 0; i < n; ++i){
+        if(i) json += ",";
+        json += "{";
+        json += "\"rssi\":"+String(WiFi.RSSI(i));
+        json += ",\"ssid\":\""+WiFi.SSID(i)+"\"";
+        json += ",\"bssid\":\""+WiFi.BSSIDstr(i)+"\"";
+        json += ",\"channel\":"+String(WiFi.channel(i));
+        json += ",\"secure\":"+String(WiFi.encryptionType(i));
+        json += ",\"hidden\":"+String(WiFi.isHidden(i)?"true":"false");
+        json += "}";
+      }
+      WiFi.scanDelete();
+      if(WiFi.scanComplete() == -2){
+        WiFi.scanNetworks(true);
+      }
+    }
+    json += "]";
+    request->send(200, "application/json", json);
+    json = String();
+  });
+  
 
   // Redirect and activate STATION mode
   server.on("/continue", HTTP_GET, [](AsyncWebServerRequest *request){
@@ -1010,8 +1078,9 @@ void setup() {
   });
 
   server.begin();
+  g_status |= F__SERVERUP;
       
-  if (VERBOSE) {Serial.println("done!");Serial.println("Setup complete.\n");}
+  //if (VERBOSE) {Serial.println("done!");Serial.println("Setup complete.\n");}
 }
 
 void loop() {
@@ -1024,7 +1093,7 @@ void loop() {
     if (g_status & F__SW2STAT) {
     //if (switch_to_station) {
       // Make sure connection info is stored in memory
-      update_wifi_memory(ssid, password, ip_addr);
+      update_wifi_memory(ssid, password, server_ip);
 
       // Turn off the server and connect to a network
       enter_station_mode(ssid, password);

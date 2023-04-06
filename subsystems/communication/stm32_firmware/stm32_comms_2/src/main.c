@@ -14,13 +14,6 @@
 
 #define COMM_DELAY 20 // Number of seconds to wait between commands
 
-#define LIL_INTERVAL 10
-#define BIG_INTERVAL 60
-
-#define VERBOSE 1 // Uncomment this declaration to enable verbose mode.
-
-
-
 void advance_fattime(void);
 void command_shell(void);
 
@@ -37,13 +30,13 @@ const char* set__stock      = "WF+STCK=";
 const char* run__send       = "WF+SEND!\n";
 const char* run__disconnect = "WF+DCON!\n";
 
-int comm_status;
+int comm_status = 0;
 const int LIL_READY     = (1 << 0); // UNUSED
 const int BIG_READY     = (1 << 1); // UNUSED
 const int TRIGGERED     = (1 << 2);
 const int WIFI_STATUS   = (1 << 3);
-const int RESET_START   = (1 << 4);
-const int RESET_END     = (1 << 5);
+const int RESET_START   = (1 << 4); // UNUSED
+const int RESET_END     = (1 << 5); // UNUSED
 // ^ This is for saving space on my "status" variable
 
 
@@ -52,12 +45,15 @@ int global_buffer_index = 0;
 
 char g_item_name[32];
 char g_item_code[32];
-char g_unit_weight[32]; // Convert this to int when needed
-char g_tare_weight[32]; // Convert this to int when needed
+char g_unit_weight[32]; // Convert this to int as needed
+char g_tare_weight[32]; // Convert this to int as needed
+
+int g_unit_value;
+int g_tare_value;
 
 int global_stock = 10;
 
-int comm_counter;
+int comm_counter; // Increments with 1-Hz timer interrupt up to COMM_DELAY
 
 // Write your subroutines below.
 
@@ -211,42 +207,42 @@ void TIM6_DAC_IRQHandler(void) {
 //=====================================================================
 // Timer 14 setup and interrupt handler.
 // (Not currently in use.)
-//=====================================================================
-void setup_tim14(void)
-{
-    // No idea why these all say TIM6instead of tim14...
-	RCC->APB1ENR |= RCC_APB1ENR_TIM14EN;
-	TIM6->CR1 &= ~TIM_CR1_CEN;
-	TIM6->PSC = 9599; //9600
-	TIM6->ARR = 9999; //10000, will take it to 0.5 Hz
-	TIM6->DIER |= TIM_DIER_UIE;
-	TIM6->CR1 |= TIM_CR1_CEN;
-	NVIC->ISER[0] = 1<<TIM14_IRQn;
-}
-
-
-void TIM14_IRQHandler(void)
-{
-    TIM14->SR &= ~TIM_SR_UIF; //Acknowledge
-    advance_fattime();
-}
+////=====================================================================
+//void setup_tim14(void)
+//{
+//    // No idea why these all say TIM6instead of tim14...
+//	RCC->APB1ENR |= RCC_APB1ENR_TIM14EN;
+//	TIM6->CR1 &= ~TIM_CR1_CEN;
+//	TIM6->PSC = 9599; //9600
+//	TIM6->ARR = 9999; //10000, will take it to 0.5 Hz
+//	TIM6->DIER |= TIM_DIER_UIE;
+//	TIM6->CR1 |= TIM_CR1_CEN;
+//	NVIC->ISER[0] = 1<<TIM14_IRQn;
+//}
+//
+//
+//void TIM14_IRQHandler(void)
+//{
+//    TIM14->SR &= ~TIM_SR_UIF; //Acknowledge
+//    advance_fattime();
+//}
 
 
 //=====================================================================
 // UART stuff (DEFINITELY used right now
 //=====================================================================
-int simple_putchar(int x) //Tested, working for single values
-{
-	while((USART5->ISR & USART_ISR_TXE) == 0);
-	USART5->TDR = x;
-	return x;
-}
-
-int simple_getchar(void)
-{
-	while((USART5->ISR & USART_ISR_RXNE) == 0);
-	return USART5->RDR;
-}
+//int simple_putchar(int x) //Tested, working for single values
+//{
+//	while((USART5->ISR & USART_ISR_TXE) == 0);
+//	USART5->TDR = x;
+//	return x;
+//}
+//
+//int simple_getchar(void)
+//{
+//	while((USART5->ISR & USART_ISR_RXNE) == 0);
+//	return USART5->RDR;
+//}
 
 
 //Step 2.5
@@ -262,14 +258,14 @@ int better_putchar(int x)
 	return x;
 }
 
-//Step 2.5
-int better_getchar(void)
-{
-	while((USART5->ISR & USART_ISR_RXNE) == 0);
-	if (USART5->RDR == '\r')
-		return '\n';
-	return USART5->RDR;
-}
+////Step 2.5
+//int better_getchar(void)
+//{
+//	while((USART5->ISR & USART_ISR_RXNE) == 0);
+//	if (USART5->RDR == '\r')
+//		return '\n';
+//	return USART5->RDR;
+//}
 
 //Step 2.7
 int interrupt_getchar(void)
@@ -381,10 +377,14 @@ int char_response(const char* cmd, char* store_here) {
     int try = 0;
     int attempts = 3;
 
+    // Send command over UART
     printf(cmd);
+
+    // Wait for response
     while((status == 0) && (try < attempts)) {
-        fgets(cbuf, 99, stdin);
+        fgets(cbuf, 99, stdin); // uses __io_getchar, which uses interrupt_getchar to wait for interrupt on \r
         cbuf[99] = '\0';
+
         strncpy(atest, cbuf, 3);
         atest[3] = '\0';
         strncpy(ntest, cbuf, 4);
@@ -400,6 +400,7 @@ int char_response(const char* cmd, char* store_here) {
         try++;
     }
 
+    // Move the rest of the string into store_here[]
     if (status == 1) { // Get the value after ACK
         strcpy(store_here, cbuf+3);
     }
@@ -407,9 +408,7 @@ int char_response(const char* cmd, char* store_here) {
         strcpy(store_here, cbuf+4);
     }
 
-    // v THIS IS FOR TESTING
-    //printf(store_here);
-    // ^ This is for testing!
+    // Return 1 if ACK, -1 if NACK, 0 if no response.
     return status;
 }
 
@@ -693,8 +692,6 @@ int wifi_sequence(void) {
 
     int stock = 0;
 
-    //GPIOC->ODR |= (1<<9);
-
     cmd_response = char_response(run__connect, f_buffer);
     if (cmd_response != 1) {
         errors++;
@@ -744,21 +741,22 @@ int check_sequence(void) {
     char f_buffer[32];
     f_buffer[31] = '\0';
 
-    //cmd_response = char_response(run__ping, f_buffer);
-    //if (cmd_response != 1) {
-    //    errors++;
-    //}
+    cmd_response = char_response(run__ping, f_buffer);
+    if (cmd_response != 1) {
+        errors++;
+    }
 
     // PING has incorrect functionality right now, so I'm using a workaround.
+    // UPDATE: PING is fixed.
 
-    cmd_response = char_response(get__connect, f_buffer);
-    if (cmd_response != 1) { // NACK = not connected
-        cmd_response = char_response(run__connect, f_buffer);
-        if (cmd_response != 1) { // NACK again = failed to connect
-            errors++;
-        }
-        cmd_response = char_response(run__disconnect, f_buffer);
-    }
+//    cmd_response = char_response(get__connect, f_buffer);
+//    if (cmd_response != 1) { // NACK = not connected
+//        cmd_response = char_response(run__connect, f_buffer);
+//        if (cmd_response != 1) { // NACK again = failed to connect
+//            errors++;
+//        }
+//        cmd_response = char_response(run__disconnect, f_buffer);
+//    }
 
     if (errors != 0) {
         return 1;
@@ -794,14 +792,14 @@ int main()
     config_pin(GPIOC, 6, 1); // Dev board LED 1 (red)
     config_pin(GPIOC, 7, 1); // Dev board LED 2 (orange)
     config_pin(GPIOC, 8, 1); // Dev board LED 3 (green)
-    config_pin(GPIOC, 9, 1); // Dev board LED 4 (blue)
+//    config_pin(GPIOC, 9, 1); // Dev board LED 4 (blue)
 
     // Now we can set values to be outputted by the GPIO pins.
     GPIOC->ODR &= ~ESP_RST;
     GPIOC->ODR |= ESP_CH_EN;
     GPIOC->ODR |= ESP_GPIO0;
     GPIOC->ODR |= ESP_GPIO2; // Testing using this as CH_EN
-    GPIOC->ODR |= ESP_RST;
+    //GPIOC->ODR |= ESP_RST;
     //GPIOC->ODR &= ~ESP_RST; // Reset the chip
     //GPIOC->ODR |= ESP_RST;
     //GPIOC->ODR |= ESP_GPIO2;
@@ -819,18 +817,10 @@ int main()
 
     enable_tty_interrupt();
 
-    comm_status = 0;
     global_buffer[99] = '\0';
 
-    /*
-    if (comm_status & TRIGGERED) {
-        comm_status |= RESET_END;
-        GPIOC->ODR  |= ESP_RST;
-        comm_status &= ~TRIGGERED;
-    }
-    */
-
     GPIOC->ODR |= ESP_RST;
+    comm_status |= RESET_END;
 
 
     // === MAIN LOOP TEST ===
@@ -842,9 +832,10 @@ int main()
         // If not, ping module on every comm cycle until it's ready.
 
         if (comm_status & TRIGGERED) {
+            // Turn LED on; comm handling is starting
             GPIOC->ODR |= (1<<8);
-/*
-            if (!(comm_status & RESET_END)) {
+
+            /*if (!(comm_status & RESET_END)) {
                 GPIOC->ODR  |= ESP_RST;
                 comm_status |= RESET_END;
             }
@@ -861,8 +852,11 @@ int main()
                 }
             }
 
-            comm_status &= ~TRIGGERED;
+            // Turn LED off; comm handling is done
             GPIOC->ODR &= ~(1<<8);
+
+            // Lower TRIGGERED flag
+            comm_status &= ~TRIGGERED;
         }
     }
 
