@@ -84,7 +84,7 @@ char api_key[32] = "tpmat5ab3j7f9";
 char device_id[9] = "1";
 
 char stock[MAX_STRING_LENGTH] = "0";
-char name[MAX_STRING_LENGTH] = "Widgets";
+char name[MAX_STRING_LENGTH] = "Widgets"; // Unused
 
 
 //For connecting to database
@@ -477,16 +477,52 @@ int connect() {
 
 
 int disconnect() {
+  
+  
+  if (VERBOSE) {Serial.print("Disconnecting...");}
   if (WiFi.status() == WL_CONNECTED) {
     WiFi.disconnect();
   }
-  //Serial.println(ACK);
-  // if (VERBOSE) {
-  //   Serial.print("\tStatus: ");
-  //   Serial.println(WiFi.status());
+  if (VERBOSE) {Serial.println("done!");}
+
+
+  if (VERBOSE) {Serial.print("Now waiting for connection to end...");}
+
+  int done;
+  int tries = 0;
+  do {
+    wl_status_t wfstat = WiFi.status();
+    if (wfstat == WL_CONNECTED) {
+      done = 0;
+    }
+    else if (tries > 10) {
+      done = 2;
+    }
+    else {
+      done = 1;
+    }
+    tries++;
+    delay(10);
+  } while (done == 0);
+
+  if (VERBOSE) {Serial.println("done!");}
+  if (VERBOSE) {Serial.print("WiFi status = "); Serial.println(WiFi.status());}
+
+  if (done == 1) {
+    return 0; //success (ACK)
+  }
+  else {
+    return 1; //failure (NACK)
+  }
+  
+  // if (WiFi.status() != WL_CONNECTED) {
+  //   if (VERBOSE) {Serial.println("Disconnected successfully.");}
+  //   return 0;
   // }
-  while (WiFi.status() == WL_CONNECTED); // Wait until done.
-  return 0;
+  // else {
+  //   if (VERBOSE) {Serial.println("Unsuccessful disconnect.");}
+  //   return 1;
+  // }
 }
 
 
@@ -694,13 +730,15 @@ int handler(const char* cmd) {
       }
       else if (cmd[cmd_length] == modifier__get) {
         if (WiFi.status() == WL_CONNECTED) {
-          //Serial.println("Connected");
-          Serial.println(ACK);
+          Serial.print(ACK);
+          Serial.print(":");
+          Serial.println("Connected");
           return 0;
         }
         else {
-          //Serial.println("Disconnected");
-          Serial.println(NACK);
+          Serial.print(NACK);
+          Serial.print(":");
+          Serial.println("Disconnected");
           return 0;
         }
       }
@@ -932,6 +970,7 @@ void setup() {
 
   // Begin UART serial communication
   Serial.begin(115200);
+  delay(3000); // Wait to finish plugging in...
 
   // Commit 512 bytes of ESP8266 flash (for "EEPROM" emulation).
   // The esp8266 doesn't *actually* have an EEPROM, but it DOES have
@@ -941,21 +980,24 @@ void setup() {
   // EEPROM activity is stored in other functions.
   // See update_wifi_memory() and fetch_wifi_memory()
   EEPROM.begin(512);
-
-  // Delay to give time for Serial to start
-  delay(1000);
+  //EEPROM.begin(128);
+  if (VERBOSE) {Serial.println("EEPROM initialized.");}
+  delay(500);
 
   // Update values from memory
   fetch_wifi_memory(ssid, password, server_ip);
   delay(500);
+  if (VERBOSE) {Serial.print("Attempting to connect with saved WiFi parameters...");}
   int try_to_connect = connect();
 
   if (try_to_connect == 1) { // If failed to connect
+    if (VERBOSE) {Serial.println("failed.");}
     start_as_ap = true;
     try_to_connect = disconnect();
     g_status &= ~F__READY;
   }
   else {
+    if (VERBOSE) {Serial.println("success!");}
     start_as_ap = false;
     g_status |= F__READY;
   }
@@ -981,6 +1023,7 @@ void setup() {
       //   Serial.print("\tHost IP Address: ");
       //   Serial.println(myIP);
       // }
+      if (VERBOSE) {Serial.println("done!");}
     }
     else {
       g_status |= F__ERROR;
@@ -992,16 +1035,18 @@ void setup() {
   // into AP mode, then it needs to be already started.
 
   // Initialize web server
-  if (VERBOSE) {Serial.print("Starting server...");}
+  if (VERBOSE) {Serial.print("Setting up server...");}
 
   //setup_server(server); //This caused a crash
   //AsyncWebServer server = setup_server(); // This doesn't crash, but... nothing happens on access.
 
   // Homepage
+  if (VERBOSE) {Serial.print("1, ");}
   server.on("/", HTTP_GET, [](AsyncWebServerRequest *request){
     request->send_P(200, "text/html", index_html, html_replacer);
   });
 
+  if (VERBOSE) {Serial.print("2, ");}
   // Redirects
   server.on("/ssid", HTTP_GET, [](AsyncWebServerRequest *request){
     if (request->hasArg("fssid2")) {
@@ -1010,6 +1055,7 @@ void setup() {
     request->redirect("/");
   });
 
+  if (VERBOSE) {Serial.print("3, ");}
   server.on("/password", HTTP_GET, [](AsyncWebServerRequest *request){
     if (request->hasArg("fpass2")) {
       strcpy(password, request->arg("fpass2").c_str());
@@ -1017,6 +1063,7 @@ void setup() {
     request->redirect("/");
   });
 
+  if (VERBOSE) {Serial.print("4, ");}
   server.on("/ip", HTTP_GET, [](AsyncWebServerRequest *request){
     if (request->hasArg("fipad2")) {
       strcpy(server_ip, request->arg("fipad2").c_str());
@@ -1024,7 +1071,7 @@ void setup() {
     request->redirect("/");
   });
 
-  
+  if (VERBOSE) {Serial.print("5, ");}
   server.on("/submitall", HTTP_GET, [](AsyncWebServerRequest *request){
     if (request->arg("fssid").length() > 0) {
       strcpy(ssid, request->arg("fssid").c_str());
@@ -1042,6 +1089,8 @@ void setup() {
   // Get list of available networks (UNFINISHED)
   //First request will return 0 results unless you start scan from somewhere else (loop/setup)
   //Do not request more often than 3-5 seconds
+
+  /*
   server.on("/scan", HTTP_GET, [](AsyncWebServerRequest *request){
     String json = "[";
     int n = WiFi.scanComplete();
@@ -1068,8 +1117,9 @@ void setup() {
     request->send(200, "application/json", json);
     json = String();
   });
+  */
   
-
+  if (VERBOSE) {Serial.print("6, ");}
   // Redirect and activate STATION mode
   server.on("/continue", HTTP_GET, [](AsyncWebServerRequest *request){
     // switch_to_station = true;// Tells the device to exit setup mode.
@@ -1077,7 +1127,10 @@ void setup() {
     request->redirect("/");
   });
 
+  if (VERBOSE) {Serial.println("done!");}
+  if (VERBOSE) {Serial.print("Starting server...");}
   server.begin();
+  if (VERBOSE) {Serial.println("done!");}
   g_status |= F__SERVERUP;
       
   //if (VERBOSE) {Serial.println("done!");Serial.println("Setup complete.\n");}
