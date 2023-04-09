@@ -1,0 +1,6 @@
+16:02:18 **** Incremental Build of configuration Debug for project wherehouse_stm32_firmware ****
+make -j4 all 
+make: Nothing to be done for 'all'.
+
+16:02:18 Build Finished (took 572ms)
+

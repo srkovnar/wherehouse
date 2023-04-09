@@ -21,7 +21,7 @@
 		<item value="false" key="BUILD_NOW"/>
 	</section>
 	<section name="org.eclipse.ui.internal.ide.dialogs.ProjectContentsLocationArea">
-		<item value="/home/sam/Documents/senior_design/wherehouse/system/wherehouse_stm32_code_merge_2" key="OUTSIDE_LOCATION"/>
+		<item value="/home/sam/Documents/senior_design/wherehouse/system/stm32_firmware" key="OUTSIDE_LOCATION"/>
 	</section>
 	<section name="NewWizardAction">
 		<item value="org.eclipse.cdt.ui.wizards.NewCWizard2" key="NewWizardSelectionPage.STORE_SELECTED_ID"/>

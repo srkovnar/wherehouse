@@ -1,0 +1,6 @@
+15:14:02 **** Incremental Build of configuration Debug for project wherehouse_stm32_code_merge_2 ****
+make -j4 all 
+make: Nothing to be done for 'all'.
+
+15:14:02 Build Finished (took 571ms)
+
