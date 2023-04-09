@@ -123,7 +123,7 @@ void setup_usart5(void)
 void enable_tty_interrupt(void)
 {
 	USART5->CR1 |= USART_CR1_RXNEIE;
-	NVIC->ISER[0] |= 1 << 29; //don't know the cmsis symbol for that
+	NVIC->ISER[0] |= 1 << USART3_8_IRQn;
 }
 
 
@@ -139,94 +139,54 @@ void enable_tty_interrupt(void)
 // Auto-reload register = 500
 // 48 MHz * (1/48000) * (1 / 500) = 2 Hz
 // -> Interrupt will occur 2 times per second.
-//
+// and interrupt handler
 // Prescaler can be anywhere from 1 to 65536.
 // (I can't find ARR's range in the Family Reference Manual,
 // but I know it can be at least 10000.)
 //=====================================================================
-void setup_tim6(void) {
-    // Enable RCC to timer 6
-    RCC->APB1ENR |= RCC_APB1ENR_TIM6EN;
+void setup_tim3(void) {
+    // Enable RCC to timer 3
+    RCC->APB1ENR |= RCC_APB1ENR_TIM3EN;
 
-    // In Timer 6 Control Register (CR)...
-    TIM6->CR1 &= ~TIM_CR1_CEN;
-    TIM6->PSC = 47999; // Prescaler = 48000
-    TIM6->ARR = 999; // Auto-Reload Register = 1000
+    // In Timer 3 Control Register (CR)...
+    TIM3->CR1 &= ~TIM_CR1_CEN;
+    TIM3->PSC = 47999; // Prescaler = 48000
+    TIM3->ARR = 999; // Auto-Reload Register = 1000
     // Should give us a timer that goes off once per second.
-    TIM6->DIER |= TIM_DIER_UIE;
-    TIM6->CR1 |= TIM_CR1_CEN;
+    TIM3->DIER |= TIM_DIER_UIE;
+    TIM3->CR1 |= TIM_CR1_CEN;
 
     //Unmask in NVIC_ISER to enable interrupt (FRM page 217)
-    NVIC->ISER[0] = 1 << TIM6_DAC_IRQn;
+    NVIC->ISER[0] = 1 << TIM3_IRQn;
 }
 
-void TIM6_DAC_IRQHandler(void) {
-    // This just toggles two LEDs.
-    // One is toggled once per second, the other is toggled
-    // once per minute. This functionality can be replaced
-    // once the actual functionality is done.
-    int led1;
-    int led2;
-    int respval;
-
-    int buffer_index;
-
+void TIM3_IRQHandler(void) {
     // Acknowledge interrupt
-    TIM6->SR &= ~TIM_SR_UIF;
+    TIM3->SR &= ~TIM_SR_UIF;
 
-    // Toggle PC6 (Connected to the rightmost LED
-    led1 = GPIOC->ODR & (1<<6);
-    if (led1) {
-        // If on, turn it off
-        GPIOC->ODR &= ~(1<<6);
+    // Toggle LED 1
+    if (GPIOC->ODR & (1<<7)) {
+        GPIOC->ODR &= ~(1<<7);
     }
     else {
-        // If off, turn it on
-        GPIOC->ODR |= (1<<6);
+        GPIOC->ODR |= (1<<7);
     }
 
-    // ^ Above code worked on March 28, 2023
-
-    // Big stuff below
-    comm_counter = (comm_counter + 1) % COMM_DELAY; // This counts seconds.
+    // Increment secondary counter
+    comm_counter = (comm_counter + 1) % COMM_DELAY;// This counts seconds
     if (comm_counter == 0) {
-        // Raise flag to activate Wi-Fi communication
+        // Raise flag
         comm_status |= TRIGGERED;
 
-        // Toggle LED
-        led2 = GPIOC->ODR & (1<<7);
-        if (led2) {
-            GPIOC->ODR &= ~(1<<7);
+        // Toggle LED 2
+        if (GPIOC->ODR & (1<<6)) {
+            GPIOC->ODR &= ~(1<<6);
         }
         else {
-            GPIOC->ODR |= (1<<7);
+            GPIOC->ODR |= (1<<6);
         }
     }
 }
-
-//=====================================================================
-// Timer 14 setup and interrupt handler.
-// (Not currently in use.)
-////=====================================================================
-//void setup_tim14(void)
-//{
-//    // No idea why these all say TIM6instead of tim14...
-//	RCC->APB1ENR |= RCC_APB1ENR_TIM14EN;
-//	TIM6->CR1 &= ~TIM_CR1_CEN;
-//	TIM6->PSC = 9599; //9600
-//	TIM6->ARR = 9999; //10000, will take it to 0.5 Hz
-//	TIM6->DIER |= TIM_DIER_UIE;
-//	TIM6->CR1 |= TIM_CR1_CEN;
-//	NVIC->ISER[0] = 1<<TIM14_IRQn;
-//}
-//
-//
-//void TIM14_IRQHandler(void)
-//{
-//    TIM14->SR &= ~TIM_SR_UIF; //Acknowledge
-//    advance_fattime();
-//}
-
 
 //=====================================================================
 // UART stuff (DEFINITELY used right now
@@ -806,7 +766,8 @@ int main()
 
     comm_status |= RESET_START; // Signal that reset has been started
 
-    setup_tim6();
+    //setup_tim6();
+    setup_tim3();
 
     setup_usart5();
 

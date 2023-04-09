@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <section name="Workbench">
+	<item value="${workspace_loc:/${ProjName}/CMSIS}" key="org.eclipse.cdt.utils.ui.controls.FileListControl"/>
 	<item value="74" key="org.eclipse.cdt.uiformatter_pagemodify_dialog.preferred_x"/>
 	<item value="27" key="org.eclipse.cdt.uiformatter_pagemodify_dialog.preferred_y"/>
 	<item value="true" key="org.eclipse.cdt.ui.codeformatter.create_profile_dialog.open_edit"/>
@@ -11,6 +12,14 @@
 	<item value="0" key="org.eclipse.cdt.uiformatter_page.white_space.c_view.inner"/>
 	<item value="-1" key="formatter_page.modify_dialog_tab_page.last_focus_index"/>
 	<item value="1" key="org.eclipse.cdt.uiformatter_page.line_wrapping_tab_page.last_category_index"/>
+	<section name="org.eclipse.cdt.internal.ui.text.QuickOutline">
+		<item value="true" key="org.eclipse.cdt.internal.ui.text.COutlineInformationControlDIALOG_USE_PERSISTED_SIZE"/>
+		<item value="437" key="org.eclipse.cdt.internal.ui.text.COutlineInformationControlDIALOG_Y_ORIGIN"/>
+		<item value="400" key="org.eclipse.cdt.internal.ui.text.COutlineInformationControlDIALOG_WIDTH"/>
+		<item value="true" key="org.eclipse.cdt.internal.ui.text.COutlineInformationControlDIALOG_USE_PERSISTED_LOCATION"/>
+		<item value="377" key="org.eclipse.cdt.internal.ui.text.COutlineInformationControlDIALOG_HEIGHT"/>
+		<item value="865" key="org.eclipse.cdt.internal.ui.text.COutlineInformationControlDIALOG_X_ORIGIN"/>
+	</section>
 	<section name="org.eclipse.cdt.ui.text.hover.CMacroExpansionExploration.internal">
 		<item value="131" key="size.height"/>
 		<item value="571" key="size.width"/>
@@ -20,6 +29,7 @@
 	<section name="RenameInformationPopup">
 	</section>
 	<section name="OptionalMessageDialog.hide.">
+		<item value="1" key="askReindex.detail"/>
 	</section>
 	<section name="CRenameRefactoringInputPage">
 	</section>

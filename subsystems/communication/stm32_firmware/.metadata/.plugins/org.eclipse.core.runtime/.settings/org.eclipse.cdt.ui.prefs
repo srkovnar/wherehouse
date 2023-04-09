@@ -1,6 +1,13 @@
 asm_directive=255,121,198
 asm_label=255,121,198
+buildConsoleBackgroundColor=61,61,61
+buildConsoleErrorStreamColor=255,85,85
+buildConsoleInfoStreamColor=139,233,253
 buildConsoleLines=5000
+buildConsoleOutputStreamColor=255,255,255
+buildConsoleProblemBackgroundColor=61,61,61
+buildConsoleProblemInfoBackgroundColor=255,255,255
+buildConsoleProblemWarningBackgroundColor=78,75,36
 buildConsoleWrapLines=true
 c_braces=255,255,255
 c_default=255,255,255

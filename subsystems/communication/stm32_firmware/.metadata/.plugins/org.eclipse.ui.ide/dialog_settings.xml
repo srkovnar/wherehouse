@@ -1,6 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <section name="Workbench">
 	<list key="org.eclipse.ui.internal.wizards.datatransfer.SmartImportRootWizardPage.knownSources">
+		<item value="/home/sam/Documents/senior_design/wherehouse/subsystems/power-and-output"/>
+		<item value="/home/sam/Documents/senior_design/wherehouse/system/wherehouse_stm32_code_merge_1"/>
 		<item value="/home/sam/Documents/ece36200_workspace/lab05"/>
 		<item value="/home/sam/Documents/ece36200_workspace/lab10 (copy)"/>
 		<item value="/home/sam/Documents/senior_design/wherehouse/subsystems/communication/stm32_firmware/lab10_commversion"/>
@@ -19,5 +21,12 @@
 		<item value="false" key="BUILD_NOW"/>
 	</section>
 	<section name="org.eclipse.ui.internal.ide.dialogs.ProjectContentsLocationArea">
+		<item value="/home/sam/Documents/senior_design/wherehouse/system/wherehouse_stm32_code_merge_2" key="OUTSIDE_LOCATION"/>
+	</section>
+	<section name="NewWizardAction">
+		<item value="org.eclipse.cdt.ui.wizards.NewCWizard2" key="NewWizardSelectionPage.STORE_SELECTED_ID"/>
+		<list key="NewWizardSelectionPage.STORE_EXPANDED_CATEGORIES_ID">
+			<item value="org.eclipse.cdt.ui.newCWizards"/>
+		</list>
 	</section>
 </section>

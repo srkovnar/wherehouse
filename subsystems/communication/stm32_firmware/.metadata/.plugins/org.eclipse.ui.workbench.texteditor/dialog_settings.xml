@@ -2,20 +2,20 @@
 <section name="Workbench">
 	<section name="org.eclipse.ui.texteditor.FindReplaceDialog">
 		<item value="false" key="isRegEx"/>
-		<item value="" key="selection"/>
+		<item value="RCC_CFGR2" key="selection"/>
 		<item value="false" key="casesensitive"/>
 		<item value="false" key="incremental"/>
 		<item value="true" key="wrap"/>
 		<item value="false" key="wholeword"/>
 		<list key="findhistory">
-			<item value="1 &lt;&lt; 9"/>
-			<item value="1&lt;&lt;9"/>
-			<item value="BIG_INTERVAL"/>
-			<item value="LIL_INTERVAL"/>
-			<item value="VERBOSE"/>
-			<item value="RESET_END"/>
-			<item value="RESET_START"/>
-			<item value="(1&lt;&lt;9)"/>
+			<item value="RCC_CFGR2"/>
+			<item value="RCC_AHBENR_GPIOCEN"/>
+			<item value="check_sequence"/>
+			<item value="global_buffer"/>
+			<item value="TIM3"/>
+			<item value="IRQHandler"/>
+			<item value="TIM6_DAC_IRQHandler"/>
+			<item value="TIM6_DAC"/>
 		</list>
 		<list key="replacehistory">
 		</list>
