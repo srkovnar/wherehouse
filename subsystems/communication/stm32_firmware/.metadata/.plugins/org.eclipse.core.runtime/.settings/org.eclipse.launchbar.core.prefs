@@ -1,6 +1,6 @@
 LaunchTargetManager/org.eclipse.launchbar.core.launchTargetType.local,Local/arch=x86_64
 LaunchTargetManager/org.eclipse.launchbar.core.launchTargetType.local,Local/os=linux
-configDescList=org.eclipse.launchbar.core.descriptorType.default\:stm32_communication Debug,org.eclipse.launchbar.core.descriptorType.default\:lab01.elf,org.eclipse.launchbar.core.descriptorType.default\:lab01 Debug,org.eclipse.launchbar.core.descriptorType.default\:lab10_debug,org.eclipse.launchbar.core.descriptorType.default\:stm32_comms_1 Run,org.eclipse.launchbar.core.descriptorType.default\:lab05,org.eclipse.launchbar.core.descriptorType.default\:stm32_comms_2 Run,org.eclipse.launchbar.core.descriptorType.default\:merge_2,org.eclipse.launchbar.core.descriptorType.default\:stm32_comms_3,org.eclipse.launchbar.core.descriptorType.default\:New_configuration,org.eclipse.launchbar.core.descriptorType.default\:wherehouse_stm32_firmware
+configDescList=org.eclipse.launchbar.core.descriptorType.default\:lab05,org.eclipse.launchbar.core.descriptorType.default\:stm32_comms_3,org.eclipse.launchbar.core.descriptorType.default\:lab01 Debug,org.eclipse.launchbar.core.descriptorType.default\:stm32_comms_1 Run,org.eclipse.launchbar.core.descriptorType.default\:lab10_debug,org.eclipse.launchbar.core.descriptorType.default\:merge_2,org.eclipse.launchbar.core.descriptorType.default\:stm32_comms_2 Run,org.eclipse.launchbar.core.descriptorType.default\:stm32_communication Debug,org.eclipse.launchbar.core.descriptorType.default\:lab01.elf,org.eclipse.launchbar.core.descriptorType.default\:wherehouse_stm32_firmware
 eclipse.preferences.version=1
 org.eclipse.launchbar.core.descriptorType.default\:New_configuration/activeLaunchMode=run
 org.eclipse.launchbar.core.descriptorType.default\:lab01\ Debug/activeLaunchMode=debug
@@ -13,3 +13,4 @@ org.eclipse.launchbar.core.descriptorType.default\:merge_2/activeLaunchMode=debu
 org.eclipse.launchbar.core.descriptorType.default\:stm32_comms_1\ Run/activeLaunchMode=run
 org.eclipse.launchbar.core.descriptorType.default\:stm32_comms_2\ Run/activeLaunchMode=run
 org.eclipse.launchbar.core.descriptorType.default\:stm32_comms_3/activeLaunchMode=run
+org.eclipse.launchbar.core.descriptorType.default\:wherehouse_stm32_firmware/activeLaunchMode=run

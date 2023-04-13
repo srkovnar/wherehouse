@@ -1,29 +1,50 @@
 #include "stm32f0xx.h"
-#include "ff.h"
-#include "diskio.h"
-#include "fifo.h"
-#include "tty.h"
+#include "ff.h"     // Comms
+#include "diskio.h" // Unused?
+#include "fifo.h"   // Comms
+#include "tty.h"    // Comms
+
+#include "display.h"    // Display
+//#include "misc.c"       // Display
+
 #include <string.h> // for memset()
-#include <stdio.h> // for printf()
+#include <stdio.h>  // for printf()
+#include <stdlib.h> // for atof()
 
 
 #define COMM_DELAY 20 // Number of seconds to wait between commands
+//#define COMM_DELAY 5
 
-void advance_fattime(void);
-void command_shell(void);
+//void advance_fattime(void);
+//void command_shell(void);
 
 const int ESP_CH_EN = (1 << 0);
 const int ESP_RST   = (1 << 1);
 const int ESP_GPIO0 = (1 << 2);
 const int ESP_GPIO2 = (1 << 3);
 
-const char* run__ping       = "WF+PING!\n";
-const char* run__connect    = "WF+CONN!\n";
-const char* get__connect    = "WF+CONN?\n";
-const char* run__config     = "WF+CNFG!\n";
-const char* set__stock      = "WF+STCK=";
-const char* run__send       = "WF+SEND!\n";
-const char* run__disconnect = "WF+DCON!\n";
+// ID 0 = HALT; means we're done.
+const char* run__ping       = "WF+PING!\n"; // ID 1
+const char* get__connect    = "WF+CONN?\n"; // ID 2
+const char* run__connect    = "WF+CONN!\n"; // ID 3
+const char* run__disconnect = "WF+DCON!\n"; // ID 4
+const char* run__config     = "WF+CNFG!\n"; // ID 5
+const char* set__stock      = "WF+STCK=";   // ID 6
+const char* run__send       = "WF+SEND!\n"; // ID 7
+
+int comm_cmd_id = 0;
+
+int next_cmd_id[] = {
+        0, // HALT stays at HALT
+        0, // PING goes to HALT
+        5, // If CONN? returns ACK, we skip CONN! and go to CNFG!
+        5,
+        0,
+        6,
+        7,
+        4
+}; // UNUSED
+
 
 int comm_status = 0;
 const int CF_TRIGGER    = (1 << 0); // Big trigger, raised once every COMM_DELAY seconds.
@@ -31,8 +52,12 @@ const int CF_TRIGGER2   = (1 << 1); // Small trigger, raised every second.
 
 const int CF_WFSTATUS   = (1 << 3); // If HIGH, ESP8266 is in station mode
 const int CF_WAITING    = (1 << 4); // If HIGH, a command has been sent and we're waiting for response. (not implemented)
-const int RESET_START   = (1 << 5); // UNUSED
-const int RESET_END     = (1 << 6); // UNUSED
+const int RESET_START   = (1 << 5);
+const int RESET_END     = (1 << 6);
+const int CF_GOT_ACK    = (1 << 7);
+const int CF_GOT_NACK   = (1 << 8);
+const int CF_FIFO_NL    = (1 << 9);
+const int CF_ACTIVE     = (1 << 10);
 // ^ This is for saving space on my "status" variable
 
 
@@ -44,8 +69,10 @@ char g_item_code[32];
 char g_unit_weight[32]; // Convert this to int as needed
 char g_tare_weight[32]; // Convert this to int as needed
 
-int g_unit_value;
-int g_tare_value;
+float g_unit_value = 5.0;
+float g_tare_value = 0.0;
+
+int g_shelf_id = 1; // TODO: Make this configurable!
 
 int global_stock = 10;
 
@@ -58,6 +85,8 @@ int comm_counter; // Increments with 1-Hz timer interrupt up to COMM_DELAY
 
 volatile int display_update_flag = 1;
 int previous_quantity = 0;
+int saved_quantity = 0;
+int previous_quantity_3 = 0;
 int quantity = 0;
 
 
@@ -114,12 +143,20 @@ void setup_usart5(void)
 	USART5->CR1 	&= ~USART_CR1_UE;	//Disable before configuring
 	USART5->CR1 	&= ~((1<<12) | (1<<28) | USART_CR1_PCE | USART_CR1_OVER8);
 	USART5->CR2 	&= ~(USART_CR2_STOP_0 | USART_CR2_STOP_1);
-	USART5->BRR  	 = 0x1A1;
+//	USART5->BRR  	 = 0x1A1;//with 48MHz clock, creates baudrate of 115200; with 8MHz, BR=19200
+	USART5->BRR     = 0x45; // Uncomment for 8MHz system clock.
 	USART5->CR1		|= USART_CR1_TE | USART_CR1_RE;
 	USART5->CR1 	|= USART_CR1_UE;	//Enable after configuring
 
 	while((USART5->ISR & USART_ISR_REACK) == 0);
 	while((USART5->ISR & USART_ISR_TEACK) == 0);
+
+	/* A note about baud rate calculations:
+	 * The BRR is separated into two chunks.
+	 *
+	 * 48MHz / 115200 = 416.667, which rounds to 417 (0x1A1).
+	 * 8MHz / 115200 = 69.44, which rounds to 69 (0x45) (nice).
+	 */
 }
 
 
@@ -146,10 +183,12 @@ void enable_tty_interrupt(void)
 // Auto-reload register = 500
 // 48 MHz * (1/48000) * (1 / 500) = 2 Hz
 // -> Interrupt will occur 2 times per second.
-// and interrupt handler
 // Prescaler can be anywhere from 1 to 65536.
 // (I can't find ARR's range in the Family Reference Manual,
 // but I know it can be at least 10000.)
+//
+// For 8MHz clock:
+// 1 Hz clock = 8 MHz * (1/16000) * (1/500)
 //=====================================================================
 void setup_tim3(void) {
     // Enable RCC to timer 3
@@ -157,9 +196,13 @@ void setup_tim3(void) {
 
     // In Timer 3 Control Register (CR)...
     TIM3->CR1 &= ~TIM_CR1_CEN;
-    TIM3->PSC = 47999; // Prescaler = 48000
-    TIM3->ARR = 999; // Auto-Reload Register = 1000
-    // Should give us a timer that goes off once per second.
+
+//    TIM3->PSC = 48000 - 1;
+//    TIM3->ARR = 1000 - 1;
+    TIM3->PSC = 16000 - 1;
+    TIM3->ARR = 500 - 1;
+    // 1Hz timer with system clock of 8MHz
+
     TIM3->DIER |= TIM_DIER_UIE;
     TIM3->CR1 |= TIM_CR1_CEN;
 
@@ -171,27 +214,27 @@ void TIM3_IRQHandler(void) {
     // Acknowledge interrupt
     TIM3->SR &= ~TIM_SR_UIF;
 
-    // Toggle LED 1
-    if (GPIOC->ODR & (1<<7)) {
-        GPIOC->ODR &= ~(1<<7);
-    }
-    else {
-        GPIOC->ODR |= (1<<7);
-    }
-
     // Increment secondary counter
     comm_counter = (comm_counter + 1) % COMM_DELAY;// This counts seconds
     if (comm_counter == 0) {
-        // Raise flag
-        comm_status |= CF_TRIGGER;
+        comm_status |= CF_TRIGGER; // Start transmission on next loop
+    }
 
-        // Toggle LED 2
-        if (GPIOC->ODR & (1<<9)) {
-            GPIOC->ODR &= ~(1<<9);
-        }
-        else {
-            GPIOC->ODR |= (1<<9);
-        }
+//    if (!(comm_status & RESET_START)) {
+//        comm_status |= RESET_START;
+//    }
+
+    if ((comm_status & RESET_START) && !(comm_status & RESET_END)) {
+        GPIOC->ODR  |= ESP_RST;
+        comm_status |= RESET_END; // Raise reset done flag
+    }
+
+    if (fifo_newline(&input_fifo)) {
+        comm_status |= CF_FIFO_NL; // Raise newline flag
+//        printf("got a newline\n");
+    }
+    else {
+        comm_status &= ~CF_FIFO_NL;
     }
 }
 
@@ -209,16 +252,7 @@ int better_putchar(int x)
 	return x;
 }
 
-////Step 2.5
-//int better_getchar(void)
-//{
-//	while((USART5->ISR & USART_ISR_RXNE) == 0);
-//	if (USART5->RDR == '\r')
-//		return '\n';
-//	return USART5->RDR;
-//}
 
-//Step 2.7
 int interrupt_getchar(void)
 {
 	USART_TypeDef *u = USART5;
@@ -336,6 +370,8 @@ int char_response(const char* cmd, char* store_here) {
         fgets(cbuf, 99, stdin); // uses __io_getchar, which uses interrupt_getchar to wait for interrupt on \r
         cbuf[99] = '\0';
 
+//        printf("Here's what we got: %s\n", cbuf);
+
         strncpy(atest, cbuf, 3);
         atest[3] = '\0';
         strncpy(ntest, cbuf, 4);
@@ -395,6 +431,11 @@ void parse_configuration(const char* raw_text) {
             n++;
         }
     }
+
+    g_unit_value = atof(g_unit_weight);
+    g_tare_value = atof(g_tare_weight);
+
+    return;
 }
 
 
@@ -421,15 +462,22 @@ int wifi_sequence(void) {
     char cmd[32];
     cmd[31] = '\0';
 
-    char temp[32];
-    temp[31] = '\0';
+//    char temp[32];
+//    temp[31] = '\0';
 
-    int stock = 0;
-
-    cmd_response = char_response(run__connect, f_buffer);
+    cmd_response = char_response(get__connect, f_buffer);
     if (cmd_response != 1) {
-        errors++;
+        cmd_response = char_response(run__connect, f_buffer);
+        if (cmd_response != 1) {
+            errors++;
+        }
     }
+
+
+//    cmd_response = char_response(run__connect, f_buffer);
+//    if (cmd_response != 1) {
+//        errors++;
+//    }
 
     cmd_response = char_response(run__config, f_buffer);
     if (cmd_response != 1) {
@@ -439,7 +487,7 @@ int wifi_sequence(void) {
 
     // Stock calculations would happen here
 
-    sprintf(cmd, "%s%ld\n", set__stock, quantity); //Convert int stock to string
+    sprintf(cmd, "%s%d\n", set__stock, saved_quantity); //Convert int stock to string
     cmd_response = char_response(cmd, f_buffer);
     if (cmd_response != 1) {
         errors++;
@@ -450,10 +498,10 @@ int wifi_sequence(void) {
         errors++;
     }
 
-    cmd_response = char_response(run__disconnect, f_buffer);
-    if (cmd_response != 1) {
-        errors++;
-    }
+//    cmd_response = char_response(run__disconnect, f_buffer);
+//    if (cmd_response != 1) {
+//        errors++;
+//    }
 
     if (errors != 0) {
         return 1;
@@ -469,16 +517,20 @@ int wifi_sequence(void) {
 //---------------------------------------------------------------------
 int check_sequence(void) {
     int cmd_response;
-    int resp2;
     int errors = 0;
 
     char f_buffer[32];
     f_buffer[31] = '\0';
 
     cmd_response = char_response(run__ping, f_buffer);
+//    printf(f_buffer);
     if (cmd_response != 1) {
+//        printf("NACK received");
         errors++;
     }
+//    else {
+//        printf("ACK received");
+//    }
 
     if (errors != 0) {
         return 1;
@@ -498,6 +550,20 @@ void display_ui()
     int failed = 0;
     char qty_str[12];
 
+
+    // 4/13
+    char shelf_line[16] = "";
+    char item_line[16] = "";
+    char quantity_line[16] = "";
+
+    sprintf(shelf_line, "Shelf ID: %d", g_shelf_id);
+    sprintf(item_line, "%.15s", g_item_name); // 16 overflows onto the previous line and cuts it off.
+    sprintf(quantity_line, "Quantity: %d", saved_quantity);
+//    sprintf(quantity_line, "Quantity: %d", quantity);
+
+
+    // end 4/13
+
     DISPLAY_clear(0);
 
     DISPLAY_drawChar(10, 10, '2', 1);
@@ -506,9 +572,13 @@ void display_ui()
     DISPLAY_drawRect(0, 126, 230, 50, 1);
     DISPLAY_drawRect(5, 131, 220, 40, 0);
 
-    DISPLAY_print(9, 133, 1, "Shelf ID: \0");
-    DISPLAY_print(9, 80, 1, "Item: 100mH \0");
-    DISPLAY_print(9, 40, 1, "Quantity: \0");
+//    DISPLAY_print(9, 133, 1, "Shelf ID: \0");
+//    DISPLAY_print(9, 80, 1, "Item: Sam \0");
+//    DISPLAY_print(9, 40, 1, "Quantity: \0");
+
+    DISPLAY_print(9,  40, 1, quantity_line);
+    DISPLAY_print(9,  80, 1, item_line);
+    DISPLAY_print(9, 133, 1, shelf_line);
 
     if ( (failed = dtostr(quantity, qty_str, 12) )  == -1 || failed == 0)
     {
@@ -556,10 +626,11 @@ void init_tim6()
 void TIM6_DAC_IRQHandler ()
 {
     TIM6->SR &= ~0x1;
-    if (quantity != previous_quantity)
-    {
-        display_update_flag = 1;
-    }
+//    if (quantity != previous_quantity)
+//    {
+//        display_update_flag = 1;
+//    }
+    display_update_flag = 1;
 }
 
 void init_sensors()
@@ -624,6 +695,7 @@ int main()
 
     // Step 1) Enable clocks to GPIO registers in use (I'm only using C for GPIO)
     RCC->AHBENR |= RCC_AHBENR_GPIOCEN;
+    RCC->AHBENR |= RCC_AHBENR_GPIODEN;
 
     // Step 2) Configure GPIO pins as input or output (or analog or alternate function)
     config_pin(GPIOC, 0, 1);
@@ -644,22 +716,43 @@ int main()
 
     comm_status |= RESET_START; // Signal that reset has been started
 
-    //setup_tim6();
     setup_tim3();
-
     setup_usart5();
+    enable_tty_interrupt();
 
-    // Uncomment these when you're asked to...
+
     setbuf(stdin,0);
     setbuf(stdout,0);
     setbuf(stderr,0);
 
-    enable_tty_interrupt();
-
     global_buffer[99] = '\0';
 
-    GPIOC->ODR |= ESP_RST;
-    comm_status |= RESET_END;
+//    GPIOC->ODR |= ESP_RST;
+//    comm_status |= RESET_END;
+//
+//    RCC->CFGR |= (1 << 0);
+//    RCC->CFGR |= (1 << 1);
+
+//    printf("RCC->CR = 0x%08X\n", RCC->CR);
+//    printf("\nRCC->CFGR = 0x%08X\n", RCC->CFGR);
+    // On old device: RCC->CR   = 0x03037183 (0000 0011 0000 0011 0111 0001 1000 0011)
+    // On old device: RCC->CFGR = 0x0011000A (0000 0000 0001 0001 0000 0000 0000 1010)
+
+        // Which means that SW[1:0] = 10, meaning PLL is set as clock. What?
+
+    // Ok, this is weird...
+    // It's saying the CFGR on the new device is all zeros. What?
+    // On new device: RCC->CR   = 0x00015983 (0000 0000 0000 0001 0101 1001 1000 0011)
+    // DIFFERENCES:
+    //      25: PLLRDY 1->0
+    //      24: PLLON  1->0
+    // On new device: RCC->CFGR = 0x00000000
+    //      SWS[3:2]    = 00
+    //      SW[1:0]     = 00 (HSI selected as clock)
+
+    // Actually, now that I'm thinking about it, maybe I shouldn't change anything.
+    // Because if the other subsystems are working, then changing the clock speed might screw
+    // things up. I should just change the baud rate for the UART as well as the PSC and ARR for timer 3.
 
 
     // === MAIN LOOP TEST ===
@@ -671,8 +764,7 @@ int main()
         // If not, ping module on every comm cycle until it's ready.
 
         if (comm_status & CF_TRIGGER) {
-            GPIOC->ODR |= (1<<8);// Turn LED on; comm handling is starting
-
+//            GPIOC->ODR |= (1<<8);// Turn LED on; comm handling is starting
             if (comm_status & CF_WFSTATUS) {
                 result = wifi_sequence();
                 if (result != 0) {
@@ -686,9 +778,11 @@ int main()
                 }
             }
 
-            GPIOC->ODR &= ~(1<<8); // Turn LED off; comm handling is done
+//            GPIOC->ODR &= ~(1<<8); // Turn LED off; comm handling is done
             comm_status &= ~CF_TRIGGER; // Lower TRIGGERED flag
         }
+
+
 
         offset = 0;
         checker = (GPIOB->IDR);
@@ -746,14 +840,49 @@ int main()
 
 
 
+
+
         //avg = 0;
 
-        quantity =   ((value)/450 - 18480)/item_weight;
-        if ( display_update_flag == 1) {
+
+
+//        quantity =   (((value)/450 - 18480) - 6);///item_weight; //4/13
+//        quantity = ((value)/450 - 18480) / g_unit_value;
+
+        previous_quantity = quantity;
+//        quantity = (((value)/450 - 18480) - 6) / g_unit_value;
+        quantity = ((value)/450 - 18480) / g_unit_value;
+
+
+        // From oldest to youngest
+        // AAB -> new value B does not match previous two values;
+        //      do not update yet.
+        // ABB -> new value B matches previous value, but does not match oldest value.
+        //      This indicates a state change, and an update should occur.
+        // ABA -> new value A matches oldest value; the change in the middle value was a fluke.
+        //      No update should occur.
+
+        if (display_update_flag) {
+            // ABB
+            if ((quantity == previous_quantity) && (previous_quantity != saved_quantity)) {
+                display_ui();
+                saved_quantity = quantity;
+            }
+
+            display_update_flag = 0;
+        }
+
+/*
+        if ((display_update_flag == 1)) {
             display_ui();
 
             display_update_flag = 0;
             previous_quantity = quantity;
         }
+*/
+
+
+
+
     }
 }

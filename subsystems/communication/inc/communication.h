@@ -1,3 +1,5 @@
+// VERSION 1.0.0
+
 #ifndef H_COMMUNICATION
 #define H_COMMUNICATION
 
