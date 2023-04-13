@@ -10,31 +10,27 @@
 */
 
 #include <Arduino.h>
-#include <EEPROM.h>
-#include <Hash.h>
 #include <WiFiClient.h>
+#include <Hash.h>
+#include <EEPROM.h> // Not sure if this board even HAS an eeprom... but it's worth a try.
 
-#include <ESP8266HTTPClient.h>
 #include <ESP8266WiFi.h>
 #include <ESP8266WiFiMulti.h>
+#include <ESP8266HTTPClient.h>
 
 #include <ESPAsyncTCP.h>
 #include <ESPAsyncWebServer.h>
 
+#include "communication.h"
+
+// Using EEPROM for storing wifi data so that I don't have to reconfigure it every single time.
 
 
-#define FW_VERSION "0.1.0" // Readable with WF+VRSN?
+#define FW_VERSION "0.2.0" // Readable with WF+VRSN?
 
 
 #define DOTDELAY 2000 //milliseconds
-//#define VERBOSE 1
-#define VERBOSE 0 //If 0, don't print anything unnecessary
-
-#define MAX_SSID_LENGTH 32
-#define MAX_PASSWORD_LENGTH 64
-#define MAX_IP_LENGTH 16
-
-#define MAX_STRING_LENGTH 32 //For miscellaneous strings, such as dbname, root, etc.
+//#define VERBOSE 1 // Comment out to remove verbose statements
 
 #define CONN_TIMEOUT 10
 
@@ -75,7 +71,7 @@ const char* get_data_ext = "/get-esp-data.php";
 String apiKeyValue = "tpmat5ab3j7f9";
 char api_key[32] = "tpmat5ab3j7f9";
 
-char device_id[9] = "1";
+char device_id[9] = "74";
 
 char stock[MAX_STRING_LENGTH] = "0";
 char name[MAX_STRING_LENGTH] = "Widgets"; // Unused
@@ -135,6 +131,18 @@ String data;
 unsigned long previous_time;
 unsigned long current_time;
 const long interval = 500;
+
+
+
+
+
+// Test for 1MB
+
+
+
+
+
+
 
 // This seems wack, but you can actually program HTML into the C code.
 // All you have to do is make sure this gets sent when someone accesses the
@@ -229,38 +237,38 @@ void print_error(const char* cmd, int reason, int decorator) {
 
   Serial.println(NACK);
 
-  if (VERBOSE) {
-    if (reason == 1) {
-      Serial.print("\t");
-      Serial.print(cmd);
-      if (decorator == GET_ONLY) {
-        Serial.println(" only available with '?' modifier.");
-      }
-      else if (decorator == SET_ONLY) {
-        Serial.println(" only available with '=' modifier.");
-      }
-      else if (decorator == RUN_ONLY) {
-        Serial.println(" only available with '!' modifier.");
-      }
-      else if (decorator == GET_OR_SET) {
-        Serial.println(" only available with '?' or '=' modifiers.");
-      }
-      else if (decorator == SET_OR_RUN) {
-        Serial.println(" only available with '=' or '!' modifiers.");
-      }
-      else if (decorator == GET_OR_RUN) {
-        Serial.println(" only available with '?' or '!' modifiers.");
-      }
-      else if (decorator == ANY_MODIFIER) {
-        Serial.println(" must be followed by '?', '=value', or '!' modifiers.");
-      }
-    }
-    else if (reason == UNRECOGNIZED_CMD) {
-      Serial.print("\t Command '");
-      Serial.print(cmd);
-      Serial.println("' is unrecognized. Check for typos.");
-    }
-  }
+  // if (VERBOSE) {
+  //   if (reason == 1) {
+  //     Serial.print("\t");
+  //     Serial.print(cmd);
+  //     if (decorator == GET_ONLY) {
+  //       Serial.println(" only available with '?' modifier.");
+  //     }
+  //     else if (decorator == SET_ONLY) {
+  //       Serial.println(" only available with '=' modifier.");
+  //     }
+  //     else if (decorator == RUN_ONLY) {
+  //       Serial.println(" only available with '!' modifier.");
+  //     }
+  //     else if (decorator == GET_OR_SET) {
+  //       Serial.println(" only available with '?' or '=' modifiers.");
+  //     }
+  //     else if (decorator == SET_OR_RUN) {
+  //       Serial.println(" only available with '=' or '!' modifiers.");
+  //     }
+  //     else if (decorator == GET_OR_RUN) {
+  //       Serial.println(" only available with '?' or '!' modifiers.");
+  //     }
+  //     else if (decorator == ANY_MODIFIER) {
+  //       Serial.println(" must be followed by '?', '=value', or '!' modifiers.");
+  //     }
+  //   }
+  //   else if (reason == UNRECOGNIZED_CMD) {
+  //     Serial.print("\t Command '");
+  //     Serial.print(cmd);
+  //     Serial.println("' is unrecognized. Check for typos.");
+  //   }
+  // }
 }
 
 
@@ -273,26 +281,26 @@ void enter_station_mode(const char* new_ssid, const char* new_password) {
   if (VERBOSE) {Serial.println("done!");}
   */
 
-  if (VERBOSE) {Serial.print("\tStopping access point...");}
+  // if (VERBOSE) {Serial.print("\tStopping access point...");}
   //https://stackoverflow.com/questions/39688410/how-to-switch-to-normal-wifi-mode-to-access-point-mode-esp8266
   WiFi.softAPdisconnect(true); // Trying this to turn off the network.
   WiFi.disconnect();
   delay(1000);
-  if (VERBOSE) {Serial.println("done!");}
+  // if (VERBOSE) {Serial.println("done!");}
 
   //delay(1000);
   WiFi.mode(WIFI_STA);
   WiFi.begin(new_ssid, new_password); // Now we connect to the router!
-  if (WiFi.waitForConnectResult() == WL_CONNECTED) {
-    if (VERBOSE) {Serial.println("Successfully connected to new network!");}
-  }
-  else {
-    if (VERBOSE) {Serial.println("Something went wrong, wifi connection failed.");}
-  }
+  // if (WiFi.waitForConnectResult() == WL_CONNECTED) {
+  //   if (VERBOSE) {Serial.println("Successfully connected to new network!");}
+  // }
+  // else {
+  //   if (VERBOSE) {Serial.println("Something went wrong, wifi connection failed.");}
+  // }
 }
 
 void enter_access_mode() {
-  if (VERBOSE) {Serial.println("Attempting to enter access point (setup) mode.");}
+  // if (VERBOSE) {Serial.println("Attempting to enter access point (setup) mode.");}
   delay(1000);
   if (WiFi.status() == WL_CONNECTED) {
     WiFi.disconnect();
@@ -302,7 +310,7 @@ void enter_access_mode() {
   // Maybe try manually switching the mode? Like WiFi.mode(WIFI_AP);
   WiFi.mode(WIFI_AP); // (2) This doesn't do it either, but no crash at least.
   WiFi.softAP(local_ssid, local_password); // This doesn't seem to work...
-  if (VERBOSE) {Serial.print("\tHost IP Address: "); Serial.println(WiFi.softAPIP());}
+  // if (VERBOSE) {Serial.print("\tHost IP Address: "); Serial.println(WiFi.softAPIP());}
 
 
   // Actually, it works if I just don't stop the server.
@@ -322,25 +330,25 @@ void enter_access_mode() {
   */
 }
 
-AsyncWebServer setup_server() {
-  // I tried using this to setup the web server between stops
-  // and starts. It did not work. idk WHY it didn't work, but when
-  // the server stops (server.end()), it is hard to get it to start again.
-  // This is a future problem.
+// AsyncWebServer setup_server() {
+//   // I tried using this to setup the web server between stops
+//   // and starts. It did not work. idk WHY it didn't work, but when
+//   // the server stops (server.end()), it is hard to get it to start again.
+//   // This is a future problem.
 
 
-  AsyncWebServer new_server(80);
-  // Not sure if I can even initialize stuff like that here...
+//   AsyncWebServer new_server(80);
+//   // Not sure if I can even initialize stuff like that here...
 
-  // Home page
-  new_server.on("/", HTTP_GET, [](AsyncWebServerRequest *request){
-    request->send_P(200, "text/html", index_html, html_replacer);
-  });
+//   // Home page
+//   new_server.on("/", HTTP_GET, [](AsyncWebServerRequest *request){
+//     request->send_P(200, "text/html", index_html, html_replacer);
+//   });
 
-  new_server.begin(); //Trying to start it here... see if it crashes...
+//   new_server.begin(); //Trying to start it here... see if it crashes...
 
-  return new_server;
-}
+//   return new_server;
+// }
 
 
 int compare_char_array(const char* str1, const char* str2) {
@@ -376,7 +384,6 @@ int value_tool(const char* cmd, const char* base_cmd, char* value){
   /* this will be capable of setting and getting values, like the IP address*/
   int k;
   int n;
-  char buffer[MAX_STRING_LENGTH];
   char arg[MAX_STRING_LENGTH];
 
   int index = strlen(base_cmd);
@@ -384,8 +391,8 @@ int value_tool(const char* cmd, const char* base_cmd, char* value){
   int cmp;
   
   if (strlen(cmd) <= index) {
-    Serial.println("NACK");
-    if (VERBOSE) {Serial.println("\tIt's not long enough, mate.");}
+    Serial.println("NACK:length");
+    // if (VERBOSE) {Serial.println("\tIt's not long enough, mate.");}
     return 1;
   }
 
@@ -439,49 +446,46 @@ int value_tool(const char* cmd, const char* base_cmd, char* value){
 int connect() {
   int timer = 0;
 
-  if (VERBOSE) {
-    Serial.print("Connecting to ");
-    Serial.println(ssid);
-  }
+  // if (VERBOSE) {
+  //   Serial.print("Connecting to ");
+  //   Serial.println(ssid);
+  // }
 
   WiFi.begin(ssid, password);
   while ((WiFi.status() != WL_CONNECTED) && (timer < CONN_TIMEOUT)) {
     timer++;
     delay(1000);
-    if (VERBOSE) {Serial.print(".");}
+    // if (VERBOSE) {Serial.print(".");}
   }
   
   if (timer >= CONN_TIMEOUT) {
-    if (VERBOSE) {
-      Serial.println("\tConnection timed out.");
-    }
+    // if (VERBOSE) {
+    //   Serial.println("\tConnection timed out.");
+    // }
     return 1;
   }
   else {
-    if (VERBOSE) {
-      Serial.println("");
-      Serial.println("Connected to WiFi!");
-      // Print IP (Not sure what this does)
-      Serial.println("");
-      Serial.println(WiFi.localIP()); //This is the IP of the ESP8266
-      update_wifi_memory(ssid, password, "");
-    }
+    // if (VERBOSE) {
+    //   Serial.println("");
+    //   Serial.println("Connected to WiFi!");
+    //   // Print IP (Not sure what this does)
+    //   Serial.println("");
+    //   Serial.println(WiFi.localIP()); //This is the IP of the ESP8266
+    // }
     return 0;
   }
 }
 
 
 int disconnect() {
-  
-  
-  if (VERBOSE) {Serial.print("Disconnecting...");}
+  // if (VERBOSE) {Serial.print("Disconnecting...");}
   if (WiFi.status() == WL_CONNECTED) {
     WiFi.disconnect();
   }
-  if (VERBOSE) {Serial.println("done!");}
+  // if (VERBOSE) {Serial.println("done!");}
 
 
-  if (VERBOSE) {Serial.print("Now waiting for connection to end...");}
+  // if (VERBOSE) {Serial.print("Now waiting for connection to end...");}
 
   int done;
   int tries = 0;
@@ -500,8 +504,8 @@ int disconnect() {
     delay(10);
   } while (done == 0);
 
-  if (VERBOSE) {Serial.println("done!");}
-  if (VERBOSE) {Serial.print("WiFi status = "); Serial.println(WiFi.status());}
+  // if (VERBOSE) {Serial.println("done!");}
+  // if (VERBOSE) {Serial.print("WiFi status = "); Serial.println(WiFi.status());}
 
   if (done == 1) {
     return 0; //success (ACK)
@@ -537,9 +541,9 @@ int get_config(const char* api_key/*unused*/) {
 
   if (WiFi.status() != WL_CONNECTED) {
     Serial.println(NACK);
-    if (VERBOSE) {
-      Serial.println("\tERROR: Cannot get config, not connected to WiFi");
-    }
+    // if (VERBOSE) {
+    //   Serial.println("\tERROR: Cannot get config, not connected to WiFi");
+    // }
     return 1; //No Wifi error
   }
 
@@ -553,27 +557,27 @@ int get_config(const char* api_key/*unused*/) {
   http_request_data = ("?api_key=" + apiKeyValue + "&device=" + device_id);
   full_address = server_name + http_request_data;
 
-  if (VERBOSE) {
-    Serial.print("\tAccessing server at:");
-    Serial.println(full_address);
-  }
+#ifdef VERBOSE
+  Serial.print("\tAccessing server at:");
+  Serial.println(full_address);
+#endif
 
   http.addHeader("Content-Type", "application/x-www-form-urlencoded");
   http.begin(client, full_address);
-  if (VERBOSE) {Serial.println("\tStarted HTTP successfully!");}
+  // if (VERBOSE) {Serial.println("\tStarted HTTP successfully!");}
 
   http_response_code = http.GET();
-  if (VERBOSE) {Serial.println("\tGET complete");}
+  // if (VERBOSE) {Serial.println("\tGET complete");}
 
   payload = "--";
 
   if (http_response_code > 0) {
     payload = http.getString();
     payload.trim();
-    if (VERBOSE) {
-      Serial.print("HTTP response code: ");
-      Serial.println(http_response_code);
-    }
+    // if (VERBOSE) {
+    //   Serial.print("HTTP response code: ");
+    //   Serial.println(http_response_code);
+    // }
     Serial.print(ACK);
     Serial.print(":");
     Serial.println(payload);// Should add the http response code to this in the future, TODO
@@ -602,10 +606,11 @@ int post_stock() {
   char temp_server_name[64] = "";
 
   if (WiFi.status() != WL_CONNECTED) {
-    Serial.println(NACK);
-    if (VERBOSE) {
-      Serial.println("\tERROR: Cannot get config, not connected to WiFi");
-    }
+    Serial.print(NACK);
+    Serial.println(":Not connected to WiFi");
+    // if (VERBOSE) {
+    //   Serial.println("\tERROR: Cannot get config, not connected to WiFi");
+    // }
     return 1; //No Wifi error
   }
 
@@ -622,10 +627,10 @@ int post_stock() {
 
   http_request_data = "api_key=" + apiKeyValue + "&device=" + device_id + "&stock=" + stock + "&name=" + name;
   
-  if (VERBOSE) {
-    Serial.print("http_request_data: ");
-    Serial.println(http_request_data);
-  }
+  // if (VERBOSE) {
+  //   Serial.print("http_request_data: ");
+  //   Serial.println(http_request_data);
+  // }
 
   http_response_code = http.POST(http_request_data);
 
@@ -645,23 +650,16 @@ int post_stock() {
 
 
 int handler(const char* cmd) {
-  //Serial.print("Received: ");
-  //Serial.println(cmd);
-
   const char* cmd_header = "WF+";
 
   int mismatch;
-  int i;
-  bool status;
 
-  int temp;
   int out;
   int cmd_length;
 
   out = 77;
 
   mismatch = compare_char_array(cmd_header, cmd);
-
   if (mismatch) {
     Serial.println(NACK);
     return 1;
@@ -680,19 +678,16 @@ int handler(const char* cmd) {
   // === VALUE COMMANDS ===
   if (compare_char_array(cmd, cmd__ssid) == 0) {
     out = value_tool(cmd, cmd__ssid, ssid);
-    update_wifi_memory(ssid, password, server_ip);
     return out;
   }
 
   if (compare_char_array(cmd, cmd__pass) == 0) {
     out = value_tool(cmd, cmd__pass, password);
-    update_wifi_memory(ssid, password, server_ip);
     return out;
   }
 
   if (compare_char_array(cmd, cmd__ip) == 0) {
     out = value_tool(cmd, cmd__ip, server_ip);
-    update_wifi_memory(ssid, password, server_ip);
     return out;
   }
 
@@ -720,6 +715,7 @@ int handler(const char* cmd) {
         out = connect();
         if (out == 0) {
           Serial.println(ACK);
+          update_wifi_memory(ssid, password, server_ip);
         }
         else {
           Serial.println(NACK);
@@ -851,7 +847,11 @@ int handler(const char* cmd) {
 }
 
 
-void fetch_wifi_memory(char* d_ssid, char* d_pw, char* d_ip) {
+void fetch_wifi_memory(
+  char* d_ssid,
+  char* d_pw,
+  char* d_ip
+) {
   // Fetch wifi connection parameters stored in EEPROM (actually RAM) memory
   // and update the corresponding char arrays.
   // d_ssid = destination to store SSID from memory
@@ -866,26 +866,16 @@ void fetch_wifi_memory(char* d_ssid, char* d_pw, char* d_ip) {
     // as necessary. A project for another day.
     char m_ssid[MAX_SSID_LENGTH+1] = "";
     char m_pw[MAX_PASSWORD_LENGTH+1] = "";
-    char m_ip[MAX_IP_LENGTH+1] = "";
+    uint32_t m_ip = 0;
   } wifi_data;
 
-  if (VERBOSE) {Serial.println("Fetching wifi connection information from memory.");}
 
   // Fetch memory information.
   EEPROM.get(address, wifi_data);
 
-  if (VERBOSE) {
-    Serial.print("\tSSID: ");
-    Serial.println(wifi_data.m_ssid);
-    Serial.print("\tPassword: ");
-    Serial.println(wifi_data.m_pw);
-    Serial.print("\tIP Address: ");
-    Serial.println(wifi_data.m_ip);
-  }
-
   strcpy(d_ssid, wifi_data.m_ssid);
   strcpy(d_pw, wifi_data.m_pw);
-  strcpy(d_ip, wifi_data.m_ip);
+  int_to_ip(wifi_data.m_ip, d_ip);
 
   return;
 }
@@ -906,10 +896,6 @@ void update_wifi_memory(
   int pw_match;
   int ip_match;
 
-  bool update_ssid = false;
-  bool update_pw = false;
-  bool update_ip = false;
-
   int address = 0; // Could be anything within the 512-byte limit defined in setup()
   
   struct {
@@ -918,34 +904,29 @@ void update_wifi_memory(
     // as necessary. A project for another day.
     char m_ssid[MAX_SSID_LENGTH+1] = "";
     char m_pw[MAX_PASSWORD_LENGTH+1] = "";
-    char m_ip[MAX_IP_LENGTH+1] = "";
+    uint32_t m_ip = 0;
   } wifi_data;
 
   // Fetch memory information.
   EEPROM.get(address, wifi_data);
 
-  if (VERBOSE) {Serial.println("\tSaving wifi connection info to memory.");}
-
   // Check if data needs to be updated.
   ssid_match = strcmp(new_ssid, wifi_data.m_ssid);
   pw_match = strcmp(new_pw, wifi_data.m_pw);
-  ip_match = strcmp(new_ip, wifi_data.m_ip);
+  ip_match = (wifi_data.m_ip == ip_to_int(new_ip)) ? 0 : 1;
 
-  if ((strlen(new_ssid) > 0) && (ssid_match != 0)) {
+  if (ssid_match != 0) {
     strcpy(wifi_data.m_ssid, new_ssid);
-    update_ssid = true;
   }
-  if ((strlen(new_pw) > 0) && (pw_match != 0)) {
+  if (pw_match != 0) {
     strcpy(wifi_data.m_pw, new_pw);
-    update_pw = true;
   }
-  if ((strlen(new_ip) > 0) && (ip_match != 0)) {
-    strcpy(wifi_data.m_ip, new_ip);
-    update_ip = true;
+  if (ip_match != 0) {
+    wifi_data.m_ip = ip_to_int(new_ip);
   }
 
   // If any of the info doesn't match, write back to memory.
-  if ((update_ssid) || (update_pw) || (update_ip)) {
+  if ((ssid_match != 0) || (pw_match != 0) || (ip_match != 0)) {
     // Replace values in byte-array cache
     EEPROM.put(address, wifi_data);
     // Actually commit values to memory
@@ -956,14 +937,46 @@ void update_wifi_memory(
 }
 
 
+int ip_to_int(const char* ip) {
+  int final_value = 0;
+  int buffer = 0;
+
+  for (int n = 0; n < strlen(ip); n++) {
+    if (ip[n] == '.') {
+      final_value = (final_value << 8) + buffer;
+      buffer = 0;
+    }
+    else if ((ip[n] >= 48) && (ip[n] <= 57)) {
+      buffer = (buffer * 10) + (ip[n] - 48);
+    }
+  }
+  final_value = (final_value << 8) + buffer;
+
+  return final_value;
+}
+
+
+void int_to_ip(int ip, char* destination) {
+  int v1 = (ip >> 8*3) & 0xFF;
+  int v2 = (ip >> 8*2) & 0xFF;
+  int v3 = (ip >> 8*1) & 0xFF;
+  int v4 = ip & 0xFF;
+  
+  sprintf(destination, "%d.%d.%d.%d", v1, v2, v3, v4);
+  
+  return;
+}
+
+
 // === MAIN OPERATION STARTS HERE ===
 void setup() {
   // Declare some local variables
   IPAddress myIP;
   bool ap_result;
-  int ram_address = 0;
 
-  bool start_as_ap = 0;
+  int try_to_connect = 0;
+
+  bool start_as_ap = true;
 
   g_status = 0;
 
@@ -975,7 +988,6 @@ void setup() {
 
   // Begin UART serial communication
   Serial.begin(115200);
-  // Serial.begin(19200);
   delay(3000); // Wait to finish plugging in...
 
   // Commit 512 bytes of ESP8266 flash (for "EEPROM" emulation).
@@ -985,25 +997,21 @@ void setup() {
   // cache in RAM.
   // EEPROM activity is stored in other functions.
   // See update_wifi_memory() and fetch_wifi_memory()
-  EEPROM.begin(512);
-  //EEPROM.begin(128);
-  if (VERBOSE) {Serial.println("EEPROM initialized.");}
+  
+  EEPROM.begin(128);
   delay(500);
 
-  // Update values from memory
+  // // Update values from memory
   fetch_wifi_memory(ssid, password, server_ip);
   delay(500);
-  if (VERBOSE) {Serial.print("Attempting to connect with saved WiFi parameters...");}
-  int try_to_connect = connect();
+
+  try_to_connect = connect();
 
   if (try_to_connect == 1) { // If failed to connect
-    if (VERBOSE) {Serial.println("failed.");}
     start_as_ap = true;
-    try_to_connect = disconnect();
     g_status &= ~F__READY;
   }
   else {
-    if (VERBOSE) {Serial.println("success!");}
     start_as_ap = false;
     g_status |= F__READY;
   }
@@ -1012,24 +1020,9 @@ void setup() {
 
   // === START AP ===
   if (start_as_ap) {
-    if (VERBOSE) {Serial.print("Setting AP (Access Point)...");}
     ap_result = WiFi.softAP(local_ssid, local_password);
-    // if (ap_result != true) {
-    //   if (VERBOSE) {Serial.println("Error! Something went wrong...");}
-    // }
-    // else {
     if (ap_result == true) {
       myIP = WiFi.softAPIP();
-      // if (VERBOSE){
-      //   Serial.println("done!");
-      //   Serial.print("\tWiFi network name: ");
-      //   Serial.println(local_ssid);
-      //   Serial.print("\tWiFi network password: ");
-      //   Serial.println(local_password);
-      //   Serial.print("\tHost IP Address: ");
-      //   Serial.println(myIP);
-      // }
-      if (VERBOSE) {Serial.println("done!");}
     }
     else {
       g_status |= F__ERROR;
@@ -1041,43 +1034,16 @@ void setup() {
   // into AP mode, then it needs to be already started.
 
   // Initialize web server
-  if (VERBOSE) {Serial.print("Setting up server...");}
+  // if (VERBOSE) {Serial.print("Setting up server...");}
 
   //setup_server(server); //This caused a crash
   //AsyncWebServer server = setup_server(); // This doesn't crash, but... nothing happens on access.
 
   // Homepage
-  if (VERBOSE) {Serial.print("1, ");}
   server.on("/", HTTP_GET, [](AsyncWebServerRequest *request){
     request->send_P(200, "text/html", index_html, html_replacer);
   });
 
-  if (VERBOSE) {Serial.print("2, ");}
-  // Redirects
-  server.on("/ssid", HTTP_GET, [](AsyncWebServerRequest *request){
-    if (request->hasArg("fssid2")) {
-      strcpy(ssid, request->arg("fssid2").c_str());
-    }
-    request->redirect("/");
-  });
-
-  if (VERBOSE) {Serial.print("3, ");}
-  server.on("/password", HTTP_GET, [](AsyncWebServerRequest *request){
-    if (request->hasArg("fpass2")) {
-      strcpy(password, request->arg("fpass2").c_str());
-    }
-    request->redirect("/");
-  });
-
-  if (VERBOSE) {Serial.print("4, ");}
-  server.on("/ip", HTTP_GET, [](AsyncWebServerRequest *request){
-    if (request->hasArg("fipad2")) {
-      strcpy(server_ip, request->arg("fipad2").c_str());
-    }
-    request->redirect("/");
-  });
-
-  if (VERBOSE) {Serial.print("5, ");}
   server.on("/submitall", HTTP_GET, [](AsyncWebServerRequest *request){
     if (request->arg("fssid").length() > 0) {
       strcpy(ssid, request->arg("fssid").c_str());
@@ -1088,58 +1054,19 @@ void setup() {
     if (request->arg("fipad").length() > 0) {
       strcpy(server_ip, request->arg("fipad").c_str());
     }
+    update_wifi_memory(ssid, password, server_ip);
     request->redirect("/");
   });
-
-
-  // Get list of available networks (UNFINISHED)
-  //First request will return 0 results unless you start scan from somewhere else (loop/setup)
-  //Do not request more often than 3-5 seconds
-
-  /*
-  server.on("/scan", HTTP_GET, [](AsyncWebServerRequest *request){
-    String json = "[";
-    int n = WiFi.scanComplete();
-    if(n == -2){
-      WiFi.scanNetworks(true);
-    } else if(n){
-      for (int i = 0; i < n; ++i){
-        if(i) json += ",";
-        json += "{";
-        json += "\"rssi\":"+String(WiFi.RSSI(i));
-        json += ",\"ssid\":\""+WiFi.SSID(i)+"\"";
-        json += ",\"bssid\":\""+WiFi.BSSIDstr(i)+"\"";
-        json += ",\"channel\":"+String(WiFi.channel(i));
-        json += ",\"secure\":"+String(WiFi.encryptionType(i));
-        json += ",\"hidden\":"+String(WiFi.isHidden(i)?"true":"false");
-        json += "}";
-      }
-      WiFi.scanDelete();
-      if(WiFi.scanComplete() == -2){
-        WiFi.scanNetworks(true);
-      }
-    }
-    json += "]";
-    request->send(200, "application/json", json);
-    json = String();
-  });
-  */
   
-  if (VERBOSE) {Serial.print("6, ");}
   // Redirect and activate STATION mode
   server.on("/continue", HTTP_GET, [](AsyncWebServerRequest *request){
-    // switch_to_station = true;// Tells the device to exit setup mode.
     g_status |= F__SW2STAT; // Enable SW2STAT bit
     request->redirect("/");
   });
 
-  if (VERBOSE) {Serial.println("done!");}
-  if (VERBOSE) {Serial.print("Starting server...");}
   server.begin();
-  if (VERBOSE) {Serial.println("done!");}
   g_status |= F__SERVERUP;
       
-  //if (VERBOSE) {Serial.println("done!");Serial.println("Setup complete.\n");}
 }
 
 void loop() {
@@ -1169,8 +1096,7 @@ void loop() {
     }
     */
     // ^ This is being taken care of in the handler.
-    else if (Serial.available() > 0) {
-      // If there is serial data that has been received...
+    if (Serial.available() > 0) { // If there is serial data that has been received...
       String temp_command = Serial.readString();
       temp_command.trim(); // remove \r and \n
       int result = handler(temp_command.c_str()); // Result is currently unused.
