@@ -1,40 +1,43 @@
-14:14:56 **** Incremental Build of configuration Debug for project wherehouse_stm32_firmware ****
+13:40:47 **** Incremental Build of configuration Debug for project wherehouse_stm32_firmware ****
 make -j4 all 
 Building file: ../src/main.c
 Invoking: MCU GCC Compiler
 /home/sam/Documents/senior_design/wherehouse/system/stm32_firmware/Debug
 arm-none-eabi-gcc -mcpu=cortex-m0 -mthumb -mfloat-abi=soft -DSTM32 -DSTM32F0 -DSTM32F091RCTx -DDEBUG -DSTM32F091 -DUSE_STDPERIPH_DRIVER -I"/home/sam/Documents/senior_design/wherehouse/system/stm32_firmware/StdPeriph_Driver/inc" -I"/home/sam/Documents/senior_design/wherehouse/system/stm32_firmware/inc" -I"/home/sam/Documents/senior_design/wherehouse/system/stm32_firmware/CMSIS/device" -I"/home/sam/Documents/senior_design/wherehouse/system/stm32_firmware/CMSIS/core" -O0 -g3 -Wall -fmessage-length=0 -ffunction-sections -c -MMD -MP -MF"src/main.d" -MT"src/main.o" -o "src/main.o" "../src/main.c"
 ../src/main.c: In function 'interrupt_getchar':
-../src/main.c:258:17: warning: unused variable 'u' [-Wunused-variable]
+../src/main.c:261:17: warning: unused variable 'u' [-Wunused-variable]
   USART_TypeDef *u = USART5;
                  ^
 ../src/main.c: In function 'parse_configuration':
-../src/main.c:418:10: warning: unused variable 'ignore_list' [-Wunused-variable]
+../src/main.c:423:10: warning: unused variable 'ignore_list' [-Wunused-variable]
      char ignore_list[] = {':'}; // Not implemented
           ^~~~~~~~~~~
+../src/main.c:420:9: warning: variable 'different_flags' set but not used [-Wunused-but-set-variable]
+     int different_flags[] = {0, 0, 0, 0}; // If there's a difference...
+         ^~~~~~~~~~~~~~~
 ../src/main.c: In function 'display_ui':
-../src/main.c:583:20: warning: implicit declaration of function 'dtostr'; did you mean 'strstr'? [-Wimplicit-function-declaration]
+../src/main.c:625:20: warning: implicit declaration of function 'dtostr'; did you mean 'strstr'? [-Wimplicit-function-declaration]
      if ( (failed = dtostr(quantity, qty_str, 12) )  == -1 || failed == 0)
                     ^~~~~~
                     strstr
 ../src/main.c: In function 'main':
-../src/main.c:796:13: warning: implicit declaration of function 'wait'; did you mean 'main'? [-Wimplicit-function-declaration]
+../src/main.c:854:13: warning: implicit declaration of function 'wait'; did you mean 'main'? [-Wimplicit-function-declaration]
              wait(5);
              ^~~~
              main
-../src/main.c:759:9: warning: unused variable 'cstate' [-Wunused-variable]
+../src/main.c:809:9: warning: unused variable 'cstate' [-Wunused-variable]
      int cstate = 0; //Currently unused
          ^~~~~~
-../src/main.c:675:9: warning: unused variable 'item_weight' [-Wunused-variable]
+../src/main.c:724:9: warning: unused variable 'item_weight' [-Wunused-variable]
      int item_weight = 5;
          ^~~~~~~~~~~
-../src/main.c:674:9: warning: unused variable 'esp8266_weight' [-Wunused-variable]
+../src/main.c:723:9: warning: unused variable 'esp8266_weight' [-Wunused-variable]
      int esp8266_weight = 154;
          ^~~~~~~~~~~~~~
-../src/main.c:673:9: warning: variable 'avg' set but not used [-Wunused-but-set-variable]
+../src/main.c:722:9: warning: variable 'avg' set but not used [-Wunused-but-set-variable]
      int avg;
          ^~~
-../src/main.c:671:14: warning: variable 'checker' set but not used [-Wunused-but-set-variable]
+../src/main.c:720:14: warning: variable 'checker' set but not used [-Wunused-but-set-variable]
      uint32_t checker;
               ^~~~~~~
 Finished building: ../src/main.c
@@ -49,48 +52,54 @@ Generating binary and Printing size information:
 arm-none-eabi-objcopy -O binary "wherehouse_stm32_firmware.elf" "wherehouse_stm32_firmware.bin"
 arm-none-eabi-size "wherehouse_stm32_firmware.elf"
    text	   data	    bss	    dec	    hex	filename
-  60888	   2564	   7360	  70812	  1149c	wherehouse_stm32_firmware.elf
+  61592	   2572	   7360	  71524	  11764	wherehouse_stm32_firmware.elf
  
-14:15:00 **** Incremental Build of configuration Debug for project wherehouse_stm32_firmware ****
+13:40:50 **** Incremental Build of configuration Debug for project wherehouse_stm32_firmware ****
 make -j4 all 
 make: Nothing to be done for 'all'.
-14:15:12 **** Incremental Build of configuration Debug for project wherehouse_stm32_firmware ****
+13:44:37 **** Incremental Build of configuration Debug for project wherehouse_stm32_firmware ****
+make -j4 all 
+make: Nothing to be done for 'all'.
+14:03:52 **** Incremental Build of configuration Debug for project wherehouse_stm32_firmware ****
 make -j4 all 
 Building file: ../src/main.c
 Invoking: MCU GCC Compiler
 /home/sam/Documents/senior_design/wherehouse/system/stm32_firmware/Debug
 arm-none-eabi-gcc -mcpu=cortex-m0 -mthumb -mfloat-abi=soft -DSTM32 -DSTM32F0 -DSTM32F091RCTx -DDEBUG -DSTM32F091 -DUSE_STDPERIPH_DRIVER -I"/home/sam/Documents/senior_design/wherehouse/system/stm32_firmware/StdPeriph_Driver/inc" -I"/home/sam/Documents/senior_design/wherehouse/system/stm32_firmware/inc" -I"/home/sam/Documents/senior_design/wherehouse/system/stm32_firmware/CMSIS/device" -I"/home/sam/Documents/senior_design/wherehouse/system/stm32_firmware/CMSIS/core" -O0 -g3 -Wall -fmessage-length=0 -ffunction-sections -c -MMD -MP -MF"src/main.d" -MT"src/main.o" -o "src/main.o" "../src/main.c"
 ../src/main.c: In function 'interrupt_getchar':
-../src/main.c:258:17: warning: unused variable 'u' [-Wunused-variable]
+../src/main.c:261:17: warning: unused variable 'u' [-Wunused-variable]
   USART_TypeDef *u = USART5;
                  ^
 ../src/main.c: In function 'parse_configuration':
-../src/main.c:418:10: warning: unused variable 'ignore_list' [-Wunused-variable]
+../src/main.c:423:10: warning: unused variable 'ignore_list' [-Wunused-variable]
      char ignore_list[] = {':'}; // Not implemented
           ^~~~~~~~~~~
+../src/main.c:420:9: warning: variable 'different_flags' set but not used [-Wunused-but-set-variable]
+     int different_flags[] = {0, 0, 0, 0}; // If there's a difference...
+         ^~~~~~~~~~~~~~~
 ../src/main.c: In function 'display_ui':
-../src/main.c:583:20: warning: implicit declaration of function 'dtostr'; did you mean 'strstr'? [-Wimplicit-function-declaration]
+../src/main.c:625:20: warning: implicit declaration of function 'dtostr'; did you mean 'strstr'? [-Wimplicit-function-declaration]
      if ( (failed = dtostr(quantity, qty_str, 12) )  == -1 || failed == 0)
                     ^~~~~~
                     strstr
 ../src/main.c: In function 'main':
-../src/main.c:796:13: warning: implicit declaration of function 'wait'; did you mean 'main'? [-Wimplicit-function-declaration]
+../src/main.c:854:13: warning: implicit declaration of function 'wait'; did you mean 'main'? [-Wimplicit-function-declaration]
              wait(5);
              ^~~~
              main
-../src/main.c:759:9: warning: unused variable 'cstate' [-Wunused-variable]
+../src/main.c:809:9: warning: unused variable 'cstate' [-Wunused-variable]
      int cstate = 0; //Currently unused
          ^~~~~~
-../src/main.c:675:9: warning: unused variable 'item_weight' [-Wunused-variable]
+../src/main.c:724:9: warning: unused variable 'item_weight' [-Wunused-variable]
      int item_weight = 5;
          ^~~~~~~~~~~
-../src/main.c:674:9: warning: unused variable 'esp8266_weight' [-Wunused-variable]
+../src/main.c:723:9: warning: unused variable 'esp8266_weight' [-Wunused-variable]
      int esp8266_weight = 154;
          ^~~~~~~~~~~~~~
-../src/main.c:673:9: warning: variable 'avg' set but not used [-Wunused-but-set-variable]
+../src/main.c:722:9: warning: variable 'avg' set but not used [-Wunused-but-set-variable]
      int avg;
          ^~~
-../src/main.c:671:14: warning: variable 'checker' set but not used [-Wunused-but-set-variable]
+../src/main.c:720:14: warning: variable 'checker' set but not used [-Wunused-but-set-variable]
      uint32_t checker;
               ^~~~~~~
 Finished building: ../src/main.c
@@ -105,5 +114,1819 @@ Generating binary and Printing size information:
 arm-none-eabi-objcopy -O binary "wherehouse_stm32_firmware.elf" "wherehouse_stm32_firmware.bin"
 arm-none-eabi-size "wherehouse_stm32_firmware.elf"
    text	   data	    bss	    dec	    hex	filename
-  60888	   2564	   7360	  70812	  1149c	wherehouse_stm32_firmware.elf
+  61592	   2572	   7360	  71524	  11764	wherehouse_stm32_firmware.elf
+ 
+14:05:10 **** Incremental Build of configuration Debug for project wherehouse_stm32_firmware ****
+make -j4 all 
+Building file: ../src/main.c
+Invoking: MCU GCC Compiler
+/home/sam/Documents/senior_design/wherehouse/system/stm32_firmware/Debug
+arm-none-eabi-gcc -mcpu=cortex-m0 -mthumb -mfloat-abi=soft -DSTM32 -DSTM32F0 -DSTM32F091RCTx -DDEBUG -DSTM32F091 -DUSE_STDPERIPH_DRIVER -I"/home/sam/Documents/senior_design/wherehouse/system/stm32_firmware/StdPeriph_Driver/inc" -I"/home/sam/Documents/senior_design/wherehouse/system/stm32_firmware/inc" -I"/home/sam/Documents/senior_design/wherehouse/system/stm32_firmware/CMSIS/device" -I"/home/sam/Documents/senior_design/wherehouse/system/stm32_firmware/CMSIS/core" -O0 -g3 -Wall -fmessage-length=0 -ffunction-sections -c -MMD -MP -MF"src/main.d" -MT"src/main.o" -o "src/main.o" "../src/main.c"
+../src/main.c: In function 'interrupt_getchar':
+../src/main.c:261:17: warning: unused variable 'u' [-Wunused-variable]
+  USART_TypeDef *u = USART5;
+                 ^
+../src/main.c: In function 'parse_configuration':
+../src/main.c:423:10: warning: unused variable 'ignore_list' [-Wunused-variable]
+     char ignore_list[] = {':'}; // Not implemented
+          ^~~~~~~~~~~
+../src/main.c:420:9: warning: variable 'different_flags' set but not used [-Wunused-but-set-variable]
+     int different_flags[] = {0, 0, 0, 0}; // If there's a difference...
+         ^~~~~~~~~~~~~~~
+../src/main.c: In function 'display_ui':
+../src/main.c:625:20: warning: implicit declaration of function 'dtostr'; did you mean 'strstr'? [-Wimplicit-function-declaration]
+     if ( (failed = dtostr(quantity, qty_str, 12) )  == -1 || failed == 0)
+                    ^~~~~~
+                    strstr
+../src/main.c: In function 'main':
+../src/main.c:854:13: warning: implicit declaration of function 'wait'; did you mean 'main'? [-Wimplicit-function-declaration]
+             wait(5);
+             ^~~~
+             main
+../src/main.c:809:9: warning: unused variable 'cstate' [-Wunused-variable]
+     int cstate = 0; //Currently unused
+         ^~~~~~
+../src/main.c:724:9: warning: unused variable 'item_weight' [-Wunused-variable]
+     int item_weight = 5;
+         ^~~~~~~~~~~
+../src/main.c:723:9: warning: unused variable 'esp8266_weight' [-Wunused-variable]
+     int esp8266_weight = 154;
+         ^~~~~~~~~~~~~~
+../src/main.c:722:9: warning: variable 'avg' set but not used [-Wunused-but-set-variable]
+     int avg;
+         ^~~
+../src/main.c:720:14: warning: variable 'checker' set but not used [-Wunused-but-set-variable]
+     uint32_t checker;
+              ^~~~~~~
+Finished building: ../src/main.c
+ 
+Building target: wherehouse_stm32_firmware.elf
+Invoking: MCU GCC Linker
+arm-none-eabi-gcc -mcpu=cortex-m0 -mthumb -mfloat-abi=soft -T"/home/sam/Documents/senior_design/wherehouse/system/stm32_firmware/LinkerScript.ld" -Wl,-Map=output.map -Wl,--gc-sections -o "wherehouse_stm32_firmware.elf" @"objects.list"   -lm
+Finished building target: wherehouse_stm32_firmware.elf
+ 
+make --no-print-directory post-build
+Generating binary and Printing size information:
+arm-none-eabi-objcopy -O binary "wherehouse_stm32_firmware.elf" "wherehouse_stm32_firmware.bin"
+arm-none-eabi-size "wherehouse_stm32_firmware.elf"
+   text	   data	    bss	    dec	    hex	filename
+  61592	   2572	   7360	  71524	  11764	wherehouse_stm32_firmware.elf
+ 
+14:06:09 **** Incremental Build of configuration Debug for project wherehouse_stm32_firmware ****
+make -j4 all 
+Building file: ../src/main.c
+Invoking: MCU GCC Compiler
+/home/sam/Documents/senior_design/wherehouse/system/stm32_firmware/Debug
+arm-none-eabi-gcc -mcpu=cortex-m0 -mthumb -mfloat-abi=soft -DSTM32 -DSTM32F0 -DSTM32F091RCTx -DDEBUG -DSTM32F091 -DUSE_STDPERIPH_DRIVER -I"/home/sam/Documents/senior_design/wherehouse/system/stm32_firmware/StdPeriph_Driver/inc" -I"/home/sam/Documents/senior_design/wherehouse/system/stm32_firmware/inc" -I"/home/sam/Documents/senior_design/wherehouse/system/stm32_firmware/CMSIS/device" -I"/home/sam/Documents/senior_design/wherehouse/system/stm32_firmware/CMSIS/core" -O0 -g3 -Wall -fmessage-length=0 -ffunction-sections -c -MMD -MP -MF"src/main.d" -MT"src/main.o" -o "src/main.o" "../src/main.c"
+../src/main.c: In function 'interrupt_getchar':
+../src/main.c:261:17: warning: unused variable 'u' [-Wunused-variable]
+  USART_TypeDef *u = USART5;
+                 ^
+../src/main.c: In function 'parse_configuration':
+../src/main.c:423:10: warning: unused variable 'ignore_list' [-Wunused-variable]
+     char ignore_list[] = {':'}; // Not implemented
+          ^~~~~~~~~~~
+../src/main.c:420:9: warning: variable 'different_flags' set but not used [-Wunused-but-set-variable]
+     int different_flags[] = {0, 0, 0, 0}; // If there's a difference...
+         ^~~~~~~~~~~~~~~
+../src/main.c: In function 'display_ui':
+../src/main.c:625:20: warning: implicit declaration of function 'dtostr'; did you mean 'strstr'? [-Wimplicit-function-declaration]
+     if ( (failed = dtostr(quantity, qty_str, 12) )  == -1 || failed == 0)
+                    ^~~~~~
+                    strstr
+../src/main.c: In function 'main':
+../src/main.c:854:13: warning: implicit declaration of function 'wait'; did you mean 'main'? [-Wimplicit-function-declaration]
+             wait(5);
+             ^~~~
+             main
+../src/main.c:809:9: warning: unused variable 'cstate' [-Wunused-variable]
+     int cstate = 0; //Currently unused
+         ^~~~~~
+../src/main.c:724:9: warning: unused variable 'item_weight' [-Wunused-variable]
+     int item_weight = 5;
+         ^~~~~~~~~~~
+../src/main.c:723:9: warning: unused variable 'esp8266_weight' [-Wunused-variable]
+     int esp8266_weight = 154;
+         ^~~~~~~~~~~~~~
+../src/main.c:722:9: warning: variable 'avg' set but not used [-Wunused-but-set-variable]
+     int avg;
+         ^~~
+../src/main.c:720:14: warning: variable 'checker' set but not used [-Wunused-but-set-variable]
+     uint32_t checker;
+              ^~~~~~~
+Finished building: ../src/main.c
+ 
+Building target: wherehouse_stm32_firmware.elf
+Invoking: MCU GCC Linker
+arm-none-eabi-gcc -mcpu=cortex-m0 -mthumb -mfloat-abi=soft -T"/home/sam/Documents/senior_design/wherehouse/system/stm32_firmware/LinkerScript.ld" -Wl,-Map=output.map -Wl,--gc-sections -o "wherehouse_stm32_firmware.elf" @"objects.list"   -lm
+Finished building target: wherehouse_stm32_firmware.elf
+ 
+make --no-print-directory post-build
+Generating binary and Printing size information:
+arm-none-eabi-objcopy -O binary "wherehouse_stm32_firmware.elf" "wherehouse_stm32_firmware.bin"
+arm-none-eabi-size "wherehouse_stm32_firmware.elf"
+   text	   data	    bss	    dec	    hex	filename
+  61556	   2572	   7360	  71488	  11740	wherehouse_stm32_firmware.elf
+ 
+14:30:29 **** Incremental Build of configuration Debug for project wherehouse_stm32_firmware ****
+make -j4 all 
+Building file: ../src/main.c
+Invoking: MCU GCC Compiler
+/home/sam/Documents/senior_design/wherehouse/system/stm32_firmware/Debug
+arm-none-eabi-gcc -mcpu=cortex-m0 -mthumb -mfloat-abi=soft -DSTM32 -DSTM32F0 -DSTM32F091RCTx -DDEBUG -DSTM32F091 -DUSE_STDPERIPH_DRIVER -I"/home/sam/Documents/senior_design/wherehouse/system/stm32_firmware/StdPeriph_Driver/inc" -I"/home/sam/Documents/senior_design/wherehouse/system/stm32_firmware/inc" -I"/home/sam/Documents/senior_design/wherehouse/system/stm32_firmware/CMSIS/device" -I"/home/sam/Documents/senior_design/wherehouse/system/stm32_firmware/CMSIS/core" -O0 -g3 -Wall -fmessage-length=0 -ffunction-sections -c -MMD -MP -MF"src/main.d" -MT"src/main.o" -o "src/main.o" "../src/main.c"
+../src/main.c: In function 'interrupt_getchar':
+../src/main.c:270:17: warning: unused variable 'u' [-Wunused-variable]
+  USART_TypeDef *u = USART5;
+                 ^
+../src/main.c: In function 'parse_configuration':
+../src/main.c:440:10: warning: unused variable 'ignore_list' [-Wunused-variable]
+     char ignore_list[] = {':'}; // Not implemented
+          ^~~~~~~~~~~
+../src/main.c:437:9: warning: variable 'different_flags' set but not used [-Wunused-but-set-variable]
+     int different_flags[] = {0, 0, 0, 0}; // If there's a difference...
+         ^~~~~~~~~~~~~~~
+../src/main.c: In function 'display_ui':
+../src/main.c:638:20: warning: implicit declaration of function 'dtostr'; did you mean 'strstr'? [-Wimplicit-function-declaration]
+     if ( (failed = dtostr(quantity, qty_str, 12) )  == -1 || failed == 0)
+                    ^~~~~~
+                    strstr
+../src/main.c: In function 'main':
+../src/main.c:870:13: warning: implicit declaration of function 'wait'; did you mean 'main'? [-Wimplicit-function-declaration]
+             wait(5);
+             ^~~~
+             main
+../src/main.c:825:9: warning: unused variable 'cstate' [-Wunused-variable]
+     int cstate = 0; //Currently unused
+         ^~~~~~
+../src/main.c:740:9: warning: unused variable 'item_weight' [-Wunused-variable]
+     int item_weight = 5;
+         ^~~~~~~~~~~
+../src/main.c:739:9: warning: unused variable 'esp8266_weight' [-Wunused-variable]
+     int esp8266_weight = 154;
+         ^~~~~~~~~~~~~~
+../src/main.c:738:9: warning: variable 'avg' set but not used [-Wunused-but-set-variable]
+     int avg;
+         ^~~
+../src/main.c:736:14: warning: variable 'checker' set but not used [-Wunused-but-set-variable]
+     uint32_t checker;
+              ^~~~~~~
+Finished building: ../src/main.c
+ 
+Building target: wherehouse_stm32_firmware.elf
+Invoking: MCU GCC Linker
+arm-none-eabi-gcc -mcpu=cortex-m0 -mthumb -mfloat-abi=soft -T"/home/sam/Documents/senior_design/wherehouse/system/stm32_firmware/LinkerScript.ld" -Wl,-Map=output.map -Wl,--gc-sections -o "wherehouse_stm32_firmware.elf" @"objects.list"   -lm
+Finished building target: wherehouse_stm32_firmware.elf
+ 
+make --no-print-directory post-build
+Generating binary and Printing size information:
+arm-none-eabi-objcopy -O binary "wherehouse_stm32_firmware.elf" "wherehouse_stm32_firmware.bin"
+arm-none-eabi-size "wherehouse_stm32_firmware.elf"
+   text	   data	    bss	    dec	    hex	filename
+  61700	   2604	   7360	  71664	  117f0	wherehouse_stm32_firmware.elf
+ 
+14:31:53 **** Incremental Build of configuration Debug for project wherehouse_stm32_firmware ****
+make -j4 all 
+Building file: ../src/main.c
+Invoking: MCU GCC Compiler
+/home/sam/Documents/senior_design/wherehouse/system/stm32_firmware/Debug
+arm-none-eabi-gcc -mcpu=cortex-m0 -mthumb -mfloat-abi=soft -DSTM32 -DSTM32F0 -DSTM32F091RCTx -DDEBUG -DSTM32F091 -DUSE_STDPERIPH_DRIVER -I"/home/sam/Documents/senior_design/wherehouse/system/stm32_firmware/StdPeriph_Driver/inc" -I"/home/sam/Documents/senior_design/wherehouse/system/stm32_firmware/inc" -I"/home/sam/Documents/senior_design/wherehouse/system/stm32_firmware/CMSIS/device" -I"/home/sam/Documents/senior_design/wherehouse/system/stm32_firmware/CMSIS/core" -O0 -g3 -Wall -fmessage-length=0 -ffunction-sections -c -MMD -MP -MF"src/main.d" -MT"src/main.o" -o "src/main.o" "../src/main.c"
+../src/main.c: In function 'interrupt_getchar':
+../src/main.c:270:17: warning: unused variable 'u' [-Wunused-variable]
+  USART_TypeDef *u = USART5;
+                 ^
+../src/main.c: In function 'parse_configuration':
+../src/main.c:440:10: warning: unused variable 'ignore_list' [-Wunused-variable]
+     char ignore_list[] = {':'}; // Not implemented
+          ^~~~~~~~~~~
+../src/main.c:437:9: warning: variable 'different_flags' set but not used [-Wunused-but-set-variable]
+     int different_flags[] = {0, 0, 0, 0}; // If there's a difference...
+         ^~~~~~~~~~~~~~~
+../src/main.c: In function 'display_ui':
+../src/main.c:638:20: warning: implicit declaration of function 'dtostr'; did you mean 'strstr'? [-Wimplicit-function-declaration]
+     if ( (failed = dtostr(quantity, qty_str, 12) )  == -1 || failed == 0)
+                    ^~~~~~
+                    strstr
+../src/main.c: In function 'main':
+../src/main.c:870:13: warning: implicit declaration of function 'wait'; did you mean 'main'? [-Wimplicit-function-declaration]
+             wait(5);
+             ^~~~
+             main
+../src/main.c:825:9: warning: unused variable 'cstate' [-Wunused-variable]
+     int cstate = 0; //Currently unused
+         ^~~~~~
+../src/main.c:740:9: warning: unused variable 'item_weight' [-Wunused-variable]
+     int item_weight = 5;
+         ^~~~~~~~~~~
+../src/main.c:739:9: warning: unused variable 'esp8266_weight' [-Wunused-variable]
+     int esp8266_weight = 154;
+         ^~~~~~~~~~~~~~
+../src/main.c:738:9: warning: variable 'avg' set but not used [-Wunused-but-set-variable]
+     int avg;
+         ^~~
+../src/main.c:736:14: warning: variable 'checker' set but not used [-Wunused-but-set-variable]
+     uint32_t checker;
+              ^~~~~~~
+Finished building: ../src/main.c
+ 
+Building target: wherehouse_stm32_firmware.elf
+Invoking: MCU GCC Linker
+arm-none-eabi-gcc -mcpu=cortex-m0 -mthumb -mfloat-abi=soft -T"/home/sam/Documents/senior_design/wherehouse/system/stm32_firmware/LinkerScript.ld" -Wl,-Map=output.map -Wl,--gc-sections -o "wherehouse_stm32_firmware.elf" @"objects.list"   -lm
+Finished building target: wherehouse_stm32_firmware.elf
+ 
+make --no-print-directory post-build
+Generating binary and Printing size information:
+arm-none-eabi-objcopy -O binary "wherehouse_stm32_firmware.elf" "wherehouse_stm32_firmware.bin"
+arm-none-eabi-size "wherehouse_stm32_firmware.elf"
+   text	   data	    bss	    dec	    hex	filename
+  61772	   2604	   7360	  71736	  11838	wherehouse_stm32_firmware.elf
+ 
+14:35:19 **** Incremental Build of configuration Debug for project wherehouse_stm32_firmware ****
+make -j4 all 
+make: Nothing to be done for 'all'.
+10:59:18 **** Incremental Build of configuration Debug for project wherehouse_stm32_firmware ****
+make -j4 all 
+Building file: ../src/main.c
+Invoking: MCU GCC Compiler
+/home/sam/Documents/senior_design/wherehouse/system/stm32_firmware/Debug
+arm-none-eabi-gcc -mcpu=cortex-m0 -mthumb -mfloat-abi=soft -DSTM32 -DSTM32F0 -DSTM32F091RCTx -DDEBUG -DSTM32F091 -DUSE_STDPERIPH_DRIVER -I"/home/sam/Documents/senior_design/wherehouse/system/stm32_firmware/StdPeriph_Driver/inc" -I"/home/sam/Documents/senior_design/wherehouse/system/stm32_firmware/inc" -I"/home/sam/Documents/senior_design/wherehouse/system/stm32_firmware/CMSIS/device" -I"/home/sam/Documents/senior_design/wherehouse/system/stm32_firmware/CMSIS/core" -O0 -g3 -Wall -fmessage-length=0 -ffunction-sections -c -MMD -MP -MF"src/main.d" -MT"src/main.o" -o "src/main.o" "../src/main.c"
+../src/main.c: In function 'interrupt_getchar':
+../src/main.c:286:17: warning: unused variable 'u' [-Wunused-variable]
+  USART_TypeDef *u = USART5;
+                 ^
+../src/main.c: In function 'parse_configuration':
+../src/main.c:472:10: warning: unused variable 'ignore_list' [-Wunused-variable]
+     char ignore_list[] = {':'}; // Not implemented
+          ^~~~~~~~~~~
+../src/main.c:469:9: warning: variable 'different_flags' set but not used [-Wunused-but-set-variable]
+     int different_flags[] = {0, 0, 0, 0}; // If there's a difference...
+         ^~~~~~~~~~~~~~~
+../src/main.c: In function 'ap_sequence':
+../src/main.c:642:9: warning: unused variable 'errors' [-Wunused-variable]
+     int errors = 0;
+         ^~~~~~
+../src/main.c: In function 'display_ui':
+../src/main.c:705:20: warning: implicit declaration of function 'dtostr'; did you mean 'strstr'? [-Wimplicit-function-declaration]
+     if ( (failed = dtostr(quantity, qty_str, 12) )  == -1 || failed == 0)
+                    ^~~~~~
+                    strstr
+../src/main.c: In function 'main':
+../src/main.c:962:13: warning: implicit declaration of function 'wait'; did you mean 'main'? [-Wimplicit-function-declaration]
+             wait(5);
+             ^~~~
+             main
+../src/main.c:893:9: warning: unused variable 'cstate' [-Wunused-variable]
+     int cstate = 0; //Currently unused
+         ^~~~~~
+../src/main.c:807:9: warning: unused variable 'item_weight' [-Wunused-variable]
+     int item_weight = 5;
+         ^~~~~~~~~~~
+../src/main.c:806:9: warning: unused variable 'esp8266_weight' [-Wunused-variable]
+     int esp8266_weight = 154;
+         ^~~~~~~~~~~~~~
+../src/main.c:805:9: warning: variable 'avg' set but not used [-Wunused-but-set-variable]
+     int avg;
+         ^~~
+../src/main.c:803:14: warning: variable 'checker' set but not used [-Wunused-but-set-variable]
+     uint32_t checker;
+              ^~~~~~~
+Finished building: ../src/main.c
+ 
+Building target: wherehouse_stm32_firmware.elf
+Invoking: MCU GCC Linker
+arm-none-eabi-gcc -mcpu=cortex-m0 -mthumb -mfloat-abi=soft -T"/home/sam/Documents/senior_design/wherehouse/system/stm32_firmware/LinkerScript.ld" -Wl,-Map=output.map -Wl,--gc-sections -o "wherehouse_stm32_firmware.elf" @"objects.list"   -lm
+Finished building target: wherehouse_stm32_firmware.elf
+ 
+make --no-print-directory post-build
+Generating binary and Printing size information:
+arm-none-eabi-objcopy -O binary "wherehouse_stm32_firmware.elf" "wherehouse_stm32_firmware.bin"
+arm-none-eabi-size "wherehouse_stm32_firmware.elf"
+   text	   data	    bss	    dec	    hex	filename
+  62208	   2604	   7360	  72172	  119ec	wherehouse_stm32_firmware.elf
+ 
+11:03:37 **** Incremental Build of configuration Debug for project wherehouse_stm32_firmware ****
+make -j4 all 
+Building file: ../src/main.c
+Invoking: MCU GCC Compiler
+/home/sam/Documents/senior_design/wherehouse/system/stm32_firmware/Debug
+arm-none-eabi-gcc -mcpu=cortex-m0 -mthumb -mfloat-abi=soft -DSTM32 -DSTM32F0 -DSTM32F091RCTx -DDEBUG -DSTM32F091 -DUSE_STDPERIPH_DRIVER -I"/home/sam/Documents/senior_design/wherehouse/system/stm32_firmware/StdPeriph_Driver/inc" -I"/home/sam/Documents/senior_design/wherehouse/system/stm32_firmware/inc" -I"/home/sam/Documents/senior_design/wherehouse/system/stm32_firmware/CMSIS/device" -I"/home/sam/Documents/senior_design/wherehouse/system/stm32_firmware/CMSIS/core" -O0 -g3 -Wall -fmessage-length=0 -ffunction-sections -c -MMD -MP -MF"src/main.d" -MT"src/main.o" -o "src/main.o" "../src/main.c"
+../src/main.c: In function 'interrupt_getchar':
+../src/main.c:286:17: warning: unused variable 'u' [-Wunused-variable]
+  USART_TypeDef *u = USART5;
+                 ^
+../src/main.c: In function 'parse_configuration':
+../src/main.c:472:10: warning: unused variable 'ignore_list' [-Wunused-variable]
+     char ignore_list[] = {':'}; // Not implemented
+          ^~~~~~~~~~~
+../src/main.c:469:9: warning: variable 'different_flags' set but not used [-Wunused-but-set-variable]
+     int different_flags[] = {0, 0, 0, 0}; // If there's a difference...
+         ^~~~~~~~~~~~~~~
+../src/main.c: In function 'ap_sequence':
+../src/main.c:642:9: warning: unused variable 'errors' [-Wunused-variable]
+     int errors = 0;
+         ^~~~~~
+../src/main.c: In function 'display_ui':
+../src/main.c:705:20: warning: implicit declaration of function 'dtostr'; did you mean 'strstr'? [-Wimplicit-function-declaration]
+     if ( (failed = dtostr(quantity, qty_str, 12) )  == -1 || failed == 0)
+                    ^~~~~~
+                    strstr
+../src/main.c: In function 'main':
+../src/main.c:967:13: warning: implicit declaration of function 'wait'; did you mean 'main'? [-Wimplicit-function-declaration]
+             wait(5);
+             ^~~~
+             main
+../src/main.c:893:9: warning: unused variable 'cstate' [-Wunused-variable]
+     int cstate = 0; //Currently unused
+         ^~~~~~
+../src/main.c:807:9: warning: unused variable 'item_weight' [-Wunused-variable]
+     int item_weight = 5;
+         ^~~~~~~~~~~
+../src/main.c:806:9: warning: unused variable 'esp8266_weight' [-Wunused-variable]
+     int esp8266_weight = 154;
+         ^~~~~~~~~~~~~~
+../src/main.c:805:9: warning: variable 'avg' set but not used [-Wunused-but-set-variable]
+     int avg;
+         ^~~
+../src/main.c:803:14: warning: variable 'checker' set but not used [-Wunused-but-set-variable]
+     uint32_t checker;
+              ^~~~~~~
+Finished building: ../src/main.c
+ 
+Building target: wherehouse_stm32_firmware.elf
+Invoking: MCU GCC Linker
+arm-none-eabi-gcc -mcpu=cortex-m0 -mthumb -mfloat-abi=soft -T"/home/sam/Documents/senior_design/wherehouse/system/stm32_firmware/LinkerScript.ld" -Wl,-Map=output.map -Wl,--gc-sections -o "wherehouse_stm32_firmware.elf" @"objects.list"   -lm
+Finished building target: wherehouse_stm32_firmware.elf
+ 
+make --no-print-directory post-build
+Generating binary and Printing size information:
+arm-none-eabi-objcopy -O binary "wherehouse_stm32_firmware.elf" "wherehouse_stm32_firmware.bin"
+arm-none-eabi-size "wherehouse_stm32_firmware.elf"
+   text	   data	    bss	    dec	    hex	filename
+  62260	   2604	   7360	  72224	  11a20	wherehouse_stm32_firmware.elf
+ 
+11:07:05 **** Incremental Build of configuration Debug for project wherehouse_stm32_firmware ****
+make -j4 all 
+Building file: ../src/main.c
+Invoking: MCU GCC Compiler
+/home/sam/Documents/senior_design/wherehouse/system/stm32_firmware/Debug
+arm-none-eabi-gcc -mcpu=cortex-m0 -mthumb -mfloat-abi=soft -DSTM32 -DSTM32F0 -DSTM32F091RCTx -DDEBUG -DSTM32F091 -DUSE_STDPERIPH_DRIVER -I"/home/sam/Documents/senior_design/wherehouse/system/stm32_firmware/StdPeriph_Driver/inc" -I"/home/sam/Documents/senior_design/wherehouse/system/stm32_firmware/inc" -I"/home/sam/Documents/senior_design/wherehouse/system/stm32_firmware/CMSIS/device" -I"/home/sam/Documents/senior_design/wherehouse/system/stm32_firmware/CMSIS/core" -O0 -g3 -Wall -fmessage-length=0 -ffunction-sections -c -MMD -MP -MF"src/main.d" -MT"src/main.o" -o "src/main.o" "../src/main.c"
+../src/main.c: In function 'interrupt_getchar':
+../src/main.c:286:17: warning: unused variable 'u' [-Wunused-variable]
+  USART_TypeDef *u = USART5;
+                 ^
+../src/main.c: In function 'parse_configuration':
+../src/main.c:472:10: warning: unused variable 'ignore_list' [-Wunused-variable]
+     char ignore_list[] = {':'}; // Not implemented
+          ^~~~~~~~~~~
+../src/main.c:469:9: warning: variable 'different_flags' set but not used [-Wunused-but-set-variable]
+     int different_flags[] = {0, 0, 0, 0}; // If there's a difference...
+         ^~~~~~~~~~~~~~~
+../src/main.c: In function 'ap_sequence':
+../src/main.c:642:9: warning: unused variable 'errors' [-Wunused-variable]
+     int errors = 0;
+         ^~~~~~
+../src/main.c: In function 'display_ui':
+../src/main.c:705:20: warning: implicit declaration of function 'dtostr'; did you mean 'strstr'? [-Wimplicit-function-declaration]
+     if ( (failed = dtostr(quantity, qty_str, 12) )  == -1 || failed == 0)
+                    ^~~~~~
+                    strstr
+../src/main.c: In function 'main':
+../src/main.c:968:13: warning: implicit declaration of function 'wait'; did you mean 'main'? [-Wimplicit-function-declaration]
+             wait(5);
+             ^~~~
+             main
+../src/main.c:893:9: warning: unused variable 'cstate' [-Wunused-variable]
+     int cstate = 0; //Currently unused
+         ^~~~~~
+../src/main.c:807:9: warning: unused variable 'item_weight' [-Wunused-variable]
+     int item_weight = 5;
+         ^~~~~~~~~~~
+../src/main.c:806:9: warning: unused variable 'esp8266_weight' [-Wunused-variable]
+     int esp8266_weight = 154;
+         ^~~~~~~~~~~~~~
+../src/main.c:805:9: warning: variable 'avg' set but not used [-Wunused-but-set-variable]
+     int avg;
+         ^~~
+../src/main.c:803:14: warning: variable 'checker' set but not used [-Wunused-but-set-variable]
+     uint32_t checker;
+              ^~~~~~~
+Finished building: ../src/main.c
+ 
+Building target: wherehouse_stm32_firmware.elf
+Invoking: MCU GCC Linker
+arm-none-eabi-gcc -mcpu=cortex-m0 -mthumb -mfloat-abi=soft -T"/home/sam/Documents/senior_design/wherehouse/system/stm32_firmware/LinkerScript.ld" -Wl,-Map=output.map -Wl,--gc-sections -o "wherehouse_stm32_firmware.elf" @"objects.list"   -lm
+Finished building target: wherehouse_stm32_firmware.elf
+ 
+make --no-print-directory post-build
+Generating binary and Printing size information:
+arm-none-eabi-objcopy -O binary "wherehouse_stm32_firmware.elf" "wherehouse_stm32_firmware.bin"
+arm-none-eabi-size "wherehouse_stm32_firmware.elf"
+   text	   data	    bss	    dec	    hex	filename
+  62272	   2604	   7360	  72236	  11a2c	wherehouse_stm32_firmware.elf
+ 
+12:10:23 **** Incremental Build of configuration Debug for project wherehouse_stm32_firmware ****
+make -j4 all 
+Building file: ../src/main.c
+Invoking: MCU GCC Compiler
+/home/sam/Documents/senior_design/wherehouse/system/stm32_firmware/Debug
+arm-none-eabi-gcc -mcpu=cortex-m0 -mthumb -mfloat-abi=soft -DSTM32 -DSTM32F0 -DSTM32F091RCTx -DDEBUG -DSTM32F091 -DUSE_STDPERIPH_DRIVER -I"/home/sam/Documents/senior_design/wherehouse/system/stm32_firmware/StdPeriph_Driver/inc" -I"/home/sam/Documents/senior_design/wherehouse/system/stm32_firmware/inc" -I"/home/sam/Documents/senior_design/wherehouse/system/stm32_firmware/CMSIS/device" -I"/home/sam/Documents/senior_design/wherehouse/system/stm32_firmware/CMSIS/core" -O0 -g3 -Wall -fmessage-length=0 -ffunction-sections -c -MMD -MP -MF"src/main.d" -MT"src/main.o" -o "src/main.o" "../src/main.c"
+../src/main.c: In function 'interrupt_getchar':
+../src/main.c:286:17: warning: unused variable 'u' [-Wunused-variable]
+  USART_TypeDef *u = USART5;
+                 ^
+../src/main.c: In function 'parse_configuration':
+../src/main.c:472:10: warning: unused variable 'ignore_list' [-Wunused-variable]
+     char ignore_list[] = {':'}; // Not implemented
+          ^~~~~~~~~~~
+../src/main.c:469:9: warning: variable 'different_flags' set but not used [-Wunused-but-set-variable]
+     int different_flags[] = {0, 0, 0, 0}; // If there's a difference...
+         ^~~~~~~~~~~~~~~
+../src/main.c: In function 'ap_sequence':
+../src/main.c:642:9: warning: unused variable 'errors' [-Wunused-variable]
+     int errors = 0;
+         ^~~~~~
+../src/main.c: In function 'display_ui':
+../src/main.c:705:20: warning: implicit declaration of function 'dtostr'; did you mean 'strstr'? [-Wimplicit-function-declaration]
+     if ( (failed = dtostr(quantity, qty_str, 12) )  == -1 || failed == 0)
+                    ^~~~~~
+                    strstr
+../src/main.c: In function 'main':
+../src/main.c:969:13: warning: implicit declaration of function 'wait'; did you mean 'main'? [-Wimplicit-function-declaration]
+             wait(5);
+             ^~~~
+             main
+../src/main.c:893:9: warning: unused variable 'cstate' [-Wunused-variable]
+     int cstate = 0; //Currently unused
+         ^~~~~~
+../src/main.c:807:9: warning: unused variable 'item_weight' [-Wunused-variable]
+     int item_weight = 5;
+         ^~~~~~~~~~~
+../src/main.c:806:9: warning: unused variable 'esp8266_weight' [-Wunused-variable]
+     int esp8266_weight = 154;
+         ^~~~~~~~~~~~~~
+../src/main.c:805:9: warning: variable 'avg' set but not used [-Wunused-but-set-variable]
+     int avg;
+         ^~~
+../src/main.c:803:14: warning: variable 'checker' set but not used [-Wunused-but-set-variable]
+     uint32_t checker;
+              ^~~~~~~
+Finished building: ../src/main.c
+ 
+Building target: wherehouse_stm32_firmware.elf
+Invoking: MCU GCC Linker
+arm-none-eabi-gcc -mcpu=cortex-m0 -mthumb -mfloat-abi=soft -T"/home/sam/Documents/senior_design/wherehouse/system/stm32_firmware/LinkerScript.ld" -Wl,-Map=output.map -Wl,--gc-sections -o "wherehouse_stm32_firmware.elf" @"objects.list"   -lm
+Finished building target: wherehouse_stm32_firmware.elf
+ 
+make --no-print-directory post-build
+Generating binary and Printing size information:
+arm-none-eabi-objcopy -O binary "wherehouse_stm32_firmware.elf" "wherehouse_stm32_firmware.bin"
+arm-none-eabi-size "wherehouse_stm32_firmware.elf"
+   text	   data	    bss	    dec	    hex	filename
+  62288	   2604	   7360	  72252	  11a3c	wherehouse_stm32_firmware.elf
+ 
+12:11:08 **** Incremental Build of configuration Debug for project wherehouse_stm32_firmware ****
+make -j4 all 
+Building file: ../src/main.c
+Invoking: MCU GCC Compiler
+/home/sam/Documents/senior_design/wherehouse/system/stm32_firmware/Debug
+arm-none-eabi-gcc -mcpu=cortex-m0 -mthumb -mfloat-abi=soft -DSTM32 -DSTM32F0 -DSTM32F091RCTx -DDEBUG -DSTM32F091 -DUSE_STDPERIPH_DRIVER -I"/home/sam/Documents/senior_design/wherehouse/system/stm32_firmware/StdPeriph_Driver/inc" -I"/home/sam/Documents/senior_design/wherehouse/system/stm32_firmware/inc" -I"/home/sam/Documents/senior_design/wherehouse/system/stm32_firmware/CMSIS/device" -I"/home/sam/Documents/senior_design/wherehouse/system/stm32_firmware/CMSIS/core" -O0 -g3 -Wall -fmessage-length=0 -ffunction-sections -c -MMD -MP -MF"src/main.d" -MT"src/main.o" -o "src/main.o" "../src/main.c"
+../src/main.c: In function 'interrupt_getchar':
+../src/main.c:286:17: warning: unused variable 'u' [-Wunused-variable]
+  USART_TypeDef *u = USART5;
+                 ^
+../src/main.c: In function 'parse_configuration':
+../src/main.c:472:10: warning: unused variable 'ignore_list' [-Wunused-variable]
+     char ignore_list[] = {':'}; // Not implemented
+          ^~~~~~~~~~~
+../src/main.c:469:9: warning: variable 'different_flags' set but not used [-Wunused-but-set-variable]
+     int different_flags[] = {0, 0, 0, 0}; // If there's a difference...
+         ^~~~~~~~~~~~~~~
+../src/main.c: In function 'ap_sequence':
+../src/main.c:642:9: warning: unused variable 'errors' [-Wunused-variable]
+     int errors = 0;
+         ^~~~~~
+../src/main.c: In function 'display_ui':
+../src/main.c:705:20: warning: implicit declaration of function 'dtostr'; did you mean 'strstr'? [-Wimplicit-function-declaration]
+     if ( (failed = dtostr(quantity, qty_str, 12) )  == -1 || failed == 0)
+                    ^~~~~~
+                    strstr
+../src/main.c: In function 'main':
+../src/main.c:969:13: warning: implicit declaration of function 'wait'; did you mean 'main'? [-Wimplicit-function-declaration]
+             wait(5);
+             ^~~~
+             main
+../src/main.c:893:9: warning: unused variable 'cstate' [-Wunused-variable]
+     int cstate = 0; //Currently unused
+         ^~~~~~
+../src/main.c:807:9: warning: unused variable 'item_weight' [-Wunused-variable]
+     int item_weight = 5;
+         ^~~~~~~~~~~
+../src/main.c:806:9: warning: unused variable 'esp8266_weight' [-Wunused-variable]
+     int esp8266_weight = 154;
+         ^~~~~~~~~~~~~~
+../src/main.c:805:9: warning: variable 'avg' set but not used [-Wunused-but-set-variable]
+     int avg;
+         ^~~
+../src/main.c:803:14: warning: variable 'checker' set but not used [-Wunused-but-set-variable]
+     uint32_t checker;
+              ^~~~~~~
+Finished building: ../src/main.c
+ 
+Building target: wherehouse_stm32_firmware.elf
+Invoking: MCU GCC Linker
+arm-none-eabi-gcc -mcpu=cortex-m0 -mthumb -mfloat-abi=soft -T"/home/sam/Documents/senior_design/wherehouse/system/stm32_firmware/LinkerScript.ld" -Wl,-Map=output.map -Wl,--gc-sections -o "wherehouse_stm32_firmware.elf" @"objects.list"   -lm
+Finished building target: wherehouse_stm32_firmware.elf
+ 
+make --no-print-directory post-build
+Generating binary and Printing size information:
+arm-none-eabi-objcopy -O binary "wherehouse_stm32_firmware.elf" "wherehouse_stm32_firmware.bin"
+arm-none-eabi-size "wherehouse_stm32_firmware.elf"
+   text	   data	    bss	    dec	    hex	filename
+  62288	   2604	   7360	  72252	  11a3c	wherehouse_stm32_firmware.elf
+ 
+12:31:46 **** Incremental Build of configuration Debug for project wherehouse_stm32_firmware ****
+make -j4 all 
+Building file: ../src/main.c
+Invoking: MCU GCC Compiler
+/home/sam/Documents/senior_design/wherehouse/system/stm32_firmware/Debug
+arm-none-eabi-gcc -mcpu=cortex-m0 -mthumb -mfloat-abi=soft -DSTM32 -DSTM32F0 -DSTM32F091RCTx -DDEBUG -DSTM32F091 -DUSE_STDPERIPH_DRIVER -I"/home/sam/Documents/senior_design/wherehouse/system/stm32_firmware/StdPeriph_Driver/inc" -I"/home/sam/Documents/senior_design/wherehouse/system/stm32_firmware/inc" -I"/home/sam/Documents/senior_design/wherehouse/system/stm32_firmware/CMSIS/device" -I"/home/sam/Documents/senior_design/wherehouse/system/stm32_firmware/CMSIS/core" -O0 -g3 -Wall -fmessage-length=0 -ffunction-sections -c -MMD -MP -MF"src/main.d" -MT"src/main.o" -o "src/main.o" "../src/main.c"
+../src/main.c: In function 'interrupt_getchar':
+../src/main.c:289:17: warning: unused variable 'u' [-Wunused-variable]
+  USART_TypeDef *u = USART5;
+                 ^
+../src/main.c: In function 'parse_configuration':
+../src/main.c:475:10: warning: unused variable 'ignore_list' [-Wunused-variable]
+     char ignore_list[] = {':'}; // Not implemented
+          ^~~~~~~~~~~
+../src/main.c:472:9: warning: variable 'different_flags' set but not used [-Wunused-but-set-variable]
+     int different_flags[] = {0, 0, 0, 0}; // If there's a difference...
+         ^~~~~~~~~~~~~~~
+../src/main.c: In function 'ap_sequence':
+../src/main.c:645:9: warning: unused variable 'errors' [-Wunused-variable]
+     int errors = 0;
+         ^~~~~~
+../src/main.c: In function 'display_ui':
+../src/main.c:667:10: warning: unused variable 'qty_str' [-Wunused-variable]
+     char qty_str[12];
+          ^~~~~~~
+../src/main.c:666:9: warning: unused variable 'failed' [-Wunused-variable]
+     int failed = 0;
+         ^~~~~~
+../src/main.c: In function 'main':
+../src/main.c:981:13: warning: implicit declaration of function 'wait'; did you mean 'main'? [-Wimplicit-function-declaration]
+             wait(5);
+             ^~~~
+             main
+../src/main.c:905:9: warning: unused variable 'cstate' [-Wunused-variable]
+     int cstate = 0; //Currently unused
+         ^~~~~~
+../src/main.c:819:9: warning: unused variable 'item_weight' [-Wunused-variable]
+     int item_weight = 5;
+         ^~~~~~~~~~~
+../src/main.c:818:9: warning: unused variable 'esp8266_weight' [-Wunused-variable]
+     int esp8266_weight = 154;
+         ^~~~~~~~~~~~~~
+../src/main.c:817:9: warning: variable 'avg' set but not used [-Wunused-but-set-variable]
+     int avg;
+         ^~~
+../src/main.c:815:14: warning: variable 'checker' set but not used [-Wunused-but-set-variable]
+     uint32_t checker;
+              ^~~~~~~
+Finished building: ../src/main.c
+ 
+Building target: wherehouse_stm32_firmware.elf
+Invoking: MCU GCC Linker
+arm-none-eabi-gcc -mcpu=cortex-m0 -mthumb -mfloat-abi=soft -T"/home/sam/Documents/senior_design/wherehouse/system/stm32_firmware/LinkerScript.ld" -Wl,-Map=output.map -Wl,--gc-sections -o "wherehouse_stm32_firmware.elf" @"objects.list"   -lm
+Finished building target: wherehouse_stm32_firmware.elf
+ 
+make --no-print-directory post-build
+Generating binary and Printing size information:
+arm-none-eabi-objcopy -O binary "wherehouse_stm32_firmware.elf" "wherehouse_stm32_firmware.bin"
+arm-none-eabi-size "wherehouse_stm32_firmware.elf"
+   text	   data	    bss	    dec	    hex	filename
+  62004	   2604	   7360	  71968	  11920	wherehouse_stm32_firmware.elf
+ 
+12:56:01 **** Incremental Build of configuration Debug for project wherehouse_stm32_firmware ****
+make -j4 all 
+Building file: ../src/main.c
+Invoking: MCU GCC Compiler
+/home/sam/Documents/senior_design/wherehouse/system/stm32_firmware/Debug
+arm-none-eabi-gcc -mcpu=cortex-m0 -mthumb -mfloat-abi=soft -DSTM32 -DSTM32F0 -DSTM32F091RCTx -DDEBUG -DSTM32F091 -DUSE_STDPERIPH_DRIVER -I"/home/sam/Documents/senior_design/wherehouse/system/stm32_firmware/StdPeriph_Driver/inc" -I"/home/sam/Documents/senior_design/wherehouse/system/stm32_firmware/inc" -I"/home/sam/Documents/senior_design/wherehouse/system/stm32_firmware/CMSIS/device" -I"/home/sam/Documents/senior_design/wherehouse/system/stm32_firmware/CMSIS/core" -O0 -g3 -Wall -fmessage-length=0 -ffunction-sections -c -MMD -MP -MF"src/main.d" -MT"src/main.o" -o "src/main.o" "../src/main.c"
+../src/main.c: In function 'interrupt_getchar':
+../src/main.c:281:17: warning: unused variable 'u' [-Wunused-variable]
+  USART_TypeDef *u = USART5;
+                 ^
+../src/main.c: In function 'parse_configuration':
+../src/main.c:467:10: warning: unused variable 'ignore_list' [-Wunused-variable]
+     char ignore_list[] = {':'}; // Not implemented
+          ^~~~~~~~~~~
+../src/main.c:464:9: warning: variable 'different_flags' set but not used [-Wunused-but-set-variable]
+     int different_flags[] = {0, 0, 0, 0}; // If there's a difference...
+         ^~~~~~~~~~~~~~~
+../src/main.c: In function 'ap_sequence':
+../src/main.c:637:9: warning: unused variable 'errors' [-Wunused-variable]
+     int errors = 0;
+         ^~~~~~
+../src/main.c: In function 'display_ui':
+../src/main.c:659:10: warning: unused variable 'qty_str' [-Wunused-variable]
+     char qty_str[12];
+          ^~~~~~~
+../src/main.c:658:9: warning: unused variable 'failed' [-Wunused-variable]
+     int failed = 0;
+         ^~~~~~
+../src/main.c: In function 'main':
+../src/main.c:969:13: warning: implicit declaration of function 'wait'; did you mean 'main'? [-Wimplicit-function-declaration]
+             wait(5);
+             ^~~~
+             main
+../src/main.c:817:9: warning: unused variable 'item_weight' [-Wunused-variable]
+     int item_weight = 5;
+         ^~~~~~~~~~~
+../src/main.c:816:9: warning: unused variable 'esp8266_weight' [-Wunused-variable]
+     int esp8266_weight = 154;
+         ^~~~~~~~~~~~~~
+../src/main.c:815:9: warning: variable 'avg' set but not used [-Wunused-but-set-variable]
+     int avg;
+         ^~~
+../src/main.c:813:14: warning: variable 'checker' set but not used [-Wunused-but-set-variable]
+     uint32_t checker;
+              ^~~~~~~
+Finished building: ../src/main.c
+ 
+Building target: wherehouse_stm32_firmware.elf
+Invoking: MCU GCC Linker
+arm-none-eabi-gcc -mcpu=cortex-m0 -mthumb -mfloat-abi=soft -T"/home/sam/Documents/senior_design/wherehouse/system/stm32_firmware/LinkerScript.ld" -Wl,-Map=output.map -Wl,--gc-sections -o "wherehouse_stm32_firmware.elf" @"objects.list"   -lm
+Finished building target: wherehouse_stm32_firmware.elf
+ 
+make --no-print-directory post-build
+Generating binary and Printing size information:
+arm-none-eabi-objcopy -O binary "wherehouse_stm32_firmware.elf" "wherehouse_stm32_firmware.bin"
+arm-none-eabi-size "wherehouse_stm32_firmware.elf"
+   text	   data	    bss	    dec	    hex	filename
+  62060	   2604	   7360	  72024	  11958	wherehouse_stm32_firmware.elf
+ 
+12:56:46 **** Incremental Build of configuration Debug for project wherehouse_stm32_firmware ****
+make -j4 all 
+Building file: ../src/main.c
+Invoking: MCU GCC Compiler
+/home/sam/Documents/senior_design/wherehouse/system/stm32_firmware/Debug
+arm-none-eabi-gcc -mcpu=cortex-m0 -mthumb -mfloat-abi=soft -DSTM32 -DSTM32F0 -DSTM32F091RCTx -DDEBUG -DSTM32F091 -DUSE_STDPERIPH_DRIVER -I"/home/sam/Documents/senior_design/wherehouse/system/stm32_firmware/StdPeriph_Driver/inc" -I"/home/sam/Documents/senior_design/wherehouse/system/stm32_firmware/inc" -I"/home/sam/Documents/senior_design/wherehouse/system/stm32_firmware/CMSIS/device" -I"/home/sam/Documents/senior_design/wherehouse/system/stm32_firmware/CMSIS/core" -O0 -g3 -Wall -fmessage-length=0 -ffunction-sections -c -MMD -MP -MF"src/main.d" -MT"src/main.o" -o "src/main.o" "../src/main.c"
+../src/main.c: In function 'interrupt_getchar':
+../src/main.c:281:17: warning: unused variable 'u' [-Wunused-variable]
+  USART_TypeDef *u = USART5;
+                 ^
+../src/main.c: In function 'parse_configuration':
+../src/main.c:467:10: warning: unused variable 'ignore_list' [-Wunused-variable]
+     char ignore_list[] = {':'}; // Not implemented
+          ^~~~~~~~~~~
+../src/main.c:464:9: warning: variable 'different_flags' set but not used [-Wunused-but-set-variable]
+     int different_flags[] = {0, 0, 0, 0}; // If there's a difference...
+         ^~~~~~~~~~~~~~~
+../src/main.c: In function 'ap_sequence':
+../src/main.c:637:9: warning: unused variable 'errors' [-Wunused-variable]
+     int errors = 0;
+         ^~~~~~
+../src/main.c: In function 'display_ui':
+../src/main.c:659:10: warning: unused variable 'qty_str' [-Wunused-variable]
+     char qty_str[12];
+          ^~~~~~~
+../src/main.c:658:9: warning: unused variable 'failed' [-Wunused-variable]
+     int failed = 0;
+         ^~~~~~
+../src/main.c: In function 'main':
+../src/main.c:969:13: warning: implicit declaration of function 'wait'; did you mean 'main'? [-Wimplicit-function-declaration]
+             wait(5);
+             ^~~~
+             main
+../src/main.c:817:9: warning: unused variable 'item_weight' [-Wunused-variable]
+     int item_weight = 5;
+         ^~~~~~~~~~~
+../src/main.c:816:9: warning: unused variable 'esp8266_weight' [-Wunused-variable]
+     int esp8266_weight = 154;
+         ^~~~~~~~~~~~~~
+../src/main.c:815:9: warning: variable 'avg' set but not used [-Wunused-but-set-variable]
+     int avg;
+         ^~~
+../src/main.c:813:14: warning: variable 'checker' set but not used [-Wunused-but-set-variable]
+     uint32_t checker;
+              ^~~~~~~
+Finished building: ../src/main.c
+ 
+Building target: wherehouse_stm32_firmware.elf
+Invoking: MCU GCC Linker
+arm-none-eabi-gcc -mcpu=cortex-m0 -mthumb -mfloat-abi=soft -T"/home/sam/Documents/senior_design/wherehouse/system/stm32_firmware/LinkerScript.ld" -Wl,-Map=output.map -Wl,--gc-sections -o "wherehouse_stm32_firmware.elf" @"objects.list"   -lm
+Finished building target: wherehouse_stm32_firmware.elf
+ 
+make --no-print-directory post-build
+Generating binary and Printing size information:
+arm-none-eabi-objcopy -O binary "wherehouse_stm32_firmware.elf" "wherehouse_stm32_firmware.bin"
+arm-none-eabi-size "wherehouse_stm32_firmware.elf"
+   text	   data	    bss	    dec	    hex	filename
+  62060	   2604	   7360	  72024	  11958	wherehouse_stm32_firmware.elf
+ 
+13:12:50 **** Incremental Build of configuration Debug for project wherehouse_stm32_firmware ****
+make -j4 all 
+Building file: ../src/main.c
+Invoking: MCU GCC Compiler
+/home/sam/Documents/senior_design/wherehouse/system/stm32_firmware/Debug
+arm-none-eabi-gcc -mcpu=cortex-m0 -mthumb -mfloat-abi=soft -DSTM32 -DSTM32F0 -DSTM32F091RCTx -DDEBUG -DSTM32F091 -DUSE_STDPERIPH_DRIVER -I"/home/sam/Documents/senior_design/wherehouse/system/stm32_firmware/StdPeriph_Driver/inc" -I"/home/sam/Documents/senior_design/wherehouse/system/stm32_firmware/inc" -I"/home/sam/Documents/senior_design/wherehouse/system/stm32_firmware/CMSIS/device" -I"/home/sam/Documents/senior_design/wherehouse/system/stm32_firmware/CMSIS/core" -O0 -g3 -Wall -fmessage-length=0 -ffunction-sections -c -MMD -MP -MF"src/main.d" -MT"src/main.o" -o "src/main.o" "../src/main.c"
+../src/main.c: In function 'interrupt_getchar':
+../src/main.c:281:17: warning: unused variable 'u' [-Wunused-variable]
+  USART_TypeDef *u = USART5;
+                 ^
+../src/main.c: In function 'parse_configuration':
+../src/main.c:467:10: warning: unused variable 'ignore_list' [-Wunused-variable]
+     char ignore_list[] = {':'}; // Not implemented
+          ^~~~~~~~~~~
+../src/main.c:464:9: warning: variable 'different_flags' set but not used [-Wunused-but-set-variable]
+     int different_flags[] = {0, 0, 0, 0}; // If there's a difference...
+         ^~~~~~~~~~~~~~~
+../src/main.c: In function 'ap_sequence':
+../src/main.c:637:9: warning: unused variable 'errors' [-Wunused-variable]
+     int errors = 0;
+         ^~~~~~
+../src/main.c: In function 'display_ui':
+../src/main.c:659:10: warning: unused variable 'qty_str' [-Wunused-variable]
+     char qty_str[12];
+          ^~~~~~~
+../src/main.c:658:9: warning: unused variable 'failed' [-Wunused-variable]
+     int failed = 0;
+         ^~~~~~
+../src/main.c: In function 'main':
+../src/main.c:970:13: warning: implicit declaration of function 'wait'; did you mean 'main'? [-Wimplicit-function-declaration]
+             wait(5);
+             ^~~~
+             main
+../src/main.c:821:9: warning: unused variable 'balance' [-Wunused-variable]
+     int balance = 0;
+         ^~~~~~~
+../src/main.c:817:9: warning: unused variable 'item_weight' [-Wunused-variable]
+     int item_weight = 5;
+         ^~~~~~~~~~~
+../src/main.c:816:9: warning: unused variable 'esp8266_weight' [-Wunused-variable]
+     int esp8266_weight = 154;
+         ^~~~~~~~~~~~~~
+../src/main.c:815:9: warning: variable 'avg' set but not used [-Wunused-but-set-variable]
+     int avg;
+         ^~~
+../src/main.c:813:14: warning: variable 'checker' set but not used [-Wunused-but-set-variable]
+     uint32_t checker;
+              ^~~~~~~
+../src/main.c: At top level:
+../src/main.c:1069:1: error: expected identifier or '(' before '}' token
+ }
+ ^
+make: *** [src/subdir.mk:51: src/main.o] Error 1
+13:13:37 **** Incremental Build of configuration Debug for project wherehouse_stm32_firmware ****
+make -j4 all 
+Building file: ../src/main.c
+Invoking: MCU GCC Compiler
+/home/sam/Documents/senior_design/wherehouse/system/stm32_firmware/Debug
+arm-none-eabi-gcc -mcpu=cortex-m0 -mthumb -mfloat-abi=soft -DSTM32 -DSTM32F0 -DSTM32F091RCTx -DDEBUG -DSTM32F091 -DUSE_STDPERIPH_DRIVER -I"/home/sam/Documents/senior_design/wherehouse/system/stm32_firmware/StdPeriph_Driver/inc" -I"/home/sam/Documents/senior_design/wherehouse/system/stm32_firmware/inc" -I"/home/sam/Documents/senior_design/wherehouse/system/stm32_firmware/CMSIS/device" -I"/home/sam/Documents/senior_design/wherehouse/system/stm32_firmware/CMSIS/core" -O0 -g3 -Wall -fmessage-length=0 -ffunction-sections -c -MMD -MP -MF"src/main.d" -MT"src/main.o" -o "src/main.o" "../src/main.c"
+../src/main.c: In function 'interrupt_getchar':
+../src/main.c:281:17: warning: unused variable 'u' [-Wunused-variable]
+  USART_TypeDef *u = USART5;
+                 ^
+../src/main.c: In function 'parse_configuration':
+../src/main.c:467:10: warning: unused variable 'ignore_list' [-Wunused-variable]
+     char ignore_list[] = {':'}; // Not implemented
+          ^~~~~~~~~~~
+../src/main.c:464:9: warning: variable 'different_flags' set but not used [-Wunused-but-set-variable]
+     int different_flags[] = {0, 0, 0, 0}; // If there's a difference...
+         ^~~~~~~~~~~~~~~
+../src/main.c: In function 'ap_sequence':
+../src/main.c:637:9: warning: unused variable 'errors' [-Wunused-variable]
+     int errors = 0;
+         ^~~~~~
+../src/main.c: In function 'display_ui':
+../src/main.c:659:10: warning: unused variable 'qty_str' [-Wunused-variable]
+     char qty_str[12];
+          ^~~~~~~
+../src/main.c:658:9: warning: unused variable 'failed' [-Wunused-variable]
+     int failed = 0;
+         ^~~~~~
+../src/main.c: In function 'main':
+../src/main.c:970:13: warning: implicit declaration of function 'wait'; did you mean 'main'? [-Wimplicit-function-declaration]
+             wait(5);
+             ^~~~
+             main
+../src/main.c:821:9: warning: unused variable 'balance' [-Wunused-variable]
+     int balance = 0;
+         ^~~~~~~
+../src/main.c:817:9: warning: unused variable 'item_weight' [-Wunused-variable]
+     int item_weight = 5;
+         ^~~~~~~~~~~
+../src/main.c:816:9: warning: unused variable 'esp8266_weight' [-Wunused-variable]
+     int esp8266_weight = 154;
+         ^~~~~~~~~~~~~~
+../src/main.c:815:9: warning: variable 'avg' set but not used [-Wunused-but-set-variable]
+     int avg;
+         ^~~
+../src/main.c:813:14: warning: variable 'checker' set but not used [-Wunused-but-set-variable]
+     uint32_t checker;
+              ^~~~~~~
+Finished building: ../src/main.c
+ 
+Building target: wherehouse_stm32_firmware.elf
+Invoking: MCU GCC Linker
+arm-none-eabi-gcc -mcpu=cortex-m0 -mthumb -mfloat-abi=soft -T"/home/sam/Documents/senior_design/wherehouse/system/stm32_firmware/LinkerScript.ld" -Wl,-Map=output.map -Wl,--gc-sections -o "wherehouse_stm32_firmware.elf" @"objects.list"   -lm
+Finished building target: wherehouse_stm32_firmware.elf
+ 
+make --no-print-directory post-build
+Generating binary and Printing size information:
+arm-none-eabi-objcopy -O binary "wherehouse_stm32_firmware.elf" "wherehouse_stm32_firmware.bin"
+arm-none-eabi-size "wherehouse_stm32_firmware.elf"
+   text	   data	    bss	    dec	    hex	filename
+  63032	   2604	   7360	  72996	  11d24	wherehouse_stm32_firmware.elf
+ 
+13:15:34 **** Incremental Build of configuration Debug for project wherehouse_stm32_firmware ****
+make -j4 all 
+Building file: ../src/main.c
+Invoking: MCU GCC Compiler
+/home/sam/Documents/senior_design/wherehouse/system/stm32_firmware/Debug
+arm-none-eabi-gcc -mcpu=cortex-m0 -mthumb -mfloat-abi=soft -DSTM32 -DSTM32F0 -DSTM32F091RCTx -DDEBUG -DSTM32F091 -DUSE_STDPERIPH_DRIVER -I"/home/sam/Documents/senior_design/wherehouse/system/stm32_firmware/StdPeriph_Driver/inc" -I"/home/sam/Documents/senior_design/wherehouse/system/stm32_firmware/inc" -I"/home/sam/Documents/senior_design/wherehouse/system/stm32_firmware/CMSIS/device" -I"/home/sam/Documents/senior_design/wherehouse/system/stm32_firmware/CMSIS/core" -O0 -g3 -Wall -fmessage-length=0 -ffunction-sections -c -MMD -MP -MF"src/main.d" -MT"src/main.o" -o "src/main.o" "../src/main.c"
+../src/main.c: In function 'interrupt_getchar':
+../src/main.c:281:17: warning: unused variable 'u' [-Wunused-variable]
+  USART_TypeDef *u = USART5;
+                 ^
+../src/main.c: In function 'parse_configuration':
+../src/main.c:467:10: warning: unused variable 'ignore_list' [-Wunused-variable]
+     char ignore_list[] = {':'}; // Not implemented
+          ^~~~~~~~~~~
+../src/main.c:464:9: warning: variable 'different_flags' set but not used [-Wunused-but-set-variable]
+     int different_flags[] = {0, 0, 0, 0}; // If there's a difference...
+         ^~~~~~~~~~~~~~~
+../src/main.c: In function 'ap_sequence':
+../src/main.c:637:9: warning: unused variable 'errors' [-Wunused-variable]
+     int errors = 0;
+         ^~~~~~
+../src/main.c: In function 'display_ui':
+../src/main.c:659:10: warning: unused variable 'qty_str' [-Wunused-variable]
+     char qty_str[12];
+          ^~~~~~~
+../src/main.c:658:9: warning: unused variable 'failed' [-Wunused-variable]
+     int failed = 0;
+         ^~~~~~
+../src/main.c: In function 'main':
+../src/main.c:970:13: warning: implicit declaration of function 'wait'; did you mean 'main'? [-Wimplicit-function-declaration]
+             wait(5);
+             ^~~~
+             main
+../src/main.c:821:9: warning: unused variable 'balance' [-Wunused-variable]
+     int balance = 0;
+         ^~~~~~~
+../src/main.c:817:9: warning: unused variable 'item_weight' [-Wunused-variable]
+     int item_weight = 5;
+         ^~~~~~~~~~~
+../src/main.c:816:9: warning: unused variable 'esp8266_weight' [-Wunused-variable]
+     int esp8266_weight = 154;
+         ^~~~~~~~~~~~~~
+../src/main.c:815:9: warning: variable 'avg' set but not used [-Wunused-but-set-variable]
+     int avg;
+         ^~~
+../src/main.c:813:14: warning: variable 'checker' set but not used [-Wunused-but-set-variable]
+     uint32_t checker;
+              ^~~~~~~
+Finished building: ../src/main.c
+ 
+Building target: wherehouse_stm32_firmware.elf
+Invoking: MCU GCC Linker
+arm-none-eabi-gcc -mcpu=cortex-m0 -mthumb -mfloat-abi=soft -T"/home/sam/Documents/senior_design/wherehouse/system/stm32_firmware/LinkerScript.ld" -Wl,-Map=output.map -Wl,--gc-sections -o "wherehouse_stm32_firmware.elf" @"objects.list"   -lm
+Finished building target: wherehouse_stm32_firmware.elf
+ 
+make --no-print-directory post-build
+Generating binary and Printing size information:
+arm-none-eabi-objcopy -O binary "wherehouse_stm32_firmware.elf" "wherehouse_stm32_firmware.bin"
+arm-none-eabi-size "wherehouse_stm32_firmware.elf"
+   text	   data	    bss	    dec	    hex	filename
+  63080	   2604	   7360	  73044	  11d54	wherehouse_stm32_firmware.elf
+ 
+13:16:55 **** Incremental Build of configuration Debug for project wherehouse_stm32_firmware ****
+make -j4 all 
+Building file: ../src/main.c
+Invoking: MCU GCC Compiler
+/home/sam/Documents/senior_design/wherehouse/system/stm32_firmware/Debug
+arm-none-eabi-gcc -mcpu=cortex-m0 -mthumb -mfloat-abi=soft -DSTM32 -DSTM32F0 -DSTM32F091RCTx -DDEBUG -DSTM32F091 -DUSE_STDPERIPH_DRIVER -I"/home/sam/Documents/senior_design/wherehouse/system/stm32_firmware/StdPeriph_Driver/inc" -I"/home/sam/Documents/senior_design/wherehouse/system/stm32_firmware/inc" -I"/home/sam/Documents/senior_design/wherehouse/system/stm32_firmware/CMSIS/device" -I"/home/sam/Documents/senior_design/wherehouse/system/stm32_firmware/CMSIS/core" -O0 -g3 -Wall -fmessage-length=0 -ffunction-sections -c -MMD -MP -MF"src/main.d" -MT"src/main.o" -o "src/main.o" "../src/main.c"
+../src/main.c: In function 'interrupt_getchar':
+../src/main.c:281:17: warning: unused variable 'u' [-Wunused-variable]
+  USART_TypeDef *u = USART5;
+                 ^
+../src/main.c: In function 'parse_configuration':
+../src/main.c:467:10: warning: unused variable 'ignore_list' [-Wunused-variable]
+     char ignore_list[] = {':'}; // Not implemented
+          ^~~~~~~~~~~
+../src/main.c:464:9: warning: variable 'different_flags' set but not used [-Wunused-but-set-variable]
+     int different_flags[] = {0, 0, 0, 0}; // If there's a difference...
+         ^~~~~~~~~~~~~~~
+../src/main.c: In function 'ap_sequence':
+../src/main.c:637:9: warning: unused variable 'errors' [-Wunused-variable]
+     int errors = 0;
+         ^~~~~~
+../src/main.c: In function 'display_ui':
+../src/main.c:659:10: warning: unused variable 'qty_str' [-Wunused-variable]
+     char qty_str[12];
+          ^~~~~~~
+../src/main.c:658:9: warning: unused variable 'failed' [-Wunused-variable]
+     int failed = 0;
+         ^~~~~~
+../src/main.c: In function 'main':
+../src/main.c:970:13: warning: implicit declaration of function 'wait'; did you mean 'main'? [-Wimplicit-function-declaration]
+             wait(5);
+             ^~~~
+             main
+../src/main.c:821:9: warning: unused variable 'balance' [-Wunused-variable]
+     int balance = 0;
+         ^~~~~~~
+../src/main.c:817:9: warning: unused variable 'item_weight' [-Wunused-variable]
+     int item_weight = 5;
+         ^~~~~~~~~~~
+../src/main.c:816:9: warning: unused variable 'esp8266_weight' [-Wunused-variable]
+     int esp8266_weight = 154;
+         ^~~~~~~~~~~~~~
+../src/main.c:815:9: warning: variable 'avg' set but not used [-Wunused-but-set-variable]
+     int avg;
+         ^~~
+../src/main.c:813:14: warning: variable 'checker' set but not used [-Wunused-but-set-variable]
+     uint32_t checker;
+              ^~~~~~~
+Finished building: ../src/main.c
+ 
+Building target: wherehouse_stm32_firmware.elf
+Invoking: MCU GCC Linker
+arm-none-eabi-gcc -mcpu=cortex-m0 -mthumb -mfloat-abi=soft -T"/home/sam/Documents/senior_design/wherehouse/system/stm32_firmware/LinkerScript.ld" -Wl,-Map=output.map -Wl,--gc-sections -o "wherehouse_stm32_firmware.elf" @"objects.list"   -lm
+Finished building target: wherehouse_stm32_firmware.elf
+ 
+make --no-print-directory post-build
+Generating binary and Printing size information:
+arm-none-eabi-objcopy -O binary "wherehouse_stm32_firmware.elf" "wherehouse_stm32_firmware.bin"
+arm-none-eabi-size "wherehouse_stm32_firmware.elf"
+   text	   data	    bss	    dec	    hex	filename
+  63260	   2604	   7360	  73224	  11e08	wherehouse_stm32_firmware.elf
+ 
+13:32:24 **** Incremental Build of configuration Debug for project wherehouse_stm32_firmware ****
+make -j4 all 
+Building file: ../src/main.c
+Invoking: MCU GCC Compiler
+/home/sam/Documents/senior_design/wherehouse/system/stm32_firmware/Debug
+arm-none-eabi-gcc -mcpu=cortex-m0 -mthumb -mfloat-abi=soft -DSTM32 -DSTM32F0 -DSTM32F091RCTx -DDEBUG -DSTM32F091 -DUSE_STDPERIPH_DRIVER -I"/home/sam/Documents/senior_design/wherehouse/system/stm32_firmware/StdPeriph_Driver/inc" -I"/home/sam/Documents/senior_design/wherehouse/system/stm32_firmware/inc" -I"/home/sam/Documents/senior_design/wherehouse/system/stm32_firmware/CMSIS/device" -I"/home/sam/Documents/senior_design/wherehouse/system/stm32_firmware/CMSIS/core" -O0 -g3 -Wall -fmessage-length=0 -ffunction-sections -c -MMD -MP -MF"src/main.d" -MT"src/main.o" -o "src/main.o" "../src/main.c"
+../src/main.c: In function 'interrupt_getchar':
+../src/main.c:296:17: warning: unused variable 'u' [-Wunused-variable]
+  USART_TypeDef *u = USART5;
+                 ^
+../src/main.c: In function 'parse_configuration':
+../src/main.c:482:10: warning: unused variable 'ignore_list' [-Wunused-variable]
+     char ignore_list[] = {':'}; // Not implemented
+          ^~~~~~~~~~~
+../src/main.c:479:9: warning: variable 'different_flags' set but not used [-Wunused-but-set-variable]
+     int different_flags[] = {0, 0, 0, 0}; // If there's a difference...
+         ^~~~~~~~~~~~~~~
+../src/main.c: In function 'ap_sequence':
+../src/main.c:652:9: warning: unused variable 'errors' [-Wunused-variable]
+     int errors = 0;
+         ^~~~~~
+../src/main.c: In function 'display_ui':
+../src/main.c:674:10: warning: unused variable 'qty_str' [-Wunused-variable]
+     char qty_str[12];
+          ^~~~~~~
+../src/main.c:673:9: warning: unused variable 'failed' [-Wunused-variable]
+     int failed = 0;
+         ^~~~~~
+../src/main.c: In function 'main':
+../src/main.c:1007:13: warning: implicit declaration of function 'wait'; did you mean 'main'? [-Wimplicit-function-declaration]
+             wait(5);
+             ^~~~
+             main
+../src/main.c:836:9: warning: unused variable 'balance' [-Wunused-variable]
+     int balance = 0;
+         ^~~~~~~
+../src/main.c:832:9: warning: unused variable 'item_weight' [-Wunused-variable]
+     int item_weight = 5;
+         ^~~~~~~~~~~
+../src/main.c:831:9: warning: unused variable 'esp8266_weight' [-Wunused-variable]
+     int esp8266_weight = 154;
+         ^~~~~~~~~~~~~~
+../src/main.c:830:9: warning: variable 'avg' set but not used [-Wunused-but-set-variable]
+     int avg;
+         ^~~
+../src/main.c:828:14: warning: variable 'checker' set but not used [-Wunused-but-set-variable]
+     uint32_t checker;
+              ^~~~~~~
+Finished building: ../src/main.c
+ 
+Building target: wherehouse_stm32_firmware.elf
+Invoking: MCU GCC Linker
+arm-none-eabi-gcc -mcpu=cortex-m0 -mthumb -mfloat-abi=soft -T"/home/sam/Documents/senior_design/wherehouse/system/stm32_firmware/LinkerScript.ld" -Wl,-Map=output.map -Wl,--gc-sections -o "wherehouse_stm32_firmware.elf" @"objects.list"   -lm
+Finished building target: wherehouse_stm32_firmware.elf
+ 
+make --no-print-directory post-build
+Generating binary and Printing size information:
+arm-none-eabi-objcopy -O binary "wherehouse_stm32_firmware.elf" "wherehouse_stm32_firmware.bin"
+arm-none-eabi-size "wherehouse_stm32_firmware.elf"
+   text	   data	    bss	    dec	    hex	filename
+  63424	   2604	   7360	  73388	  11eac	wherehouse_stm32_firmware.elf
+ 
+13:33:19 **** Incremental Build of configuration Debug for project wherehouse_stm32_firmware ****
+make -j4 all 
+Building file: ../src/main.c
+Invoking: MCU GCC Compiler
+/home/sam/Documents/senior_design/wherehouse/system/stm32_firmware/Debug
+arm-none-eabi-gcc -mcpu=cortex-m0 -mthumb -mfloat-abi=soft -DSTM32 -DSTM32F0 -DSTM32F091RCTx -DDEBUG -DSTM32F091 -DUSE_STDPERIPH_DRIVER -I"/home/sam/Documents/senior_design/wherehouse/system/stm32_firmware/StdPeriph_Driver/inc" -I"/home/sam/Documents/senior_design/wherehouse/system/stm32_firmware/inc" -I"/home/sam/Documents/senior_design/wherehouse/system/stm32_firmware/CMSIS/device" -I"/home/sam/Documents/senior_design/wherehouse/system/stm32_firmware/CMSIS/core" -O0 -g3 -Wall -fmessage-length=0 -ffunction-sections -c -MMD -MP -MF"src/main.d" -MT"src/main.o" -o "src/main.o" "../src/main.c"
+../src/main.c: In function 'interrupt_getchar':
+../src/main.c:296:17: warning: unused variable 'u' [-Wunused-variable]
+  USART_TypeDef *u = USART5;
+                 ^
+../src/main.c: In function 'parse_configuration':
+../src/main.c:482:10: warning: unused variable 'ignore_list' [-Wunused-variable]
+     char ignore_list[] = {':'}; // Not implemented
+          ^~~~~~~~~~~
+../src/main.c:479:9: warning: variable 'different_flags' set but not used [-Wunused-but-set-variable]
+     int different_flags[] = {0, 0, 0, 0}; // If there's a difference...
+         ^~~~~~~~~~~~~~~
+../src/main.c: In function 'ap_sequence':
+../src/main.c:652:9: warning: unused variable 'errors' [-Wunused-variable]
+     int errors = 0;
+         ^~~~~~
+../src/main.c: In function 'display_ui':
+../src/main.c:674:10: warning: unused variable 'qty_str' [-Wunused-variable]
+     char qty_str[12];
+          ^~~~~~~
+../src/main.c:673:9: warning: unused variable 'failed' [-Wunused-variable]
+     int failed = 0;
+         ^~~~~~
+../src/main.c: In function 'main':
+../src/main.c:1007:13: warning: implicit declaration of function 'wait'; did you mean 'main'? [-Wimplicit-function-declaration]
+             wait(5);
+             ^~~~
+             main
+../src/main.c:836:9: warning: unused variable 'balance' [-Wunused-variable]
+     int balance = 0;
+         ^~~~~~~
+../src/main.c:832:9: warning: unused variable 'item_weight' [-Wunused-variable]
+     int item_weight = 5;
+         ^~~~~~~~~~~
+../src/main.c:831:9: warning: unused variable 'esp8266_weight' [-Wunused-variable]
+     int esp8266_weight = 154;
+         ^~~~~~~~~~~~~~
+../src/main.c:830:9: warning: variable 'avg' set but not used [-Wunused-but-set-variable]
+     int avg;
+         ^~~
+../src/main.c:828:14: warning: variable 'checker' set but not used [-Wunused-but-set-variable]
+     uint32_t checker;
+              ^~~~~~~
+Finished building: ../src/main.c
+ 
+Building target: wherehouse_stm32_firmware.elf
+Invoking: MCU GCC Linker
+arm-none-eabi-gcc -mcpu=cortex-m0 -mthumb -mfloat-abi=soft -T"/home/sam/Documents/senior_design/wherehouse/system/stm32_firmware/LinkerScript.ld" -Wl,-Map=output.map -Wl,--gc-sections -o "wherehouse_stm32_firmware.elf" @"objects.list"   -lm
+Finished building target: wherehouse_stm32_firmware.elf
+ 
+make --no-print-directory post-build
+Generating binary and Printing size information:
+arm-none-eabi-objcopy -O binary "wherehouse_stm32_firmware.elf" "wherehouse_stm32_firmware.bin"
+arm-none-eabi-size "wherehouse_stm32_firmware.elf"
+   text	   data	    bss	    dec	    hex	filename
+  63424	   2604	   7360	  73388	  11eac	wherehouse_stm32_firmware.elf
+ 
+13:43:07 **** Incremental Build of configuration Debug for project wherehouse_stm32_firmware ****
+make -j4 all 
+Building file: ../src/main.c
+Invoking: MCU GCC Compiler
+/home/sam/Documents/senior_design/wherehouse/system/stm32_firmware/Debug
+arm-none-eabi-gcc -mcpu=cortex-m0 -mthumb -mfloat-abi=soft -DSTM32 -DSTM32F0 -DSTM32F091RCTx -DDEBUG -DSTM32F091 -DUSE_STDPERIPH_DRIVER -I"/home/sam/Documents/senior_design/wherehouse/system/stm32_firmware/StdPeriph_Driver/inc" -I"/home/sam/Documents/senior_design/wherehouse/system/stm32_firmware/inc" -I"/home/sam/Documents/senior_design/wherehouse/system/stm32_firmware/CMSIS/device" -I"/home/sam/Documents/senior_design/wherehouse/system/stm32_firmware/CMSIS/core" -O0 -g3 -Wall -fmessage-length=0 -ffunction-sections -c -MMD -MP -MF"src/main.d" -MT"src/main.o" -o "src/main.o" "../src/main.c"
+../src/main.c: In function 'interrupt_getchar':
+../src/main.c:296:17: warning: unused variable 'u' [-Wunused-variable]
+  USART_TypeDef *u = USART5;
+                 ^
+../src/main.c: In function 'parse_configuration':
+../src/main.c:482:10: warning: unused variable 'ignore_list' [-Wunused-variable]
+     char ignore_list[] = {':'}; // Not implemented
+          ^~~~~~~~~~~
+../src/main.c:479:9: warning: variable 'different_flags' set but not used [-Wunused-but-set-variable]
+     int different_flags[] = {0, 0, 0, 0}; // If there's a difference...
+         ^~~~~~~~~~~~~~~
+../src/main.c: In function 'ap_sequence':
+../src/main.c:652:9: warning: unused variable 'errors' [-Wunused-variable]
+     int errors = 0;
+         ^~~~~~
+../src/main.c: In function 'display_ui':
+../src/main.c:674:10: warning: unused variable 'qty_str' [-Wunused-variable]
+     char qty_str[12];
+          ^~~~~~~
+../src/main.c:673:9: warning: unused variable 'failed' [-Wunused-variable]
+     int failed = 0;
+         ^~~~~~
+../src/main.c: In function 'main':
+../src/main.c:1010:13: warning: implicit declaration of function 'wait'; did you mean 'main'? [-Wimplicit-function-declaration]
+             wait(5);
+             ^~~~
+             main
+../src/main.c:836:9: warning: unused variable 'balance' [-Wunused-variable]
+     int balance = 0;
+         ^~~~~~~
+../src/main.c:832:9: warning: unused variable 'item_weight' [-Wunused-variable]
+     int item_weight = 5;
+         ^~~~~~~~~~~
+../src/main.c:831:9: warning: unused variable 'esp8266_weight' [-Wunused-variable]
+     int esp8266_weight = 154;
+         ^~~~~~~~~~~~~~
+../src/main.c:830:9: warning: variable 'avg' set but not used [-Wunused-but-set-variable]
+     int avg;
+         ^~~
+../src/main.c:828:14: warning: variable 'checker' set but not used [-Wunused-but-set-variable]
+     uint32_t checker;
+              ^~~~~~~
+Finished building: ../src/main.c
+ 
+Building target: wherehouse_stm32_firmware.elf
+Invoking: MCU GCC Linker
+arm-none-eabi-gcc -mcpu=cortex-m0 -mthumb -mfloat-abi=soft -T"/home/sam/Documents/senior_design/wherehouse/system/stm32_firmware/LinkerScript.ld" -Wl,-Map=output.map -Wl,--gc-sections -o "wherehouse_stm32_firmware.elf" @"objects.list"   -lm
+Finished building target: wherehouse_stm32_firmware.elf
+ 
+make --no-print-directory post-build
+Generating binary and Printing size information:
+arm-none-eabi-objcopy -O binary "wherehouse_stm32_firmware.elf" "wherehouse_stm32_firmware.bin"
+arm-none-eabi-size "wherehouse_stm32_firmware.elf"
+   text	   data	    bss	    dec	    hex	filename
+  63576	   2604	   7360	  73540	  11f44	wherehouse_stm32_firmware.elf
+ 
+13:49:12 **** Incremental Build of configuration Debug for project wherehouse_stm32_firmware ****
+make -j4 all 
+Building file: ../src/main.c
+Invoking: MCU GCC Compiler
+/home/sam/Documents/senior_design/wherehouse/system/stm32_firmware/Debug
+arm-none-eabi-gcc -mcpu=cortex-m0 -mthumb -mfloat-abi=soft -DSTM32 -DSTM32F0 -DSTM32F091RCTx -DDEBUG -DSTM32F091 -DUSE_STDPERIPH_DRIVER -I"/home/sam/Documents/senior_design/wherehouse/system/stm32_firmware/StdPeriph_Driver/inc" -I"/home/sam/Documents/senior_design/wherehouse/system/stm32_firmware/inc" -I"/home/sam/Documents/senior_design/wherehouse/system/stm32_firmware/CMSIS/device" -I"/home/sam/Documents/senior_design/wherehouse/system/stm32_firmware/CMSIS/core" -O0 -g3 -Wall -fmessage-length=0 -ffunction-sections -c -MMD -MP -MF"src/main.d" -MT"src/main.o" -o "src/main.o" "../src/main.c"
+../src/main.c: In function 'interrupt_getchar':
+../src/main.c:306:17: warning: unused variable 'u' [-Wunused-variable]
+  USART_TypeDef *u = USART5;
+                 ^
+../src/main.c: In function 'parse_configuration':
+../src/main.c:492:10: warning: unused variable 'ignore_list' [-Wunused-variable]
+     char ignore_list[] = {':'}; // Not implemented
+          ^~~~~~~~~~~
+../src/main.c:489:9: warning: variable 'different_flags' set but not used [-Wunused-but-set-variable]
+     int different_flags[] = {0, 0, 0, 0}; // If there's a difference...
+         ^~~~~~~~~~~~~~~
+../src/main.c: In function 'ap_sequence':
+../src/main.c:662:9: warning: unused variable 'errors' [-Wunused-variable]
+     int errors = 0;
+         ^~~~~~
+../src/main.c: In function 'display_ui':
+../src/main.c:684:10: warning: unused variable 'qty_str' [-Wunused-variable]
+     char qty_str[12];
+          ^~~~~~~
+../src/main.c:683:9: warning: unused variable 'failed' [-Wunused-variable]
+     int failed = 0;
+         ^~~~~~
+../src/main.c: In function 'main':
+../src/main.c:1020:13: warning: implicit declaration of function 'wait'; did you mean 'main'? [-Wimplicit-function-declaration]
+             wait(5);
+             ^~~~
+             main
+../src/main.c:846:9: warning: unused variable 'balance' [-Wunused-variable]
+     int balance = 0;
+         ^~~~~~~
+../src/main.c:842:9: warning: unused variable 'item_weight' [-Wunused-variable]
+     int item_weight = 5;
+         ^~~~~~~~~~~
+../src/main.c:841:9: warning: unused variable 'esp8266_weight' [-Wunused-variable]
+     int esp8266_weight = 154;
+         ^~~~~~~~~~~~~~
+../src/main.c:840:9: warning: variable 'avg' set but not used [-Wunused-but-set-variable]
+     int avg;
+         ^~~
+../src/main.c:838:14: warning: variable 'checker' set but not used [-Wunused-but-set-variable]
+     uint32_t checker;
+              ^~~~~~~
+Finished building: ../src/main.c
+ 
+Building target: wherehouse_stm32_firmware.elf
+Invoking: MCU GCC Linker
+arm-none-eabi-gcc -mcpu=cortex-m0 -mthumb -mfloat-abi=soft -T"/home/sam/Documents/senior_design/wherehouse/system/stm32_firmware/LinkerScript.ld" -Wl,-Map=output.map -Wl,--gc-sections -o "wherehouse_stm32_firmware.elf" @"objects.list"   -lm
+Finished building target: wherehouse_stm32_firmware.elf
+ 
+make --no-print-directory post-build
+Generating binary and Printing size information:
+arm-none-eabi-objcopy -O binary "wherehouse_stm32_firmware.elf" "wherehouse_stm32_firmware.bin"
+arm-none-eabi-size "wherehouse_stm32_firmware.elf"
+   text	   data	    bss	    dec	    hex	filename
+  63268	   2604	   7360	  73232	  11e10	wherehouse_stm32_firmware.elf
+ 
+13:53:29 **** Incremental Build of configuration Debug for project wherehouse_stm32_firmware ****
+make -j4 all 
+Building file: ../src/main.c
+Invoking: MCU GCC Compiler
+/home/sam/Documents/senior_design/wherehouse/system/stm32_firmware/Debug
+arm-none-eabi-gcc -mcpu=cortex-m0 -mthumb -mfloat-abi=soft -DSTM32 -DSTM32F0 -DSTM32F091RCTx -DDEBUG -DSTM32F091 -DUSE_STDPERIPH_DRIVER -I"/home/sam/Documents/senior_design/wherehouse/system/stm32_firmware/StdPeriph_Driver/inc" -I"/home/sam/Documents/senior_design/wherehouse/system/stm32_firmware/inc" -I"/home/sam/Documents/senior_design/wherehouse/system/stm32_firmware/CMSIS/device" -I"/home/sam/Documents/senior_design/wherehouse/system/stm32_firmware/CMSIS/core" -O0 -g3 -Wall -fmessage-length=0 -ffunction-sections -c -MMD -MP -MF"src/main.d" -MT"src/main.o" -o "src/main.o" "../src/main.c"
+../src/main.c: In function 'interrupt_getchar':
+../src/main.c:306:17: warning: unused variable 'u' [-Wunused-variable]
+  USART_TypeDef *u = USART5;
+                 ^
+../src/main.c: In function 'parse_configuration':
+../src/main.c:492:10: warning: unused variable 'ignore_list' [-Wunused-variable]
+     char ignore_list[] = {':'}; // Not implemented
+          ^~~~~~~~~~~
+../src/main.c:489:9: warning: variable 'different_flags' set but not used [-Wunused-but-set-variable]
+     int different_flags[] = {0, 0, 0, 0}; // If there's a difference...
+         ^~~~~~~~~~~~~~~
+../src/main.c: In function 'ap_sequence':
+../src/main.c:662:9: warning: unused variable 'errors' [-Wunused-variable]
+     int errors = 0;
+         ^~~~~~
+../src/main.c: In function 'display_ui':
+../src/main.c:684:10: warning: unused variable 'qty_str' [-Wunused-variable]
+     char qty_str[12];
+          ^~~~~~~
+../src/main.c:683:9: warning: unused variable 'failed' [-Wunused-variable]
+     int failed = 0;
+         ^~~~~~
+../src/main.c: In function 'main':
+../src/main.c:1020:13: warning: implicit declaration of function 'wait'; did you mean 'main'? [-Wimplicit-function-declaration]
+             wait(5);
+             ^~~~
+             main
+../src/main.c:846:9: warning: unused variable 'balance' [-Wunused-variable]
+     int balance = 0;
+         ^~~~~~~
+../src/main.c:842:9: warning: unused variable 'item_weight' [-Wunused-variable]
+     int item_weight = 5;
+         ^~~~~~~~~~~
+../src/main.c:841:9: warning: unused variable 'esp8266_weight' [-Wunused-variable]
+     int esp8266_weight = 154;
+         ^~~~~~~~~~~~~~
+../src/main.c:840:9: warning: variable 'avg' set but not used [-Wunused-but-set-variable]
+     int avg;
+         ^~~
+../src/main.c:838:14: warning: variable 'checker' set but not used [-Wunused-but-set-variable]
+     uint32_t checker;
+              ^~~~~~~
+Finished building: ../src/main.c
+ 
+Building target: wherehouse_stm32_firmware.elf
+Invoking: MCU GCC Linker
+arm-none-eabi-gcc -mcpu=cortex-m0 -mthumb -mfloat-abi=soft -T"/home/sam/Documents/senior_design/wherehouse/system/stm32_firmware/LinkerScript.ld" -Wl,-Map=output.map -Wl,--gc-sections -o "wherehouse_stm32_firmware.elf" @"objects.list"   -lm
+Finished building target: wherehouse_stm32_firmware.elf
+ 
+make --no-print-directory post-build
+Generating binary and Printing size information:
+arm-none-eabi-objcopy -O binary "wherehouse_stm32_firmware.elf" "wherehouse_stm32_firmware.bin"
+arm-none-eabi-size "wherehouse_stm32_firmware.elf"
+   text	   data	    bss	    dec	    hex	filename
+  63480	   2604	   7360	  73444	  11ee4	wherehouse_stm32_firmware.elf
+ 
+13:55:03 **** Incremental Build of configuration Debug for project wherehouse_stm32_firmware ****
+make -j4 all 
+Building file: ../src/main.c
+Invoking: MCU GCC Compiler
+/home/sam/Documents/senior_design/wherehouse/system/stm32_firmware/Debug
+arm-none-eabi-gcc -mcpu=cortex-m0 -mthumb -mfloat-abi=soft -DSTM32 -DSTM32F0 -DSTM32F091RCTx -DDEBUG -DSTM32F091 -DUSE_STDPERIPH_DRIVER -I"/home/sam/Documents/senior_design/wherehouse/system/stm32_firmware/StdPeriph_Driver/inc" -I"/home/sam/Documents/senior_design/wherehouse/system/stm32_firmware/inc" -I"/home/sam/Documents/senior_design/wherehouse/system/stm32_firmware/CMSIS/device" -I"/home/sam/Documents/senior_design/wherehouse/system/stm32_firmware/CMSIS/core" -O0 -g3 -Wall -fmessage-length=0 -ffunction-sections -c -MMD -MP -MF"src/main.d" -MT"src/main.o" -o "src/main.o" "../src/main.c"
+../src/main.c: In function 'interrupt_getchar':
+../src/main.c:306:17: warning: unused variable 'u' [-Wunused-variable]
+  USART_TypeDef *u = USART5;
+                 ^
+../src/main.c: In function 'parse_configuration':
+../src/main.c:492:10: warning: unused variable 'ignore_list' [-Wunused-variable]
+     char ignore_list[] = {':'}; // Not implemented
+          ^~~~~~~~~~~
+../src/main.c:489:9: warning: variable 'different_flags' set but not used [-Wunused-but-set-variable]
+     int different_flags[] = {0, 0, 0, 0}; // If there's a difference...
+         ^~~~~~~~~~~~~~~
+../src/main.c: In function 'ap_sequence':
+../src/main.c:662:9: warning: unused variable 'errors' [-Wunused-variable]
+     int errors = 0;
+         ^~~~~~
+../src/main.c: In function 'display_ui':
+../src/main.c:684:10: warning: unused variable 'qty_str' [-Wunused-variable]
+     char qty_str[12];
+          ^~~~~~~
+../src/main.c:683:9: warning: unused variable 'failed' [-Wunused-variable]
+     int failed = 0;
+         ^~~~~~
+../src/main.c: In function 'main':
+../src/main.c:1020:13: warning: implicit declaration of function 'wait'; did you mean 'main'? [-Wimplicit-function-declaration]
+             wait(5);
+             ^~~~
+             main
+../src/main.c:846:9: warning: unused variable 'balance' [-Wunused-variable]
+     int balance = 0;
+         ^~~~~~~
+../src/main.c:842:9: warning: unused variable 'item_weight' [-Wunused-variable]
+     int item_weight = 5;
+         ^~~~~~~~~~~
+../src/main.c:841:9: warning: unused variable 'esp8266_weight' [-Wunused-variable]
+     int esp8266_weight = 154;
+         ^~~~~~~~~~~~~~
+../src/main.c:840:9: warning: variable 'avg' set but not used [-Wunused-but-set-variable]
+     int avg;
+         ^~~
+../src/main.c:838:14: warning: variable 'checker' set but not used [-Wunused-but-set-variable]
+     uint32_t checker;
+              ^~~~~~~
+Finished building: ../src/main.c
+ 
+Building target: wherehouse_stm32_firmware.elf
+Invoking: MCU GCC Linker
+arm-none-eabi-gcc -mcpu=cortex-m0 -mthumb -mfloat-abi=soft -T"/home/sam/Documents/senior_design/wherehouse/system/stm32_firmware/LinkerScript.ld" -Wl,-Map=output.map -Wl,--gc-sections -o "wherehouse_stm32_firmware.elf" @"objects.list"   -lm
+Finished building target: wherehouse_stm32_firmware.elf
+ 
+make --no-print-directory post-build
+Generating binary and Printing size information:
+arm-none-eabi-objcopy -O binary "wherehouse_stm32_firmware.elf" "wherehouse_stm32_firmware.bin"
+arm-none-eabi-size "wherehouse_stm32_firmware.elf"
+   text	   data	    bss	    dec	    hex	filename
+  63508	   2604	   7360	  73472	  11f00	wherehouse_stm32_firmware.elf
+ 
+13:56:02 **** Incremental Build of configuration Debug for project wherehouse_stm32_firmware ****
+make -j4 all 
+Building file: ../src/main.c
+Invoking: MCU GCC Compiler
+/home/sam/Documents/senior_design/wherehouse/system/stm32_firmware/Debug
+arm-none-eabi-gcc -mcpu=cortex-m0 -mthumb -mfloat-abi=soft -DSTM32 -DSTM32F0 -DSTM32F091RCTx -DDEBUG -DSTM32F091 -DUSE_STDPERIPH_DRIVER -I"/home/sam/Documents/senior_design/wherehouse/system/stm32_firmware/StdPeriph_Driver/inc" -I"/home/sam/Documents/senior_design/wherehouse/system/stm32_firmware/inc" -I"/home/sam/Documents/senior_design/wherehouse/system/stm32_firmware/CMSIS/device" -I"/home/sam/Documents/senior_design/wherehouse/system/stm32_firmware/CMSIS/core" -O0 -g3 -Wall -fmessage-length=0 -ffunction-sections -c -MMD -MP -MF"src/main.d" -MT"src/main.o" -o "src/main.o" "../src/main.c"
+../src/main.c: In function 'interrupt_getchar':
+../src/main.c:306:17: warning: unused variable 'u' [-Wunused-variable]
+  USART_TypeDef *u = USART5;
+                 ^
+../src/main.c: In function 'parse_configuration':
+../src/main.c:492:10: warning: unused variable 'ignore_list' [-Wunused-variable]
+     char ignore_list[] = {':'}; // Not implemented
+          ^~~~~~~~~~~
+../src/main.c:489:9: warning: variable 'different_flags' set but not used [-Wunused-but-set-variable]
+     int different_flags[] = {0, 0, 0, 0}; // If there's a difference...
+         ^~~~~~~~~~~~~~~
+../src/main.c: In function 'ap_sequence':
+../src/main.c:662:9: warning: unused variable 'errors' [-Wunused-variable]
+     int errors = 0;
+         ^~~~~~
+../src/main.c: In function 'display_ui':
+../src/main.c:684:10: warning: unused variable 'qty_str' [-Wunused-variable]
+     char qty_str[12];
+          ^~~~~~~
+../src/main.c:683:9: warning: unused variable 'failed' [-Wunused-variable]
+     int failed = 0;
+         ^~~~~~
+../src/main.c: In function 'main':
+../src/main.c:1020:13: warning: implicit declaration of function 'wait'; did you mean 'main'? [-Wimplicit-function-declaration]
+             wait(5);
+             ^~~~
+             main
+../src/main.c:846:9: warning: unused variable 'balance' [-Wunused-variable]
+     int balance = 0;
+         ^~~~~~~
+../src/main.c:842:9: warning: unused variable 'item_weight' [-Wunused-variable]
+     int item_weight = 5;
+         ^~~~~~~~~~~
+../src/main.c:841:9: warning: unused variable 'esp8266_weight' [-Wunused-variable]
+     int esp8266_weight = 154;
+         ^~~~~~~~~~~~~~
+../src/main.c:840:9: warning: variable 'avg' set but not used [-Wunused-but-set-variable]
+     int avg;
+         ^~~
+../src/main.c:838:14: warning: variable 'checker' set but not used [-Wunused-but-set-variable]
+     uint32_t checker;
+              ^~~~~~~
+Finished building: ../src/main.c
+ 
+Building target: wherehouse_stm32_firmware.elf
+Invoking: MCU GCC Linker
+arm-none-eabi-gcc -mcpu=cortex-m0 -mthumb -mfloat-abi=soft -T"/home/sam/Documents/senior_design/wherehouse/system/stm32_firmware/LinkerScript.ld" -Wl,-Map=output.map -Wl,--gc-sections -o "wherehouse_stm32_firmware.elf" @"objects.list"   -lm
+Finished building target: wherehouse_stm32_firmware.elf
+ 
+make --no-print-directory post-build
+Generating binary and Printing size information:
+arm-none-eabi-objcopy -O binary "wherehouse_stm32_firmware.elf" "wherehouse_stm32_firmware.bin"
+arm-none-eabi-size "wherehouse_stm32_firmware.elf"
+   text	   data	    bss	    dec	    hex	filename
+  63528	   2604	   7360	  73492	  11f14	wherehouse_stm32_firmware.elf
+ 
+13:56:28 **** Incremental Build of configuration Debug for project wherehouse_stm32_firmware ****
+make -j4 all 
+Building file: ../src/main.c
+Invoking: MCU GCC Compiler
+/home/sam/Documents/senior_design/wherehouse/system/stm32_firmware/Debug
+arm-none-eabi-gcc -mcpu=cortex-m0 -mthumb -mfloat-abi=soft -DSTM32 -DSTM32F0 -DSTM32F091RCTx -DDEBUG -DSTM32F091 -DUSE_STDPERIPH_DRIVER -I"/home/sam/Documents/senior_design/wherehouse/system/stm32_firmware/StdPeriph_Driver/inc" -I"/home/sam/Documents/senior_design/wherehouse/system/stm32_firmware/inc" -I"/home/sam/Documents/senior_design/wherehouse/system/stm32_firmware/CMSIS/device" -I"/home/sam/Documents/senior_design/wherehouse/system/stm32_firmware/CMSIS/core" -O0 -g3 -Wall -fmessage-length=0 -ffunction-sections -c -MMD -MP -MF"src/main.d" -MT"src/main.o" -o "src/main.o" "../src/main.c"
+../src/main.c: In function 'interrupt_getchar':
+../src/main.c:306:17: warning: unused variable 'u' [-Wunused-variable]
+  USART_TypeDef *u = USART5;
+                 ^
+../src/main.c: In function 'parse_configuration':
+../src/main.c:492:10: warning: unused variable 'ignore_list' [-Wunused-variable]
+     char ignore_list[] = {':'}; // Not implemented
+          ^~~~~~~~~~~
+../src/main.c:489:9: warning: variable 'different_flags' set but not used [-Wunused-but-set-variable]
+     int different_flags[] = {0, 0, 0, 0}; // If there's a difference...
+         ^~~~~~~~~~~~~~~
+../src/main.c: In function 'ap_sequence':
+../src/main.c:662:9: warning: unused variable 'errors' [-Wunused-variable]
+     int errors = 0;
+         ^~~~~~
+../src/main.c: In function 'display_ui':
+../src/main.c:684:10: warning: unused variable 'qty_str' [-Wunused-variable]
+     char qty_str[12];
+          ^~~~~~~
+../src/main.c:683:9: warning: unused variable 'failed' [-Wunused-variable]
+     int failed = 0;
+         ^~~~~~
+../src/main.c: In function 'main':
+../src/main.c:1020:13: warning: implicit declaration of function 'wait'; did you mean 'main'? [-Wimplicit-function-declaration]
+             wait(5);
+             ^~~~
+             main
+../src/main.c:846:9: warning: unused variable 'balance' [-Wunused-variable]
+     int balance = 0;
+         ^~~~~~~
+../src/main.c:842:9: warning: unused variable 'item_weight' [-Wunused-variable]
+     int item_weight = 5;
+         ^~~~~~~~~~~
+../src/main.c:841:9: warning: unused variable 'esp8266_weight' [-Wunused-variable]
+     int esp8266_weight = 154;
+         ^~~~~~~~~~~~~~
+../src/main.c:840:9: warning: variable 'avg' set but not used [-Wunused-but-set-variable]
+     int avg;
+         ^~~
+../src/main.c:838:14: warning: variable 'checker' set but not used [-Wunused-but-set-variable]
+     uint32_t checker;
+              ^~~~~~~
+Finished building: ../src/main.c
+ 
+Building target: wherehouse_stm32_firmware.elf
+Invoking: MCU GCC Linker
+arm-none-eabi-gcc -mcpu=cortex-m0 -mthumb -mfloat-abi=soft -T"/home/sam/Documents/senior_design/wherehouse/system/stm32_firmware/LinkerScript.ld" -Wl,-Map=output.map -Wl,--gc-sections -o "wherehouse_stm32_firmware.elf" @"objects.list"   -lm
+Finished building target: wherehouse_stm32_firmware.elf
+ 
+make --no-print-directory post-build
+Generating binary and Printing size information:
+arm-none-eabi-objcopy -O binary "wherehouse_stm32_firmware.elf" "wherehouse_stm32_firmware.bin"
+arm-none-eabi-size "wherehouse_stm32_firmware.elf"
+   text	   data	    bss	    dec	    hex	filename
+  63556	   2604	   7360	  73520	  11f30	wherehouse_stm32_firmware.elf
+ 
+13:58:13 **** Incremental Build of configuration Debug for project wherehouse_stm32_firmware ****
+make -j4 all 
+Building file: ../src/main.c
+Invoking: MCU GCC Compiler
+/home/sam/Documents/senior_design/wherehouse/system/stm32_firmware/Debug
+arm-none-eabi-gcc -mcpu=cortex-m0 -mthumb -mfloat-abi=soft -DSTM32 -DSTM32F0 -DSTM32F091RCTx -DDEBUG -DSTM32F091 -DUSE_STDPERIPH_DRIVER -I"/home/sam/Documents/senior_design/wherehouse/system/stm32_firmware/StdPeriph_Driver/inc" -I"/home/sam/Documents/senior_design/wherehouse/system/stm32_firmware/inc" -I"/home/sam/Documents/senior_design/wherehouse/system/stm32_firmware/CMSIS/device" -I"/home/sam/Documents/senior_design/wherehouse/system/stm32_firmware/CMSIS/core" -O0 -g3 -Wall -fmessage-length=0 -ffunction-sections -c -MMD -MP -MF"src/main.d" -MT"src/main.o" -o "src/main.o" "../src/main.c"
+../src/main.c: In function 'interrupt_getchar':
+../src/main.c:306:17: warning: unused variable 'u' [-Wunused-variable]
+  USART_TypeDef *u = USART5;
+                 ^
+../src/main.c: In function 'parse_configuration':
+../src/main.c:492:10: warning: unused variable 'ignore_list' [-Wunused-variable]
+     char ignore_list[] = {':'}; // Not implemented
+          ^~~~~~~~~~~
+../src/main.c:489:9: warning: variable 'different_flags' set but not used [-Wunused-but-set-variable]
+     int different_flags[] = {0, 0, 0, 0}; // If there's a difference...
+         ^~~~~~~~~~~~~~~
+../src/main.c: In function 'ap_sequence':
+../src/main.c:662:9: warning: unused variable 'errors' [-Wunused-variable]
+     int errors = 0;
+         ^~~~~~
+../src/main.c: In function 'display_ui':
+../src/main.c:684:10: warning: unused variable 'qty_str' [-Wunused-variable]
+     char qty_str[12];
+          ^~~~~~~
+../src/main.c:683:9: warning: unused variable 'failed' [-Wunused-variable]
+     int failed = 0;
+         ^~~~~~
+../src/main.c: In function 'main':
+../src/main.c:1020:13: warning: implicit declaration of function 'wait'; did you mean 'main'? [-Wimplicit-function-declaration]
+             wait(5);
+             ^~~~
+             main
+../src/main.c:846:9: warning: unused variable 'balance' [-Wunused-variable]
+     int balance = 0;
+         ^~~~~~~
+../src/main.c:842:9: warning: unused variable 'item_weight' [-Wunused-variable]
+     int item_weight = 5;
+         ^~~~~~~~~~~
+../src/main.c:841:9: warning: unused variable 'esp8266_weight' [-Wunused-variable]
+     int esp8266_weight = 154;
+         ^~~~~~~~~~~~~~
+../src/main.c:840:9: warning: variable 'avg' set but not used [-Wunused-but-set-variable]
+     int avg;
+         ^~~
+../src/main.c:838:14: warning: variable 'checker' set but not used [-Wunused-but-set-variable]
+     uint32_t checker;
+              ^~~~~~~
+Finished building: ../src/main.c
+ 
+Building target: wherehouse_stm32_firmware.elf
+Invoking: MCU GCC Linker
+arm-none-eabi-gcc -mcpu=cortex-m0 -mthumb -mfloat-abi=soft -T"/home/sam/Documents/senior_design/wherehouse/system/stm32_firmware/LinkerScript.ld" -Wl,-Map=output.map -Wl,--gc-sections -o "wherehouse_stm32_firmware.elf" @"objects.list"   -lm
+Finished building target: wherehouse_stm32_firmware.elf
+ 
+make --no-print-directory post-build
+Generating binary and Printing size information:
+arm-none-eabi-objcopy -O binary "wherehouse_stm32_firmware.elf" "wherehouse_stm32_firmware.bin"
+arm-none-eabi-size "wherehouse_stm32_firmware.elf"
+   text	   data	    bss	    dec	    hex	filename
+  63576	   2604	   7360	  73540	  11f44	wherehouse_stm32_firmware.elf
+ 
+14:01:03 **** Incremental Build of configuration Debug for project wherehouse_stm32_firmware ****
+make -j4 all 
+Building file: ../src/main.c
+Invoking: MCU GCC Compiler
+/home/sam/Documents/senior_design/wherehouse/system/stm32_firmware/Debug
+arm-none-eabi-gcc -mcpu=cortex-m0 -mthumb -mfloat-abi=soft -DSTM32 -DSTM32F0 -DSTM32F091RCTx -DDEBUG -DSTM32F091 -DUSE_STDPERIPH_DRIVER -I"/home/sam/Documents/senior_design/wherehouse/system/stm32_firmware/StdPeriph_Driver/inc" -I"/home/sam/Documents/senior_design/wherehouse/system/stm32_firmware/inc" -I"/home/sam/Documents/senior_design/wherehouse/system/stm32_firmware/CMSIS/device" -I"/home/sam/Documents/senior_design/wherehouse/system/stm32_firmware/CMSIS/core" -O0 -g3 -Wall -fmessage-length=0 -ffunction-sections -c -MMD -MP -MF"src/main.d" -MT"src/main.o" -o "src/main.o" "../src/main.c"
+../src/main.c: In function 'interrupt_getchar':
+../src/main.c:306:17: warning: unused variable 'u' [-Wunused-variable]
+  USART_TypeDef *u = USART5;
+                 ^
+../src/main.c: In function 'parse_configuration':
+../src/main.c:492:10: warning: unused variable 'ignore_list' [-Wunused-variable]
+     char ignore_list[] = {':'}; // Not implemented
+          ^~~~~~~~~~~
+../src/main.c:489:9: warning: variable 'different_flags' set but not used [-Wunused-but-set-variable]
+     int different_flags[] = {0, 0, 0, 0}; // If there's a difference...
+         ^~~~~~~~~~~~~~~
+../src/main.c: In function 'ap_sequence':
+../src/main.c:662:9: warning: unused variable 'errors' [-Wunused-variable]
+     int errors = 0;
+         ^~~~~~
+../src/main.c: In function 'display_ui':
+../src/main.c:684:10: warning: unused variable 'qty_str' [-Wunused-variable]
+     char qty_str[12];
+          ^~~~~~~
+../src/main.c:683:9: warning: unused variable 'failed' [-Wunused-variable]
+     int failed = 0;
+         ^~~~~~
+../src/main.c: In function 'main':
+../src/main.c:1020:13: warning: implicit declaration of function 'wait'; did you mean 'main'? [-Wimplicit-function-declaration]
+             wait(5);
+             ^~~~
+             main
+../src/main.c:846:9: warning: unused variable 'balance' [-Wunused-variable]
+     int balance = 0;
+         ^~~~~~~
+../src/main.c:842:9: warning: unused variable 'item_weight' [-Wunused-variable]
+     int item_weight = 5;
+         ^~~~~~~~~~~
+../src/main.c:841:9: warning: unused variable 'esp8266_weight' [-Wunused-variable]
+     int esp8266_weight = 154;
+         ^~~~~~~~~~~~~~
+../src/main.c:840:9: warning: variable 'avg' set but not used [-Wunused-but-set-variable]
+     int avg;
+         ^~~
+../src/main.c:838:14: warning: variable 'checker' set but not used [-Wunused-but-set-variable]
+     uint32_t checker;
+              ^~~~~~~
+Finished building: ../src/main.c
+ 
+Building target: wherehouse_stm32_firmware.elf
+Invoking: MCU GCC Linker
+arm-none-eabi-gcc -mcpu=cortex-m0 -mthumb -mfloat-abi=soft -T"/home/sam/Documents/senior_design/wherehouse/system/stm32_firmware/LinkerScript.ld" -Wl,-Map=output.map -Wl,--gc-sections -o "wherehouse_stm32_firmware.elf" @"objects.list"   -lm
+Finished building target: wherehouse_stm32_firmware.elf
+ 
+make --no-print-directory post-build
+Generating binary and Printing size information:
+arm-none-eabi-objcopy -O binary "wherehouse_stm32_firmware.elf" "wherehouse_stm32_firmware.bin"
+arm-none-eabi-size "wherehouse_stm32_firmware.elf"
+   text	   data	    bss	    dec	    hex	filename
+  63608	   2604	   7360	  73572	  11f64	wherehouse_stm32_firmware.elf
+ 
+14:02:44 **** Incremental Build of configuration Debug for project wherehouse_stm32_firmware ****
+make -j4 all 
+Building file: ../src/main.c
+Invoking: MCU GCC Compiler
+/home/sam/Documents/senior_design/wherehouse/system/stm32_firmware/Debug
+arm-none-eabi-gcc -mcpu=cortex-m0 -mthumb -mfloat-abi=soft -DSTM32 -DSTM32F0 -DSTM32F091RCTx -DDEBUG -DSTM32F091 -DUSE_STDPERIPH_DRIVER -I"/home/sam/Documents/senior_design/wherehouse/system/stm32_firmware/StdPeriph_Driver/inc" -I"/home/sam/Documents/senior_design/wherehouse/system/stm32_firmware/inc" -I"/home/sam/Documents/senior_design/wherehouse/system/stm32_firmware/CMSIS/device" -I"/home/sam/Documents/senior_design/wherehouse/system/stm32_firmware/CMSIS/core" -O0 -g3 -Wall -fmessage-length=0 -ffunction-sections -c -MMD -MP -MF"src/main.d" -MT"src/main.o" -o "src/main.o" "../src/main.c"
+../src/main.c: In function 'interrupt_getchar':
+../src/main.c:306:17: warning: unused variable 'u' [-Wunused-variable]
+  USART_TypeDef *u = USART5;
+                 ^
+../src/main.c: In function 'parse_configuration':
+../src/main.c:492:10: warning: unused variable 'ignore_list' [-Wunused-variable]
+     char ignore_list[] = {':'}; // Not implemented
+          ^~~~~~~~~~~
+../src/main.c:489:9: warning: variable 'different_flags' set but not used [-Wunused-but-set-variable]
+     int different_flags[] = {0, 0, 0, 0}; // If there's a difference...
+         ^~~~~~~~~~~~~~~
+../src/main.c: In function 'ap_sequence':
+../src/main.c:662:9: warning: unused variable 'errors' [-Wunused-variable]
+     int errors = 0;
+         ^~~~~~
+../src/main.c: In function 'display_ui':
+../src/main.c:684:10: warning: unused variable 'qty_str' [-Wunused-variable]
+     char qty_str[12];
+          ^~~~~~~
+../src/main.c:683:9: warning: unused variable 'failed' [-Wunused-variable]
+     int failed = 0;
+         ^~~~~~
+../src/main.c: In function 'main':
+../src/main.c:1020:13: warning: implicit declaration of function 'wait'; did you mean 'main'? [-Wimplicit-function-declaration]
+             wait(5);
+             ^~~~
+             main
+../src/main.c:846:9: warning: unused variable 'balance' [-Wunused-variable]
+     int balance = 0;
+         ^~~~~~~
+../src/main.c:842:9: warning: unused variable 'item_weight' [-Wunused-variable]
+     int item_weight = 5;
+         ^~~~~~~~~~~
+../src/main.c:841:9: warning: unused variable 'esp8266_weight' [-Wunused-variable]
+     int esp8266_weight = 154;
+         ^~~~~~~~~~~~~~
+../src/main.c:840:9: warning: variable 'avg' set but not used [-Wunused-but-set-variable]
+     int avg;
+         ^~~
+../src/main.c:838:14: warning: variable 'checker' set but not used [-Wunused-but-set-variable]
+     uint32_t checker;
+              ^~~~~~~
+Finished building: ../src/main.c
+ 
+Building target: wherehouse_stm32_firmware.elf
+Invoking: MCU GCC Linker
+arm-none-eabi-gcc -mcpu=cortex-m0 -mthumb -mfloat-abi=soft -T"/home/sam/Documents/senior_design/wherehouse/system/stm32_firmware/LinkerScript.ld" -Wl,-Map=output.map -Wl,--gc-sections -o "wherehouse_stm32_firmware.elf" @"objects.list"   -lm
+Finished building target: wherehouse_stm32_firmware.elf
+ 
+make --no-print-directory post-build
+Generating binary and Printing size information:
+arm-none-eabi-objcopy -O binary "wherehouse_stm32_firmware.elf" "wherehouse_stm32_firmware.bin"
+arm-none-eabi-size "wherehouse_stm32_firmware.elf"
+   text	   data	    bss	    dec	    hex	filename
+  63292	   2604	   7360	  73256	  11e28	wherehouse_stm32_firmware.elf
+ 
+14:11:06 **** Incremental Build of configuration Debug for project wherehouse_stm32_firmware ****
+make -j4 all 
+Building file: ../src/main.c
+Invoking: MCU GCC Compiler
+/home/sam/Documents/senior_design/wherehouse/system/stm32_firmware/Debug
+arm-none-eabi-gcc -mcpu=cortex-m0 -mthumb -mfloat-abi=soft -DSTM32 -DSTM32F0 -DSTM32F091RCTx -DDEBUG -DSTM32F091 -DUSE_STDPERIPH_DRIVER -I"/home/sam/Documents/senior_design/wherehouse/system/stm32_firmware/StdPeriph_Driver/inc" -I"/home/sam/Documents/senior_design/wherehouse/system/stm32_firmware/inc" -I"/home/sam/Documents/senior_design/wherehouse/system/stm32_firmware/CMSIS/device" -I"/home/sam/Documents/senior_design/wherehouse/system/stm32_firmware/CMSIS/core" -O0 -g3 -Wall -fmessage-length=0 -ffunction-sections -c -MMD -MP -MF"src/main.d" -MT"src/main.o" -o "src/main.o" "../src/main.c"
+../src/main.c: In function 'interrupt_getchar':
+../src/main.c:306:17: warning: unused variable 'u' [-Wunused-variable]
+  USART_TypeDef *u = USART5;
+                 ^
+../src/main.c: In function 'parse_configuration':
+../src/main.c:492:10: warning: unused variable 'ignore_list' [-Wunused-variable]
+     char ignore_list[] = {':'}; // Not implemented
+          ^~~~~~~~~~~
+../src/main.c:489:9: warning: variable 'different_flags' set but not used [-Wunused-but-set-variable]
+     int different_flags[] = {0, 0, 0, 0}; // If there's a difference...
+         ^~~~~~~~~~~~~~~
+../src/main.c: In function 'ap_sequence':
+../src/main.c:662:9: warning: unused variable 'errors' [-Wunused-variable]
+     int errors = 0;
+         ^~~~~~
+../src/main.c: In function 'display_ui':
+../src/main.c:684:10: warning: unused variable 'qty_str' [-Wunused-variable]
+     char qty_str[12];
+          ^~~~~~~
+../src/main.c:683:9: warning: unused variable 'failed' [-Wunused-variable]
+     int failed = 0;
+         ^~~~~~
+../src/main.c: In function 'main':
+../src/main.c:1018:13: warning: implicit declaration of function 'wait'; did you mean 'main'? [-Wimplicit-function-declaration]
+             wait(5);
+             ^~~~
+             main
+../src/main.c:846:9: warning: unused variable 'balance' [-Wunused-variable]
+     int balance = 0;
+         ^~~~~~~
+../src/main.c:842:9: warning: unused variable 'item_weight' [-Wunused-variable]
+     int item_weight = 5;
+         ^~~~~~~~~~~
+../src/main.c:841:9: warning: unused variable 'esp8266_weight' [-Wunused-variable]
+     int esp8266_weight = 154;
+         ^~~~~~~~~~~~~~
+../src/main.c:840:9: warning: variable 'avg' set but not used [-Wunused-but-set-variable]
+     int avg;
+         ^~~
+../src/main.c:838:14: warning: variable 'checker' set but not used [-Wunused-but-set-variable]
+     uint32_t checker;
+              ^~~~~~~
+Finished building: ../src/main.c
+ 
+Building target: wherehouse_stm32_firmware.elf
+Invoking: MCU GCC Linker
+arm-none-eabi-gcc -mcpu=cortex-m0 -mthumb -mfloat-abi=soft -T"/home/sam/Documents/senior_design/wherehouse/system/stm32_firmware/LinkerScript.ld" -Wl,-Map=output.map -Wl,--gc-sections -o "wherehouse_stm32_firmware.elf" @"objects.list"   -lm
+Finished building target: wherehouse_stm32_firmware.elf
+ 
+make --no-print-directory post-build
+Generating binary and Printing size information:
+arm-none-eabi-objcopy -O binary "wherehouse_stm32_firmware.elf" "wherehouse_stm32_firmware.bin"
+arm-none-eabi-size "wherehouse_stm32_firmware.elf"
+   text	   data	    bss	    dec	    hex	filename
+  63288	   2604	   7360	  73252	  11e24	wherehouse_stm32_firmware.elf
+ 
+14:16:24 **** Incremental Build of configuration Debug for project wherehouse_stm32_firmware ****
+make -j4 all 
+Building file: ../src/main.c
+Invoking: MCU GCC Compiler
+/home/sam/Documents/senior_design/wherehouse/system/stm32_firmware/Debug
+arm-none-eabi-gcc -mcpu=cortex-m0 -mthumb -mfloat-abi=soft -DSTM32 -DSTM32F0 -DSTM32F091RCTx -DDEBUG -DSTM32F091 -DUSE_STDPERIPH_DRIVER -I"/home/sam/Documents/senior_design/wherehouse/system/stm32_firmware/StdPeriph_Driver/inc" -I"/home/sam/Documents/senior_design/wherehouse/system/stm32_firmware/inc" -I"/home/sam/Documents/senior_design/wherehouse/system/stm32_firmware/CMSIS/device" -I"/home/sam/Documents/senior_design/wherehouse/system/stm32_firmware/CMSIS/core" -O0 -g3 -Wall -fmessage-length=0 -ffunction-sections -c -MMD -MP -MF"src/main.d" -MT"src/main.o" -o "src/main.o" "../src/main.c"
+../src/main.c: In function 'interrupt_getchar':
+../src/main.c:309:17: warning: unused variable 'u' [-Wunused-variable]
+  USART_TypeDef *u = USART5;
+                 ^
+../src/main.c: In function 'parse_configuration':
+../src/main.c:495:10: warning: unused variable 'ignore_list' [-Wunused-variable]
+     char ignore_list[] = {':'}; // Not implemented
+          ^~~~~~~~~~~
+../src/main.c:492:9: warning: variable 'different_flags' set but not used [-Wunused-but-set-variable]
+     int different_flags[] = {0, 0, 0, 0}; // If there's a difference...
+         ^~~~~~~~~~~~~~~
+../src/main.c: In function 'ap_sequence':
+../src/main.c:666:9: warning: unused variable 'errors' [-Wunused-variable]
+     int errors = 0;
+         ^~~~~~
+../src/main.c: In function 'display_ui':
+../src/main.c:688:10: warning: unused variable 'qty_str' [-Wunused-variable]
+     char qty_str[12];
+          ^~~~~~~
+../src/main.c:687:9: warning: unused variable 'failed' [-Wunused-variable]
+     int failed = 0;
+         ^~~~~~
+../src/main.c: In function 'main':
+../src/main.c:1024:13: warning: implicit declaration of function 'wait'; did you mean 'main'? [-Wimplicit-function-declaration]
+             wait(5);
+             ^~~~
+             main
+../src/main.c:850:9: warning: unused variable 'balance' [-Wunused-variable]
+     int balance = 0;
+         ^~~~~~~
+../src/main.c:846:9: warning: unused variable 'item_weight' [-Wunused-variable]
+     int item_weight = 5;
+         ^~~~~~~~~~~
+../src/main.c:845:9: warning: unused variable 'esp8266_weight' [-Wunused-variable]
+     int esp8266_weight = 154;
+         ^~~~~~~~~~~~~~
+../src/main.c:844:9: warning: variable 'avg' set but not used [-Wunused-but-set-variable]
+     int avg;
+         ^~~
+../src/main.c:842:14: warning: variable 'checker' set but not used [-Wunused-but-set-variable]
+     uint32_t checker;
+              ^~~~~~~
+Finished building: ../src/main.c
+ 
+Building target: wherehouse_stm32_firmware.elf
+Invoking: MCU GCC Linker
+arm-none-eabi-gcc -mcpu=cortex-m0 -mthumb -mfloat-abi=soft -T"/home/sam/Documents/senior_design/wherehouse/system/stm32_firmware/LinkerScript.ld" -Wl,-Map=output.map -Wl,--gc-sections -o "wherehouse_stm32_firmware.elf" @"objects.list"   -lm
+Finished building target: wherehouse_stm32_firmware.elf
+ 
+make --no-print-directory post-build
+Generating binary and Printing size information:
+arm-none-eabi-objcopy -O binary "wherehouse_stm32_firmware.elf" "wherehouse_stm32_firmware.bin"
+arm-none-eabi-size "wherehouse_stm32_firmware.elf"
+   text	   data	    bss	    dec	    hex	filename
+  62340	   2604	   7368	  72312	  11a78	wherehouse_stm32_firmware.elf
+ 
+14:22:46 **** Incremental Build of configuration Debug for project wherehouse_stm32_firmware ****
+make -j4 all 
+Building file: ../src/main.c
+Invoking: MCU GCC Compiler
+/home/sam/Documents/senior_design/wherehouse/system/stm32_firmware/Debug
+arm-none-eabi-gcc -mcpu=cortex-m0 -mthumb -mfloat-abi=soft -DSTM32 -DSTM32F0 -DSTM32F091RCTx -DDEBUG -DSTM32F091 -DUSE_STDPERIPH_DRIVER -I"/home/sam/Documents/senior_design/wherehouse/system/stm32_firmware/StdPeriph_Driver/inc" -I"/home/sam/Documents/senior_design/wherehouse/system/stm32_firmware/inc" -I"/home/sam/Documents/senior_design/wherehouse/system/stm32_firmware/CMSIS/device" -I"/home/sam/Documents/senior_design/wherehouse/system/stm32_firmware/CMSIS/core" -O0 -g3 -Wall -fmessage-length=0 -ffunction-sections -c -MMD -MP -MF"src/main.d" -MT"src/main.o" -o "src/main.o" "../src/main.c"
+../src/main.c: In function 'interrupt_getchar':
+../src/main.c:309:17: warning: unused variable 'u' [-Wunused-variable]
+  USART_TypeDef *u = USART5;
+                 ^
+../src/main.c: In function 'parse_configuration':
+../src/main.c:495:10: warning: unused variable 'ignore_list' [-Wunused-variable]
+     char ignore_list[] = {':'}; // Not implemented
+          ^~~~~~~~~~~
+../src/main.c:492:9: warning: variable 'different_flags' set but not used [-Wunused-but-set-variable]
+     int different_flags[] = {0, 0, 0, 0}; // If there's a difference...
+         ^~~~~~~~~~~~~~~
+../src/main.c: In function 'ap_sequence':
+../src/main.c:666:9: warning: unused variable 'errors' [-Wunused-variable]
+     int errors = 0;
+         ^~~~~~
+../src/main.c: In function 'display_ui':
+../src/main.c:688:10: warning: unused variable 'qty_str' [-Wunused-variable]
+     char qty_str[12];
+          ^~~~~~~
+../src/main.c:687:9: warning: unused variable 'failed' [-Wunused-variable]
+     int failed = 0;
+         ^~~~~~
+../src/main.c: In function 'main':
+../src/main.c:1024:13: warning: implicit declaration of function 'wait'; did you mean 'main'? [-Wimplicit-function-declaration]
+             wait(5);
+             ^~~~
+             main
+../src/main.c:850:9: warning: unused variable 'balance' [-Wunused-variable]
+     int balance = 0;
+         ^~~~~~~
+../src/main.c:846:9: warning: unused variable 'item_weight' [-Wunused-variable]
+     int item_weight = 5;
+         ^~~~~~~~~~~
+../src/main.c:845:9: warning: unused variable 'esp8266_weight' [-Wunused-variable]
+     int esp8266_weight = 154;
+         ^~~~~~~~~~~~~~
+../src/main.c:844:9: warning: variable 'avg' set but not used [-Wunused-but-set-variable]
+     int avg;
+         ^~~
+../src/main.c:842:14: warning: variable 'checker' set but not used [-Wunused-but-set-variable]
+     uint32_t checker;
+              ^~~~~~~
+Finished building: ../src/main.c
+ 
+Building target: wherehouse_stm32_firmware.elf
+Invoking: MCU GCC Linker
+arm-none-eabi-gcc -mcpu=cortex-m0 -mthumb -mfloat-abi=soft -T"/home/sam/Documents/senior_design/wherehouse/system/stm32_firmware/LinkerScript.ld" -Wl,-Map=output.map -Wl,--gc-sections -o "wherehouse_stm32_firmware.elf" @"objects.list"   -lm
+Finished building target: wherehouse_stm32_firmware.elf
+ 
+make --no-print-directory post-build
+Generating binary and Printing size information:
+arm-none-eabi-objcopy -O binary "wherehouse_stm32_firmware.elf" "wherehouse_stm32_firmware.bin"
+arm-none-eabi-size "wherehouse_stm32_firmware.elf"
+   text	   data	    bss	    dec	    hex	filename
+  62328	   2604	   7368	  72300	  11a6c	wherehouse_stm32_firmware.elf
  

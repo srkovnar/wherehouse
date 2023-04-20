@@ -11,17 +11,27 @@
 #include <stdio.h>  // for printf()
 #include <stdlib.h> // for atof()
 
-
-#define COMM_DELAY 20 // Number of seconds to wait between commands
 //#define COMM_DELAY 5
 
 //void advance_fattime(void);
 //void command_shell(void);
 
+//const int comm_delay = 20;// Number of seconds to wait between commands
+const int comm_delay = 60;
+
+// PIN DEFINITIONS
+// GPIOC
 const int ESP_CH_EN = (1 << 0);
 const int ESP_RST   = (1 << 1);
 const int ESP_GPIO0 = (1 << 2);
 const int ESP_GPIO2 = (1 << 3);
+
+// GPIOB
+const int B_SET     = (1 << 12); // Middle
+const int B_UP      = (1 << 11); // Middle-Left
+const int B_DOWN    = (1 <<  8); // Middle-Right
+const int B_RESET   = (1 << 10); // Far Left
+const int B_FN      = (1 <<  9); // Far Right
 
 // ID 0 = HALT; means we're done.
 const char* run__ping       = "WF+PING!\n"; // ID 1
@@ -31,6 +41,17 @@ const char* run__disconnect = "WF+DCON!\n"; // ID 4
 const char* run__config     = "WF+CNFG!\n"; // ID 5
 const char* set__stock      = "WF+STCK=";   // ID 6
 const char* run__send       = "WF+SEND!\n"; // ID 7
+const char* get__device_id  = "WF+DVID?\n"; // ID 8
+const char* set__device_id  = "WF+DVID=";
+
+const char* cmd__ping       = "WF+PING";
+const char* cmd__connect    = "WF+CONN";
+const char* cmd__disconnect = "WF+DCON";
+const char* cmd__config     = "WF+CNFG";
+const char* cmd__stock      = "WF+STCK";
+const char* cmd__send       = "WF+SEND";
+const char* cmd__device_id  = "WF+DVID";
+const char* cmd__access_point = "WF+APMD";
 
 int comm_cmd_id = 0;
 
@@ -46,19 +67,30 @@ int next_cmd_id[] = {
 }; // UNUSED
 
 
-int comm_status = 0;
+uint32_t comm_status = 0; // Holds all of the flags used by the comm system.
 const int CF_TRIGGER    = (1 << 0); // Big trigger, raised once every COMM_DELAY seconds.
 const int CF_TRIGGER2   = (1 << 1); // Small trigger, raised every second.
 
-const int CF_WFSTATUS   = (1 << 3); // If HIGH, ESP8266 is in station mode
+const int CF_DO_PING    = (1 << 2); // If HIGH, main lopp will run ping_sequence() until successful (i.e. out of AP mode).
+
+const int CF_ACTIVE     = (1 << 3); // If HIGH, ESP8266 is in station mode
 const int CF_WAITING    = (1 << 4); // If HIGH, a command has been sent and we're waiting for response. (not implemented)
-const int RESET_START   = (1 << 5);
-const int RESET_END     = (1 << 6);
+// Flag bit 5 unused
+// Flag bit 6 unused
 const int CF_GOT_ACK    = (1 << 7);
 const int CF_GOT_NACK   = (1 << 8);
 const int CF_FIFO_NL    = (1 << 9);
-const int CF_ACTIVE     = (1 << 10);
+// Flag bit 10 unused
+const int CF_GOOD_WIFI  = (1 << 13); // Indicates connection to Wi-Fi
+const int CF_GOOD_IP    = (1 << 14); // Indicates connection to the server
+const int CF_UPDATE     = (1 << 11); // Raised when the display should be updated.
+const int CF_DO_STARTUP = (1 << 12); // If HIGH, main loop will run startup_sequence() until successful.
+const int CF_DO_AP_MODE = (1 << 15); // If HIGH, main loop will run ap_sequence() until successful.
+const int CF_DO_RESET   = (1 << 16); // Tell timer to perform a reset
 // ^ This is for saving space on my "status" variable
+
+
+const int qty_update_limit = 5; // If quantity changes by more than this amount, the screen will update.
 
 
 char global_buffer[100];
@@ -77,6 +109,9 @@ int g_shelf_id = 1; // TODO: Make this configurable!
 int global_stock = 10;
 
 int comm_counter; // Increments with 1-Hz timer interrupt up to COMM_DELAY
+
+
+int g_offset = 0;
 
 
 
@@ -98,10 +133,13 @@ int quantity = 0;
 // Configure GPIO Pin mode.
 // x = Pin number (0, 1, 2, etc.)
 // mode = The mode with which to configure the pin
+//      mode = 00 -> Input
+//      mode = 01 -> Output
+//      mode = 10 -> Alternate
+//      mode = 11 -> Analog
 //=====================================================================
 void config_pin(GPIO_TypeDef *g, uint8_t x, uint8_t mode)
 {
-	//INPUT = 00, OUTPUT = 01, ALTERNATE = 10, ANALOG = 11
 	g->MODER &= ~(3 << (x * 2));
 	g->MODER |= mode << (x * 2);
 }
@@ -121,6 +159,18 @@ void config_afr(GPIO_TypeDef *g, uint8_t x, uint8_t afr)
 	}
 	g->AFR[reg] &= ~(0xF << addr);
 	g->AFR[reg] |= afr << addr;
+}
+
+//=====================================================================
+// Configure pullup or pulldown resistor.
+//      pupd = 00 -> Floating
+//      pupd = 01 -> Pull-up
+//      pupd = 10 -> Pull-down
+//      pupd = 11 -> RESERVED (do not use)
+//=====================================================================
+void set_pull(GPIO_TypeDef *g, uint8_t pin, uint8_t pupd) {
+    g->PUPDR &= ~(3 << (pin * 2));
+    g->PUPDR |= (pupd << (pin * 2));
 }
 
 
@@ -215,18 +265,19 @@ void TIM3_IRQHandler(void) {
     TIM3->SR &= ~TIM_SR_UIF;
 
     // Increment secondary counter
-    comm_counter = (comm_counter + 1) % COMM_DELAY;// This counts seconds
+    comm_counter = (comm_counter + 1) % comm_delay;// This counts seconds
     if (comm_counter == 0) {
         comm_status |= CF_TRIGGER; // Start transmission on next loop
     }
 
-//    if (!(comm_status & RESET_START)) {
-//        comm_status |= RESET_START;
-//    }
-
-    if ((comm_status & RESET_START) && !(comm_status & RESET_END)) {
-        GPIOC->ODR  |= ESP_RST;
-        comm_status |= RESET_END; // Raise reset done flag
+    if (comm_status & CF_DO_RESET) {
+        if (GPIOC->ODR & ESP_RST) {
+            comm_status &= ~CF_DO_RESET;
+            GPIOC->ODR &= ~ESP_RST;
+        }
+        else {
+            GPIOC->ODR |= ESP_RST;
+        }
     }
 
     if (fifo_newline(&input_fifo)) {
@@ -317,9 +368,6 @@ void USART3_4_5_6_7_8_IRQHandler(void)
 }
 
 
-// Write your subroutines above.
-
-
 //=====================================================================
 // Wait for either "ACK" or "NACK" from device.
 //
@@ -330,28 +378,6 @@ void USART3_4_5_6_7_8_IRQHandler(void)
 //    1 = ACK
 //   -1 = NACK
 //=====================================================================
-int wait_for_response(const char* cmd) {
-    int status = 0;
-    char cbuf[100];
-
-    int try = 0;
-    int attempts = 3;
-
-    printf(cmd);
-    while ((status == 0) && (try < attempts)) {
-        fgets(cbuf, 99, stdin);
-        cbuf[99] = '\0';
-        if (strcmp(cbuf, "ACK\n") == 0) {
-            status = 1;
-        }
-        else if (strcmp(cbuf, "NACK\n") == 0) {
-            status = -1;
-        }
-        try++;
-    }
-    return status;
-}
-
 int char_response(const char* cmd, char* store_here) {
     int status = 0;
     char cbuf[100];
@@ -399,6 +425,55 @@ int char_response(const char* cmd, char* store_here) {
     return status;
 }
 
+//=====================================================================
+// Command function templates for communication subsystem
+//=====================================================================
+
+//---------------------------------------------------------------------
+// SET Command function for communication.
+//      base_cmd -> Pointer to string in the form "WF+____", to which
+//          '=arg' will be appended.
+//      arg -> Pointer to string of any form to be appended to the
+//          command as the argument.
+//      store_here -> Pointer to location in which to store any
+//          response arguments. This is mostly unused, but is reserved
+//          for future use.
+//          For example, a response of "ACK:0" would result in "0"
+//          being stored at the location [store_here].
+//---------------------------------------------------------------------
+int cmd_set(const char* base_cmd, const char* arg, char* store_here) {
+    char cmd[100] = "";
+    sprintf(cmd, "%s=%s\n", base_cmd, arg); //Convert int stock to string
+
+    int cmd_response = char_response(cmd, store_here);
+
+    return cmd_response;
+}
+
+//---------------------------------------------------------------------
+// GET Command function for communication.
+//---------------------------------------------------------------------
+int cmd_get(const char* base_cmd, char* store_here) {
+    char cmd[100] = "";
+    sprintf(cmd, "%s?\n", base_cmd);
+
+    int cmd_response = char_response(cmd, store_here);
+
+    return cmd_response;
+}
+
+//---------------------------------------------------------------------
+// RUN Command function for communication.
+//---------------------------------------------------------------------
+int cmd_run(const char* base_cmd, char* store_here) {
+    char cmd[100] = "";
+    sprintf(cmd, "%s!\n", base_cmd);
+
+    int cmd_response = char_response(cmd, store_here);
+
+    return cmd_response;
+}
+
 
 //---------------------------------------------------------------------
 // Parse raw text containing "code|item name|unit weight|tare weight"
@@ -414,13 +489,20 @@ void parse_configuration(const char* raw_text) {
     p_buffer[31] = '\0'; // Just in case
 
     char* strplist[] = {g_item_code, g_item_name, g_unit_weight, g_tare_weight};
+    int different_flags[] = {0, 0, 0, 0}; // If there's a difference...
+
     // ^ Avoids if-statements
     char ignore_list[] = {':'}; // Not implemented
 
     //for (int i = 0; i <= strlen(raw_text); i++) {
     for (int i = 1; i <= strlen(raw_text); i++) { //Ignore the first character, it's a colon.
         if (raw_text[i] == delimiter) {
-            strcpy(strplist[k], p_buffer);
+            if (strcmp(strplist[k], p_buffer) != 0) {
+                strcpy(strplist[k], p_buffer);
+                different_flags[k] = 1;
+//                printf("Found a difference");
+                comm_status |= CF_UPDATE;
+            }
             n = 0;
             k++;
         }
@@ -434,6 +516,7 @@ void parse_configuration(const char* raw_text) {
 
     g_unit_value = atof(g_unit_weight);
     g_tare_value = atof(g_tare_weight);
+    //printf("New name: %s", g_item_name);
 
     return;
 }
@@ -453,10 +536,16 @@ void parse_configuration(const char* raw_text) {
 // number. This will put the STM32 back in waiting mode, where it just
 // repeatedly pings the ESP8266 to see if it's ready and connected
 // to WiFi.
+//
+// Return 0 -> Process completed successfully
+// Return 1 -> Wi-Fi connection failed
+// Return 2 -> Failed to connect to server for getting configuration
+// Return 3 -> Setting stock failed     (why would this happen?)
+// Return 4 -> Failed to connect to server for updating stock
 //---------------------------------------------------------------------
 int wifi_sequence(void) {
     int cmd_response;
-    int errors = 0;
+    //int errors = 0;
     char f_buffer[32];
     f_buffer[31] = '\0'; // Just in case
     char cmd[32];
@@ -469,7 +558,7 @@ int wifi_sequence(void) {
     if (cmd_response != 1) {
         cmd_response = char_response(run__connect, f_buffer);
         if (cmd_response != 1) {
-            errors++;
+            return 1;
         }
     }
 
@@ -481,21 +570,22 @@ int wifi_sequence(void) {
 
     cmd_response = char_response(run__config, f_buffer);
     if (cmd_response != 1) {
-        errors++;
+        return 2;
     }
     parse_configuration(f_buffer);
 
     // Stock calculations would happen here
 
-    sprintf(cmd, "%s%d\n", set__stock, saved_quantity); //Convert int stock to string
+//    sprintf(cmd, "%s%d\n", set__stock, saved_quantity); //Convert int stock to string
+    sprintf(cmd, "%s%d\n", set__stock, saved_quantity+g_offset); //Convert int stock to string
     cmd_response = char_response(cmd, f_buffer);
     if (cmd_response != 1) {
-        errors++;
+        return 3;
     }
 
     cmd_response = char_response(run__send, f_buffer);
     if (cmd_response != 1) {
-        errors++;
+        return 4;
     }
 
 //    cmd_response = char_response(run__disconnect, f_buffer);
@@ -503,9 +593,9 @@ int wifi_sequence(void) {
 //        errors++;
 //    }
 
-    if (errors != 0) {
-        return 1;
-    }
+//    if (errors != 0) {
+//        return 1;
+//    }
     else {
         return 0;
     }
@@ -515,24 +605,71 @@ int wifi_sequence(void) {
 // Send PING command; wait for response. Return 0 if we receive ACK;
 // otherwise, return 1 to indicate not ready.
 //---------------------------------------------------------------------
-int check_sequence(void) {
+int ping_sequence(void) {
     int cmd_response;
     int errors = 0;
 
     char f_buffer[32];
     f_buffer[31] = '\0';
 
-    cmd_response = char_response(run__ping, f_buffer);
-//    printf(f_buffer);
+//    cmd_response = char_response(run__ping, f_buffer);
+    cmd_response = cmd_run(cmd__ping, f_buffer);
     if (cmd_response != 1) {
-//        printf("NACK received");
         errors++;
     }
-//    else {
-//        printf("ACK received");
-//    }
 
     if (errors != 0) {
+        return 1;
+    }
+    else {
+        return 0;
+    }
+}
+
+
+//---------------------------------------------------------------------
+// Sequence for when the device first starts up.
+// Right now, this only includes getting Device ID (a.k.a. Shelf ID).
+//---------------------------------------------------------------------
+int startup_sequence(void) {
+    int cmd_response;
+    int errors = 0;
+
+    char f_buffer[32];
+    f_buffer[31] = '\0';
+
+    // Get Device ID
+    cmd_response = cmd_get(cmd__device_id, f_buffer);
+    if (cmd_response != 1) {
+        errors += (1 << 0);
+    }
+    else {
+        g_shelf_id = atoi(f_buffer+1);
+    }
+
+    // Ping.
+//    cmd_response = cmd_run(cmd__ping, f_buffer);
+//    if (cmd_response != 1) {
+//        errors += (1 << 1);
+//    }
+
+    // Return
+    return errors;
+}
+
+//---------------------------------------------------------------------
+// Send ESP8266 back into access point mode (happens if there is WiFi
+// connection but no connection to the server)
+//---------------------------------------------------------------------
+int ap_sequence(void) {
+    int cmd_response;
+    int errors = 0;
+
+    char f_buffer[32];
+    f_buffer[31] = '\0';
+
+    cmd_response = cmd_run(cmd__access_point, f_buffer);
+    if (cmd_response != 1) {
         return 1;
     }
     else {
@@ -556,9 +693,24 @@ void display_ui()
     char item_line[16] = "";
     char quantity_line[16] = "";
 
+
+    if (comm_status & CF_DO_STARTUP) {
+        strcpy(item_line, "Starting...");
+    }
+    else if (comm_status & CF_DO_PING) {
+        strcpy(item_line, "Pinging...");
+    }
+    else if (!(comm_status & CF_GOOD_WIFI)) {
+        strcpy(item_line, "No Wi-Fi");
+    }
+    else if (!(comm_status & CF_GOOD_IP)) {
+        strcpy(item_line, "No Server");
+    }
+    else {
+        sprintf(item_line, "%.15s", g_item_name); // 16 overflows onto the previous line and cuts it off.
+    }
     sprintf(shelf_line, "Shelf ID: %d", g_shelf_id);
-    sprintf(item_line, "%.15s", g_item_name); // 16 overflows onto the previous line and cuts it off.
-    sprintf(quantity_line, "Quantity: %d", saved_quantity);
+    sprintf(quantity_line, "Quantity: %d", saved_quantity+g_offset);
 //    sprintf(quantity_line, "Quantity: %d", quantity);
 
 
@@ -580,33 +732,32 @@ void display_ui()
     DISPLAY_print(9,  80, 1, item_line);
     DISPLAY_print(9, 133, 1, shelf_line);
 
-    if ( (failed = dtostr(quantity, qty_str, 12) )  == -1 || failed == 0)
-    {
-        DISPLAY_clear(0);
-        DISPLAY_print(4, 40, 1, "ERR: Failed to get string rep\0");
-    }
-    else
-    {
-        //DISPLAY_clear(0);
-        DISPLAY_print(160,40, 1, qty_str);
-        //DISPLAY_print(20,150, 1, qty_str);
-        //dtostr(123, qty_str, 12);
-        //DISPLAY_print(5,30, 1, qty_str);
-        //dtostr(1234, qty_str, 12);
-        //DISPLAY_print(5,60, 1, qty_str);
-        //dtostr(12345, qty_str, 12);
-        //DISPLAY_print(5,90, 1, qty_str);
-        //dtostr(123456, qty_str, 12);
-        //DISPLAY_print(5,120, 1, qty_str);
-        //dtostr(0, qty_str, 12);
-        //DISPLAY_print(5,150, 1, qty_str);
-    }
+    // 4/20
+//    if ( (failed = dtostr(quantity, qty_str, 12) )  == -1 || failed == 0)
+//    {
+//        DISPLAY_clear(0);
+//        DISPLAY_print(4, 40, 1, "ERR: Failed to get string rep\0");
+//    }
+//    else
+//    {
+//        //DISPLAY_clear(0);
+//        DISPLAY_print(160,40, 1, qty_str);
+//        //DISPLAY_print(20,150, 1, qty_str);
+//        //dtostr(123, qty_str, 12);
+//        //DISPLAY_print(5,30, 1, qty_str);
+//        //dtostr(1234, qty_str, 12);
+//        //DISPLAY_print(5,60, 1, qty_str);
+//        //dtostr(12345, qty_str, 12);
+//        //DISPLAY_print(5,90, 1, qty_str);
+//        //dtostr(123456, qty_str, 12);
+//        //DISPLAY_print(5,120, 1, qty_str);
+//        //dtostr(0, qty_str, 12);
+//        //DISPLAY_print(5,150, 1, qty_str);
+//    }
 
     DISPLAY_update();
 }
 
-
-//
 
 void init_tim6()
 {
@@ -623,15 +774,35 @@ void init_tim6()
     NVIC->ISER[0] |= 0x1 << 17;
 }
 
+
 void TIM6_DAC_IRQHandler ()
 {
     TIM6->SR &= ~0x1;
-//    if (quantity != previous_quantity)
-//    {
+
+    // From oldest to youngest
+    // AAB -> new value B does not match previous two values;
+    //      do not update yet.
+    // ABB -> new value B matches previous value, but does not match oldest value.
+    //      This indicates a state change, and an update should occur.
+    // ABA -> new value A matches oldest value; the change in the middle value was a fluke.
+    //      No update should occur.
+
+    // ABB
+    if (quantity == previous_quantity) {
+        if (((previous_quantity - saved_quantity) > qty_update_limit) || ((previous_quantity - saved_quantity) < -qty_update_limit)) {
+            display_update_flag = 1;
+            saved_quantity = quantity;
+        }
+    }
+
+
+//    if ((quantity == previous_quantity) && (previous_quantity != saved_quantity)) {
 //        display_update_flag = 1;
+//        saved_quantity = quantity;
 //    }
-    display_update_flag = 1;
 }
+
+
 
 void init_sensors()
 {
@@ -669,13 +840,19 @@ int main()
     uint32_t value;
     uint32_t fixer;
     uint32_t checker;
-    int offset;
+//    int offset = 0;
     int avg;
     int esp8266_weight = 154;
     int item_weight = 5;
     avg = 0;
     fixer = 0x800000;
-    offset = 0;
+
+    int balance = 0;
+
+    int set_button_held = 0;
+    int other_down = 0;
+
+    g_offset = 0;
 
 
     init_sensors();
@@ -698,14 +875,36 @@ int main()
     RCC->AHBENR |= RCC_AHBENR_GPIODEN;
 
     // Step 2) Configure GPIO pins as input or output (or analog or alternate function)
-    config_pin(GPIOC, 0, 1);
-    config_pin(GPIOC, 1, 1);
-    config_pin(GPIOC, 2, 1);
-    config_pin(GPIOC, 3, 1); // I'm not actually using GPIO2 right now, so I'm gonna
+    config_pin(GPIOC,  0, 1);
+    config_pin(GPIOC,  1, 1);
+    config_pin(GPIOC,  2, 1);
+    config_pin(GPIOC,  3, 1); // I'm not actually using GPIO2 right now, so I'm gonna
     // link it to an LED to demo that my timer works.
-    config_pin(GPIOC, 7, 1); // Dev board LED 2 (orange)
-    config_pin(GPIOC, 8, 1); // Dev board LED 3 (green)
-    config_pin(GPIOC, 9, 1); // Dev board LED 4 (blue)
+//    config_pin(GPIOC, 7, 1); // Dev board LED 2 (orange)
+//    config_pin(GPIOC, 8, 1); // Dev board LED 3 (green)
+//    config_pin(GPIOC, 9, 1); // Dev board LED 4 (blue)
+
+
+
+
+
+    // BUTTON CONFIGS
+
+    config_pin(GPIOB, 12, 0);
+    config_pin(GPIOB, 11, 0);
+    config_pin(GPIOB, 10, 0);
+    config_pin(GPIOB,  9, 0);
+    config_pin(GPIOB,  8, 0);
+
+    set_pull(GPIOB, 12, 2);
+    set_pull(GPIOB, 11, 2);
+    set_pull(GPIOB, 10, 2);
+    set_pull(GPIOB,  9, 2);
+    set_pull(GPIOB,  8, 2);
+
+
+
+
 
 
     // Now we can set values to be outputted by the GPIO pins.
@@ -714,7 +913,9 @@ int main()
     GPIOC->ODR |= ESP_GPIO0;
     GPIOC->ODR |= ESP_GPIO2; // Testing using this as CH_EN
 
-    comm_status |= RESET_START; // Signal that reset has been started
+    comm_status |= CF_DO_RESET;     // Handled by timer (1 Hz)
+    comm_status |= CF_DO_STARTUP;   // Handled by main comm loop (1/comm_delay Hz)
+    comm_status |= CF_DO_PING;      // Handled by main comm loop (1/comm_delay Hz)
 
     setup_tim3();
     setup_usart5();
@@ -727,8 +928,6 @@ int main()
 
     global_buffer[99] = '\0';
 
-//    GPIOC->ODR |= ESP_RST;
-//    comm_status |= RESET_END;
 //
 //    RCC->CFGR |= (1 << 0);
 //    RCC->CFGR |= (1 << 1);
@@ -756,7 +955,6 @@ int main()
 
 
     // === MAIN LOOP TEST ===
-    int cstate = 0; //Currently unused
     int result;
 
     for (;;) {
@@ -764,31 +962,61 @@ int main()
         // If not, ping module on every comm cycle until it's ready.
 
         if (comm_status & CF_TRIGGER) {
-//            GPIOC->ODR |= (1<<8);// Turn LED on; comm handling is starting
-            if (comm_status & CF_WFSTATUS) {
+            if (comm_status & CF_DO_STARTUP) {
+                result = startup_sequence();
+                if (result == 0) {
+                    // Lower flag if completed successfully
+                    comm_status &= ~CF_DO_STARTUP;
+                    comm_status |= CF_UPDATE; // Update display to show Shelf ID
+                }
+            }
+            else if (comm_status & CF_DO_AP_MODE) {
+                result = ap_sequence();
+                if (result == 0) {
+                    // Lower flag if completed successfully
+                    comm_status &= ~CF_DO_AP_MODE;
+                    comm_status |= CF_DO_PING;
+                }
+            }
+            else if (comm_status & CF_ACTIVE) {
                 result = wifi_sequence();
-                if (result != 0) {
-                    comm_status &= ~CF_WFSTATUS;
+                if (result == 0) {
+                    comm_status |= CF_GOOD_WIFI;
+                    comm_status |= CF_GOOD_IP;
+                }
+                else if (result == 1) {
+                    comm_status &= ~CF_GOOD_WIFI;
+
+                    comm_status &= ~CF_ACTIVE;
+//                    comm_status |= CF_DO_AP_MODE;
+                    comm_status |= CF_UPDATE;
+                }
+                else if ((result == 2) || (result == 4)) {
+                    comm_status |= CF_GOOD_WIFI;
+                    comm_status &= ~CF_GOOD_IP;
+
+                    comm_status &= ~CF_ACTIVE;
+                    comm_status |= CF_DO_AP_MODE;
+                    comm_status |= CF_UPDATE;
                 }
             }
             else {
-                result = check_sequence();
+                result = ping_sequence();
                 if (result == 0) {
-                    comm_status |= CF_WFSTATUS;
+                    comm_status |= CF_ACTIVE;
+                    comm_status |= CF_GOOD_WIFI;
+                    comm_status &= ~CF_DO_PING;
                 }
             }
 
-//            GPIOC->ODR &= ~(1<<8); // Turn LED off; comm handling is done
             comm_status &= ~CF_TRIGGER; // Lower TRIGGERED flag
         }
 
 
-
-        offset = 0;
         checker = (GPIOB->IDR);
 
 
-        // LOOP 1
+        // LOOP 1: Weight
         while (GPIOB->IDR & (1<<14)){}
         //for (int x = 0; x < 100; x++){
         value = 0;
@@ -810,39 +1038,56 @@ int main()
         //}
         //avg = avg / 100;
         //int show = value;
-        int balance = (value / 15000) - offset;
+
+//        int balance = (value / 15000) - offset;
 
         //Buttons
         if ((GPIOB->IDR & (1<<12))){GPIOC->BSRR = GPIO_ODR_6;}
         if (!(GPIOB->IDR & (1<<12))){GPIOC->BRR = GPIO_ODR_6;}
-        int holder = GPIOB->IDR & (1<<12);
 
-        // LOOP 2
+        // LOOP 2: Buttons
 
-        while (!(holder & (1<<12))){
-            if (!((GPIOB->IDR & (1<<11)))){
-                balance += 1;
-            }
-            if (!((GPIOB->IDR & (1<<11)))){
-                balance -= 1;
-            }
-            if (!((GPIOB->IDR & (1<<9)))){
-                balance = 0;
-            }
-            if (!((GPIOB->IDR & (1<<8)))){
-                offset = value / 15000;
-            }
-            if (!((GPIOB->IDR & (1<<12)))){
-                holder = (1<<12);
-            }
+        // ORDER FROM LEFT TO RIGHT: 10, 11, 12, 8, 9
+        if (GPIOB->IDR & B_SET) {
+            set_button_held = 1;
+            other_down = 0;
+            display_update_flag = 1;
         }
 
+        while(set_button_held) {
+            if (!other_down) {
+                if (GPIOB->IDR & B_UP) {
+                    //offset += 1;
+                    g_offset += 1;
+                    other_down = 1;
+                }
+                else if (GPIOB->IDR & B_DOWN) {
+                    //offset -= 1;
+                    g_offset -= 1;
+                    other_down = 1;
+                }
+                else if (GPIOB->IDR & B_RESET) {
+                    //offset = 0;
+                    g_offset = 0;
+                    other_down = 1;
+                }
+                else if (GPIOB->IDR & B_FN) {
+                    other_down = 1;
+                }
+            }
+            else {
+                if (!(GPIOB->IDR & (B_UP | B_DOWN | B_RESET | B_FN))) {
+                    // Determine if no buttons are pressed.
+                    other_down = 0;
+                }
+            }
 
 
-
-
-
-        //avg = 0;
+            if (!(GPIOB->IDR & B_SET)) {
+                set_button_held = 0;
+            }
+        }
+        other_down = 0;
 
 
 
@@ -850,26 +1095,15 @@ int main()
 //        quantity = ((value)/450 - 18480) / g_unit_value;
 
         previous_quantity = quantity;
-//        quantity = (((value)/450 - 18480) - 6) / g_unit_value;
         quantity = ((value)/450 - 18480) / g_unit_value;
+//        quantity = (((value)/450 - 18480) / g_unit_value) + offset;
 
 
-        // From oldest to youngest
-        // AAB -> new value B does not match previous two values;
-        //      do not update yet.
-        // ABB -> new value B matches previous value, but does not match oldest value.
-        //      This indicates a state change, and an update should occur.
-        // ABA -> new value A matches oldest value; the change in the middle value was a fluke.
-        //      No update should occur.
-
-        if (display_update_flag) {
-            // ABB
-            if ((quantity == previous_quantity) && (previous_quantity != saved_quantity)) {
-                display_ui();
-                saved_quantity = quantity;
-            }
+        if ((display_update_flag) || (comm_status & CF_UPDATE)) {
+            display_ui();
 
             display_update_flag = 0;
+            comm_status &= ~CF_UPDATE;
         }
 
 /*

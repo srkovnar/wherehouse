@@ -1,40 +1,49 @@
-14:15:12 **** Incremental Build of configuration Debug for project wherehouse_stm32_firmware ****
+14:22:46 **** Incremental Build of configuration Debug for project wherehouse_stm32_firmware ****
 make -j4 all 
 Building file: ../src/main.c
 Invoking: MCU GCC Compiler
 /home/sam/Documents/senior_design/wherehouse/system/stm32_firmware/Debug
 arm-none-eabi-gcc -mcpu=cortex-m0 -mthumb -mfloat-abi=soft -DSTM32 -DSTM32F0 -DSTM32F091RCTx -DDEBUG -DSTM32F091 -DUSE_STDPERIPH_DRIVER -I"/home/sam/Documents/senior_design/wherehouse/system/stm32_firmware/StdPeriph_Driver/inc" -I"/home/sam/Documents/senior_design/wherehouse/system/stm32_firmware/inc" -I"/home/sam/Documents/senior_design/wherehouse/system/stm32_firmware/CMSIS/device" -I"/home/sam/Documents/senior_design/wherehouse/system/stm32_firmware/CMSIS/core" -O0 -g3 -Wall -fmessage-length=0 -ffunction-sections -c -MMD -MP -MF"src/main.d" -MT"src/main.o" -o "src/main.o" "../src/main.c"
 ../src/main.c: In function 'interrupt_getchar':
-../src/main.c:258:17: warning: unused variable 'u' [-Wunused-variable]
+../src/main.c:309:17: warning: unused variable 'u' [-Wunused-variable]
   USART_TypeDef *u = USART5;
                  ^
 ../src/main.c: In function 'parse_configuration':
-../src/main.c:418:10: warning: unused variable 'ignore_list' [-Wunused-variable]
+../src/main.c:495:10: warning: unused variable 'ignore_list' [-Wunused-variable]
      char ignore_list[] = {':'}; // Not implemented
           ^~~~~~~~~~~
+../src/main.c:492:9: warning: variable 'different_flags' set but not used [-Wunused-but-set-variable]
+     int different_flags[] = {0, 0, 0, 0}; // If there's a difference...
+         ^~~~~~~~~~~~~~~
+../src/main.c: In function 'ap_sequence':
+../src/main.c:666:9: warning: unused variable 'errors' [-Wunused-variable]
+     int errors = 0;
+         ^~~~~~
 ../src/main.c: In function 'display_ui':
-../src/main.c:583:20: warning: implicit declaration of function 'dtostr'; did you mean 'strstr'? [-Wimplicit-function-declaration]
-     if ( (failed = dtostr(quantity, qty_str, 12) )  == -1 || failed == 0)
-                    ^~~~~~
-                    strstr
+../src/main.c:688:10: warning: unused variable 'qty_str' [-Wunused-variable]
+     char qty_str[12];
+          ^~~~~~~
+../src/main.c:687:9: warning: unused variable 'failed' [-Wunused-variable]
+     int failed = 0;
+         ^~~~~~
 ../src/main.c: In function 'main':
-../src/main.c:796:13: warning: implicit declaration of function 'wait'; did you mean 'main'? [-Wimplicit-function-declaration]
+../src/main.c:1024:13: warning: implicit declaration of function 'wait'; did you mean 'main'? [-Wimplicit-function-declaration]
              wait(5);
              ^~~~
              main
-../src/main.c:759:9: warning: unused variable 'cstate' [-Wunused-variable]
-     int cstate = 0; //Currently unused
-         ^~~~~~
-../src/main.c:675:9: warning: unused variable 'item_weight' [-Wunused-variable]
+../src/main.c:850:9: warning: unused variable 'balance' [-Wunused-variable]
+     int balance = 0;
+         ^~~~~~~
+../src/main.c:846:9: warning: unused variable 'item_weight' [-Wunused-variable]
      int item_weight = 5;
          ^~~~~~~~~~~
-../src/main.c:674:9: warning: unused variable 'esp8266_weight' [-Wunused-variable]
+../src/main.c:845:9: warning: unused variable 'esp8266_weight' [-Wunused-variable]
      int esp8266_weight = 154;
          ^~~~~~~~~~~~~~
-../src/main.c:673:9: warning: variable 'avg' set but not used [-Wunused-but-set-variable]
+../src/main.c:844:9: warning: variable 'avg' set but not used [-Wunused-but-set-variable]
      int avg;
          ^~~
-../src/main.c:671:14: warning: variable 'checker' set but not used [-Wunused-but-set-variable]
+../src/main.c:842:14: warning: variable 'checker' set but not used [-Wunused-but-set-variable]
      uint32_t checker;
               ^~~~~~~
 Finished building: ../src/main.c
@@ -49,8 +58,8 @@ Generating binary and Printing size information:
 arm-none-eabi-objcopy -O binary "wherehouse_stm32_firmware.elf" "wherehouse_stm32_firmware.bin"
 arm-none-eabi-size "wherehouse_stm32_firmware.elf"
    text	   data	    bss	    dec	    hex	filename
-  60888	   2564	   7360	  70812	  1149c	wherehouse_stm32_firmware.elf
+  62328	   2604	   7368	  72300	  11a6c	wherehouse_stm32_firmware.elf
  
 
-14:15:13 Build Finished (took 822ms)
+14:22:47 Build Finished (took 992ms)
 

@@ -467,7 +467,7 @@ int wifi_sequence(void) {
 // Send PING command; wait for response. Return 0 if we receive ACK;
 // otherwise, return 1 to indicate not ready.
 //---------------------------------------------------------------------
-int check_sequence(void) {
+int ping_sequence(void) {
     int cmd_response;
     int resp2;
     int errors = 0;
@@ -680,7 +680,7 @@ int main()
                 }
             }
             else {
-                result = check_sequence();
+                result = ping_sequence();
                 if (result == 0) {
                     comm_status |= CF_WFSTATUS;
                 }

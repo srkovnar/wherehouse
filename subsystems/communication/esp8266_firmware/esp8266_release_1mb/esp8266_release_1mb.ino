@@ -71,7 +71,8 @@ const char* get_data_ext = "/get-esp-data.php";
 String apiKeyValue = "tpmat5ab3j7f9";
 char api_key[32] = "tpmat5ab3j7f9";
 
-char device_id[9] = "74";
+char device_id[9] = "0";
+//uint32_t device_id = 0;
 
 char stock[MAX_STRING_LENGTH] = "0";
 char name[MAX_STRING_LENGTH] = "Widgets"; // Unused
@@ -227,6 +228,37 @@ String html_replacer(const String& var) {
   else {
     return String();
   }
+}
+
+
+int ip_to_int(const char* ip) {
+  int final_value = 0;
+  int buffer = 0;
+
+  for (int n = 0; n < strlen(ip); n++) {
+    if (ip[n] == '.') {
+      final_value = (final_value << 8) + buffer;
+      buffer = 0;
+    }
+    else if ((ip[n] >= 48) && (ip[n] <= 57)) {
+      buffer = (buffer * 10) + (ip[n] - 48);
+    }
+  }
+  final_value = (final_value << 8) + buffer;
+
+  return final_value;
+}
+
+
+void int_to_ip(int ip, char* destination) {
+  int v1 = (ip >> 8*3) & 0xFF;
+  int v2 = (ip >> 8*2) & 0xFF;
+  int v3 = (ip >> 8*1) & 0xFF;
+  int v4 = ip & 0xFF;
+  
+  sprintf(destination, "%d.%d.%d.%d", v1, v2, v3, v4);
+  
+  return;
 }
 
 
@@ -478,14 +510,9 @@ int connect() {
 
 
 int disconnect() {
-  // if (VERBOSE) {Serial.print("Disconnecting...");}
   if (WiFi.status() == WL_CONNECTED) {
     WiFi.disconnect();
   }
-  // if (VERBOSE) {Serial.println("done!");}
-
-
-  // if (VERBOSE) {Serial.print("Now waiting for connection to end...");}
 
   int done;
   int tries = 0;
@@ -540,10 +567,8 @@ int get_config(const char* api_key/*unused*/) {
   char temp_server_name[64] = "";
 
   if (WiFi.status() != WL_CONNECTED) {
-    Serial.println(NACK);
-    // if (VERBOSE) {
-    //   Serial.println("\tERROR: Cannot get config, not connected to WiFi");
-    // }
+    Serial.print(NACK);
+    Serial.println(": Not connected to WiFi");
     return 1; //No Wifi error
   }
 
@@ -564,20 +589,28 @@ int get_config(const char* api_key/*unused*/) {
 
   http.addHeader("Content-Type", "application/x-www-form-urlencoded");
   http.begin(client, full_address);
-  // if (VERBOSE) {Serial.println("\tStarted HTTP successfully!");}
+
+#ifdef VERBOSE
+  Serial.println("\tStarted HTTP successfully!");
+#endif
 
   http_response_code = http.GET();
-  // if (VERBOSE) {Serial.println("\tGET complete");}
+
+#ifdef VERBOSE
+  Serial.print("\tGET complete with response code ");
+  Serial.println(http_response_code);
+#endif
 
   payload = "--";
+
+#ifdef VERBOSE
+  Serial.print("\tInitial payload");
+  Serial.println(payload);
+#endif
 
   if (http_response_code > 0) {
     payload = http.getString();
     payload.trim();
-    // if (VERBOSE) {
-    //   Serial.print("HTTP response code: ");
-    //   Serial.println(http_response_code);
-    // }
     Serial.print(ACK);
     Serial.print(":");
     Serial.println(payload);// Should add the http response code to this in the future, TODO
@@ -649,6 +682,107 @@ int post_stock() {
 }
 
 
+void fetch_memory(
+  char* d_ssid,
+  char* d_pw,
+  char* d_ip,
+  char* d_id
+) {
+  // Fetch wifi connection parameters stored in EEPROM (actually RAM) memory
+  // and update the corresponding char arrays.
+  // d_ssid = destination to store SSID from memory
+  // d_pw = destination to store password from memory
+  // d_ip = destination to store IP address from memory
+  // d_id = String form of Device ID
+
+  int address = EEPROM_START_ADDRESS; //Arbitrary, keep it consistent
+
+  struct {
+    char m_ssid[MAX_SSID_LENGTH+1] = "";
+    char m_pw[MAX_PASSWORD_LENGTH+1] = "";
+    uint32_t m_ip = 0;
+    uint32_t m_id = 0;
+  } wifi_data;
+
+  // Fetch memory information.
+  EEPROM.get(address, wifi_data);
+
+  strcpy(d_ssid, wifi_data.m_ssid);
+  strcpy(d_pw, wifi_data.m_pw);
+  int_to_ip(wifi_data.m_ip, d_ip);
+  sprintf(d_id, "%d", wifi_data.m_id);
+
+  return;
+}
+
+
+void update_memory(
+  const char* new_ssid,
+  const char* new_pw,
+  const char* new_ip,
+  const char* new_id
+) {
+  // Function for updating stored WiFi connection information.
+  // If saved connection information is out-of-date, then update memory.
+  // Remember that memory writes should be limited, because memory has
+  // a limited lifespan. That's why we actually check whether memory needs to be updated;
+  // only write when necessary.
+
+  int ssid_match;
+  int pw_match;
+  int ip_match;
+  int id_match;
+
+  char id_buffer[9] = "";
+
+  int address = EEPROM_START_ADDRESS; // Could be anything within the 512-byte limit defined in setup()
+  
+  struct {
+    // TODO: Remove the +1 if it gets too big, because it's just a null terminator.
+    // It can be assumed. Just load the raw data from memory and slice it up
+    // as necessary. A project for another day.
+    char m_ssid[MAX_SSID_LENGTH+1] = "";
+    char m_pw[MAX_PASSWORD_LENGTH+1] = "";
+    uint32_t m_ip = 0;
+    uint32_t m_id = 0;
+  } wifi_data;
+
+  // Fetch memory information.
+  EEPROM.get(address, wifi_data);
+
+  sprintf(id_buffer, "%d", wifi_data.m_id);
+
+  // Check if data needs to be updated.
+  ssid_match = strcmp(new_ssid, wifi_data.m_ssid);
+  if (ssid_match != 0) {
+    strcpy(wifi_data.m_ssid, new_ssid);
+  }
+  pw_match = strcmp(new_pw, wifi_data.m_pw);
+  if (pw_match != 0) {
+    strcpy(wifi_data.m_pw, new_pw);
+  }
+  ip_match = (wifi_data.m_ip == ip_to_int(new_ip)) ? 0 : 1;
+  if (ip_match != 0) {
+    wifi_data.m_ip = ip_to_int(new_ip);
+  }
+  id_match = strcmp(new_id, id_buffer);
+  if (id_match != 0) {
+    wifi_data.m_id = atoi(new_id);
+  }
+
+  // If any of the info doesn't match, write back to memory.
+  if ((ssid_match != 0) || (pw_match != 0) || (ip_match != 0) || (id_match != 0)) {
+    // Replace values in byte-array cache
+    EEPROM.put(address, wifi_data);
+    // Actually commit values to memory
+    EEPROM.commit();
+  }
+
+  return;
+}
+
+
+
 int handler(const char* cmd) {
   const char* cmd_header = "WF+";
 
@@ -715,7 +849,7 @@ int handler(const char* cmd) {
         out = connect();
         if (out == 0) {
           Serial.println(ACK);
-          update_wifi_memory(ssid, password, server_ip);
+          update_memory(ssid, password, server_ip, device_id);
         }
         else {
           Serial.println(NACK);
@@ -847,125 +981,7 @@ int handler(const char* cmd) {
 }
 
 
-void fetch_wifi_memory(
-  char* d_ssid,
-  char* d_pw,
-  char* d_ip
-) {
-  // Fetch wifi connection parameters stored in EEPROM (actually RAM) memory
-  // and update the corresponding char arrays.
-  // d_ssid = destination to store SSID from memory
-  // d_pw = destination to store password from memory
-  // d_ip = destination to store IP address from memory
 
-  int address = 0; //Arbitrary, keep it consistent
-
-  struct {
-    // TODO: Remove the +1 if it gets too big, because it's just a null terminator.
-    // It can be assumed. Just load the raw data from memory and slice it up
-    // as necessary. A project for another day.
-    char m_ssid[MAX_SSID_LENGTH+1] = "";
-    char m_pw[MAX_PASSWORD_LENGTH+1] = "";
-    uint32_t m_ip = 0;
-  } wifi_data;
-
-
-  // Fetch memory information.
-  EEPROM.get(address, wifi_data);
-
-  strcpy(d_ssid, wifi_data.m_ssid);
-  strcpy(d_pw, wifi_data.m_pw);
-  int_to_ip(wifi_data.m_ip, d_ip);
-
-  return;
-}
-
-
-void update_wifi_memory(
-  const char* new_ssid,
-  const char* new_pw,
-  const char* new_ip
-) {
-  // Function for updating stored WiFi connection information.
-  // If saved connection information is out-of-date, then update memory.
-  // Remember that memory writes should be limited, because memory has
-  // a limited lifespan. That's why we actually check whether memory needs to be updated;
-  // only write when necessary.
-
-  int ssid_match;
-  int pw_match;
-  int ip_match;
-
-  int address = 0; // Could be anything within the 512-byte limit defined in setup()
-  
-  struct {
-    // TODO: Remove the +1 if it gets too big, because it's just a null terminator.
-    // It can be assumed. Just load the raw data from memory and slice it up
-    // as necessary. A project for another day.
-    char m_ssid[MAX_SSID_LENGTH+1] = "";
-    char m_pw[MAX_PASSWORD_LENGTH+1] = "";
-    uint32_t m_ip = 0;
-  } wifi_data;
-
-  // Fetch memory information.
-  EEPROM.get(address, wifi_data);
-
-  // Check if data needs to be updated.
-  ssid_match = strcmp(new_ssid, wifi_data.m_ssid);
-  pw_match = strcmp(new_pw, wifi_data.m_pw);
-  ip_match = (wifi_data.m_ip == ip_to_int(new_ip)) ? 0 : 1;
-
-  if (ssid_match != 0) {
-    strcpy(wifi_data.m_ssid, new_ssid);
-  }
-  if (pw_match != 0) {
-    strcpy(wifi_data.m_pw, new_pw);
-  }
-  if (ip_match != 0) {
-    wifi_data.m_ip = ip_to_int(new_ip);
-  }
-
-  // If any of the info doesn't match, write back to memory.
-  if ((ssid_match != 0) || (pw_match != 0) || (ip_match != 0)) {
-    // Replace values in byte-array cache
-    EEPROM.put(address, wifi_data);
-    // Actually commit values to memory
-    EEPROM.commit();
-  }
-
-  return;
-}
-
-
-int ip_to_int(const char* ip) {
-  int final_value = 0;
-  int buffer = 0;
-
-  for (int n = 0; n < strlen(ip); n++) {
-    if (ip[n] == '.') {
-      final_value = (final_value << 8) + buffer;
-      buffer = 0;
-    }
-    else if ((ip[n] >= 48) && (ip[n] <= 57)) {
-      buffer = (buffer * 10) + (ip[n] - 48);
-    }
-  }
-  final_value = (final_value << 8) + buffer;
-
-  return final_value;
-}
-
-
-void int_to_ip(int ip, char* destination) {
-  int v1 = (ip >> 8*3) & 0xFF;
-  int v2 = (ip >> 8*2) & 0xFF;
-  int v3 = (ip >> 8*1) & 0xFF;
-  int v4 = ip & 0xFF;
-  
-  sprintf(destination, "%d.%d.%d.%d", v1, v2, v3, v4);
-  
-  return;
-}
 
 
 // === MAIN OPERATION STARTS HERE ===
@@ -984,8 +1000,6 @@ void setup() {
   switch_to_station = false;
   switch_to_access = false;
 
-  strcat(local_ssid, device_id);
-
   // Begin UART serial communication
   Serial.begin(115200);
   delay(3000); // Wait to finish plugging in...
@@ -1002,21 +1016,21 @@ void setup() {
   delay(500);
 
   // // Update values from memory
-  fetch_wifi_memory(ssid, password, server_ip);
+  fetch_memory(ssid, password, server_ip, device_id);
   delay(500);
+  
 
   try_to_connect = connect();
 
   if (try_to_connect == 1) { // If failed to connect
     start_as_ap = true;
+    strcat(local_ssid, device_id); // Put device_id in ap name
     g_status &= ~F__READY;
   }
   else {
     start_as_ap = false;
     g_status |= F__READY;
   }
-
-
 
   // === START AP ===
   if (start_as_ap) {
@@ -1054,7 +1068,7 @@ void setup() {
     if (request->arg("fipad").length() > 0) {
       strcpy(server_ip, request->arg("fipad").c_str());
     }
-    update_wifi_memory(ssid, password, server_ip);
+    update_memory(ssid, password, server_ip, device_id);
     request->redirect("/");
   });
   
@@ -1079,7 +1093,7 @@ void loop() {
     if (g_status & F__SW2STAT) {
     //if (switch_to_station) {
       // Make sure connection info is stored in memory
-      update_wifi_memory(ssid, password, server_ip);
+      update_memory(ssid, password, server_ip, device_id);
 
       // Turn off the server and connect to a network
       enter_station_mode(ssid, password);

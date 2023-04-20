@@ -2,20 +2,20 @@
 <section name="Workbench">
 	<section name="org.eclipse.ui.texteditor.FindReplaceDialog">
 		<item value="false" key="isRegEx"/>
-		<item value="display_ui" key="selection"/>
+		<item value="quantity" key="selection"/>
 		<item value="false" key="casesensitive"/>
 		<item value="false" key="incremental"/>
 		<item value="true" key="wrap"/>
 		<item value="false" key="wholeword"/>
 		<list key="findhistory">
-			<item value="display_ui"/>
-			<item value="dtostr"/>
-			<item value="printf"/>
-			<item value="100"/>
-			<item value="GPIOC"/>
-			<item value="RCC_CFGR2"/>
-			<item value="RCC_AHBENR_GPIOCEN"/>
-			<item value="check_sequence"/>
+			<item value="quantity"/>
+			<item value="offset"/>
+			<item value="RESET_END"/>
+			<item value="RESET_START"/>
+			<item value="CF_ACTIVE"/>
+			<item value="CF_WFSTATUS"/>
+			<item value="COMM_DELAY"/>
+			<item value="cmd_set"/>
 		</list>
 		<list key="replacehistory">
 		</list>
